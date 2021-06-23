@@ -1,0 +1,20 @@
+body{
+    background-color: aquamarine;
+    overflow: hidden;
+}
+img{
+    position: absolute;
+    width: 150px;
+    height: 150px;
+}
+
+h1 {
+    position: absolute;
+    top: 2.5em;
+    left: 5em;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 6em;
+    width: auto;
+    line-height: .8em;
+    padding: .2em;
+  }
