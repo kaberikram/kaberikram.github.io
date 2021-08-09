@@ -21,7 +21,23 @@ body
     display: none;
 }
 
-#instructions {
+#description {
+    width: 100%;
+    height: 100%;
+    color: antiquewhite;
+
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+
+#instructions2 {
     width: 100%;
     height: 100%;
     color: antiquewhite;
