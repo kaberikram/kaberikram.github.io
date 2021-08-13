@@ -32,6 +32,35 @@ body
     font-size: 14px;
     cursor: pointer;
 }
+#description2 {
+    width: 100%;
+    height: 100%;
+    color: antiquewhite;
+
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#description3 {
+    width: 100%;
+    height: 100%;
+    color: antiquewhite;
+
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+}
 
 
 #instructions2 {
