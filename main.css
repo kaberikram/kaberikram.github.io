@@ -68,7 +68,7 @@ body
     height: 100%;
     color: antiquewhite;
 
-    display: flnoneex;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
