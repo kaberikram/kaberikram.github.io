@@ -1,0 +1,107 @@
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body
+{
+    overflow: hidden;
+}
+
+#blocker {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+
+#description {
+    width: 100%;
+    height: 100%;
+    color: antiquewhite;
+
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+}
+#description2 {
+    width: 100%;
+    height: 100%;
+    color: antiquewhite;
+
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#description3 {
+    width: 100%;
+    height: 100%;
+    color: antiquewhite;
+
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+
+#instructions2 {
+    width: 100%;
+    height: 100%;
+    color: antiquewhite;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#overlay1 {
+    width: 20%;
+    height: 50%;
+    border: 1px solid black;
+    color: antiquewhite;
+    /* //margin-top: 500px;
+margin-bottom: 100px; */
+    margin-left: 1300px;
+    margin-top: 400px;
+    background-color: rgba(0,0,0,0.5);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: absolute;
+    display: none;
+}
+.webgl
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+}
+
+
+/*# sourceMappingURL=main.css.map*/
