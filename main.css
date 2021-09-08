@@ -9,10 +9,42 @@ body {
 }
 
 iframe {
-  width: 80%;
-  height: 80%;
-  position: relative;
-  top: 0%;
+  position: absolute;
+  width: 40%;
+  height: 50%;
+  top: 20%;
+  left: 10%;
+  margin: auto;
+}
+
+iframe {
+  border-width: 0px;
+  border-style: inset;
+  border-color: initial;
+  border-image: initial;
+}
+
+.collapsible {
+  position: absolute;
+  width: 2.5%;
+  right: 2%;
+  top: 2%;
+  z-index: 2;
+}
+
+.close {
+  position: absolute;
+  width: 2.5%;
+  right: 2%;
+  top: 2%;
+  z-index: 2;
+}
+
+.collapsible img {
+  width: 100%;
+  height: 100%;
+  margin-top: 0.07vw;
+  margin-bottom: 0.07vw;
 }
 
 #blocker {
@@ -37,6 +69,18 @@ iframe {
   top: 35%;
   left: 10%;
 }
+
+.blocker-right-bio {
+  height: 80vh;
+  width: 500px;
+  margin-right: 60px;
+  word-break: break-word;
+  position: absolute;
+  top: 20%;
+  right: 15%;
+}
+
+
 .blocker-right {
   height: 80vh;
   position: absolute;
@@ -44,6 +88,7 @@ iframe {
   right: 15%;
   top: 35%
 }
+
 .blocker-controls {
   min-height: 180px;
   height: 15vh;
@@ -54,6 +99,7 @@ iframe {
   flex-direction: column;
   justify-content: flex-end;
 }
+
 .controls-row {
   display: flex;
   justify-content: space-between;
@@ -77,13 +123,16 @@ iframe {
   max-width: 170px;
   margin-bottom: 10px;
 }
+
 .wasd .key:first-child {
   margin: 0px 59px;
   clear: both;
 }
+
 .escape .key {
   margin: 35px 0 35px;
 }
+
 .key {
   width: 20px;
   height: 20px;
@@ -94,12 +143,14 @@ iframe {
   margin: 5px 2.5px;
   font-style: italic;
 }
+
 .mouse-lockup {
   margin: 11px 0 21px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .mouse-arrow-left {
   width: 0;
   height: 0;
@@ -107,6 +158,7 @@ iframe {
   border-width: 5px 10px 5px 0;
   border-color: transparent #ffffff transparent transparent;
 }
+
 .mouse-arrow-left:after {
   content: "";
   width: 10px;
@@ -116,6 +168,7 @@ iframe {
   margin-top: -1px;
   margin-left: 6px;
 }
+
 .mouse-body {
   width: 34px;
   border: 3px solid #fff;
@@ -124,6 +177,7 @@ iframe {
   padding: 11px 11px;
   margin: 0 13px;
 }
+
 .mouse-wheel {
   background-color: #fff;
   width: 5px;
@@ -133,6 +187,7 @@ iframe {
   position: relative;
   left: 40%;
 }
+
 .mouse-arrow-right {
   width: 0;
   height: 0;
@@ -140,6 +195,7 @@ iframe {
   border-width: 5px 0 5px 10px;
   border-color: transparent transparent transparent #ffffff;
 }
+
 .mouse-arrow-right:after {
   content: "";
   width: 10px;
@@ -166,9 +222,66 @@ iframe {
   margin: 0 0 10px;
 }
 
+.blocker-room-bio {
+  min-height: 245px;
+  height: 15vh;
+  width: 200vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  transition: 1s border-color;
+  align-items: flex-start;
+}
+
+.blocker-room-bio h1 {
+  font-size: 28px;
+  margin: 0 0 2vw;
+}
+
 .blocker-statement {
   margin-top: 40px;
   overflow: auto;
+}
+
+.blocker-statement-bio {
+  margin-top: 40px;
+  /* overflow: auto; */
+}
+
+.blocker-statement-bio p {
+  width: 27%;
+  text-align: justify;
+}
+
+.profilephoto {
+  width: 19%;
+  position: absolute;
+  top: -1%;
+  right: 0;
+}
+
+.profilephoto img {
+  width: 100%;
+  height: 100%;
+}
+
+.artworkphoto {
+  width: 19%;
+  position: relative;
+  top: 5%;
+  right: 0;
+}
+
+.artworkphoto img {
+  width: 100%;
+  height: 100%;
+}
+
+.closebtn {
+  position: absolute;
+  top: -7%;
+  right: -4%;
+  font-size: 1.2vw;
 }
 
 .description {
@@ -194,12 +307,27 @@ iframe {
   flex-direction: column;
   height: 20vh;
 }
+
 #instructions2 p {
   font-size: 0.45vw;
 }
+
 #blockerdetails {
   display: flex;
 }
+
+#limkokBio {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+
+#roopeshBio {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+
 .enter-gallery {
   font-family: aktiv-grotesk-extended, "Helvetica Neue", "Arial", sans-serif;
   background-color: rgba(255, 255, 255, 0.2);
@@ -306,6 +434,7 @@ iframe {
   font-size: 0.7vw;
   z-index: 2;
 }
+
 #logo p {
   font-size: 0.55vw;
 }
@@ -357,6 +486,5 @@ iframe {
   left: 0;
   outline: none;
 }
-
 
 /*# sourceMappingURL=main.css.map*/
