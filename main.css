@@ -1,0 +1,519 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  overflow: hidden;
+}
+
+iframe {
+  position: absolute;
+  width: 40%;
+  height: 50%;
+  top: 20%;
+  left: 10%;
+  margin: auto;
+}
+
+iframe {
+  border-width: 0px;
+  border-style: inset;
+  border-color: initial;
+  border-image: initial;
+}
+
+.collapsible {
+  position: absolute;
+  width: 2.5%;
+  right: 2%;
+  top: 2%;
+  z-index: 2;
+}
+
+.close {
+  position: absolute;
+  width: 2.5%;
+  right: 2%;
+  top: 2%;
+  z-index: 2;
+}
+
+.collapsible img {
+  width: 100%;
+  height: 100%;
+  margin-top: 0.07vw;
+  margin-bottom: 0.07vw;
+}
+
+#blocker {
+  position: absolute;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 0 1em 0;
+  transition: 1s background-color;
+}
+
+.blocker-left {
+  height: 80vh;
+  width: 500px;
+  margin-right: 60px;
+  word-break: break-word;
+  position: absolute;
+  top: 35%;
+  left: 10%;
+}
+
+.blocker-right-bio {
+  height: 80%;
+    width: 24%;
+    margin-right: auto;
+    word-break: break-word;
+    position: absolute;
+    top: 15%;
+    right: 18%;
+}
+
+
+.blocker-right {
+  height: 80vh;
+  position: absolute;
+  width: 580px;
+  right: 15%;
+  top: 35%
+}
+
+.blocker-controls {
+  min-height: 180px;
+  height: 15vh;
+  margin-bottom: 40px;
+  border-bottom: 1px solid #666;
+  padding-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.controls-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column;
+  margin: 0px 10px;
+}
+
+.control-headline {
+  margin-bottom: 3px;
+}
+
+.keys {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 170px;
+  margin-bottom: 10px;
+}
+
+.wasd .key:first-child {
+  margin: 0px 59px;
+  clear: both;
+}
+
+.escape .key {
+  margin: 35px 0 35px;
+}
+
+.key {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #fff;
+  border-radius: 5px;
+  padding: 13px;
+  font-size: 10px;
+  margin: 5px 2.5px;
+  font-style: italic;
+}
+
+.mouse-lockup {
+  margin: 11px 0 21px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mouse-arrow-left {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 10px 5px 0;
+  border-color: transparent #ffffff transparent transparent;
+}
+
+.mouse-arrow-left:after {
+  content: "";
+  width: 10px;
+  height: 2px;
+  background-color: #fff;
+  display: block;
+  margin-top: -1px;
+  margin-left: 6px;
+}
+
+.mouse-body {
+  width: 34px;
+  border: 3px solid #fff;
+  height: 60px;
+  border-radius: 25px;
+  padding: 11px 11px;
+  margin: 0 13px;
+}
+
+.mouse-wheel {
+  background-color: #fff;
+  width: 5px;
+  height: 16px;
+  border-radius: 9px;
+  /* align-items: center; */
+  position: relative;
+  left: 40%;
+}
+
+.mouse-arrow-right {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 0 5px 10px;
+  border-color: transparent transparent transparent #ffffff;
+}
+
+.mouse-arrow-right:after {
+  content: "";
+  width: 10px;
+  height: 2px;
+  background-color: #fff;
+  display: block;
+  margin-top: -1px;
+  margin-left: -16px;
+}
+
+.blocker-room {
+  min-height: 180px;
+  height: 15vh;
+  width: 200vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  transition: 1s border-color;
+  align-items: flex-start;
+}
+
+.blocker-room-bio {
+  /* min-height: 245px; */
+  height: 36%;
+    width: 100%;
+    display: block;
+  /* flex-direction: column;
+  justify-content: flex-end;
+  transition: 1s border-color;
+  align-items: flex-start; */
+}
+
+.blocker-room-bio h1 {
+  font-size: 1.7vw;
+  width: 80%;
+  margin: 0 0 1vw;
+}
+
+.blocker-room-bio p {
+  font-size: 0.8vw;
+  margin: 0 0 0.2vw;
+}
+
+.blocker-statement {
+  margin-top: 40px;
+  overflow: auto;
+}
+
+.blocker-statement-bio {
+  margin-top: 1.5vw;
+  /* overflow: auto; */
+}
+
+.blocker-statement-bio p {
+  width: 100%;
+  font-size: 0.8vw;
+  text-align: justify;
+}
+
+.profilephoto {
+  width: 19%;
+  position: absolute;
+  top: 1%;
+  right: 0;
+}
+
+.profilephoto img {
+  width: 100%;
+  height: 100%;
+}
+
+.artworkphoto {
+  width: 50%;
+  position: relative;
+  top: 5%;
+  right: 0;
+}
+
+.artworkphoto img {
+  width: 100%;
+  height: 100%;
+}
+
+.artwork_enlarge {
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 0;
+  display: none;
+}
+
+.kokyoongart {
+  display: block;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  margin-top: 2%;
+}
+
+.kokyoongart img {
+  width: 80%;
+}
+
+.closebtn {
+  position: absolute;
+  top: -6%;
+  right: -4%;
+  font-size: 1.2vw;
+  cursor: pointer;
+}
+
+.description {
+  width: 100%;
+  height: 100%;
+  color: rgb(207, 121, 8);
+  position: absolute;
+  left: 20%;
+
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+  font-size: 0.7vw;
+  cursor: pointer;
+}
+
+#instructions2 {
+  width: 95%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 160vh;
+}
+
+#instructions2 p {
+  font-size: 0.45vw;
+}
+
+#blockerdetails {
+  display: flex;
+}
+
+#limkokBio {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+
+#roopeshBio {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+
+.enter-gallery {
+  font-family: aktiv-grotesk-extended, "Helvetica Neue", "Arial", sans-serif;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 20px 65px;
+  border-radius: 3px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 20px;
+}
+
+#limKokYong {
+  display: none;
+  width: 50%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  right: -33vw;
+}
+
+#roopesh {
+  display: none;
+  width: 50%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  right: -33vw;
+}
+
+.spacer {
+  height: 10%;
+}
+
+#artimage {
+  position: relative;
+  width: 34%;
+  height: 50%;
+  left: -0.5vw;
+  margin-bottom: -1.5vw;
+  top: -1.5vw
+}
+
+#artimage img {
+  width: 100%;
+  height: 100%;
+}
+
+#artName {
+  height: 6%;
+  width: 34%;
+  z-index: 1;
+  top: 0%;
+  right: 1%;
+  background-color: #111;
+  overflow: hidden;
+  border: none;
+  color: antiquewhite;
+  background-color: rgba(0, 0, 0, 0);
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  display: block;
+}
+
+#artistName {
+  height: 6%;
+  width: 34%;
+  z-index: 1;
+  top: 0%;
+  right: 1%;
+  background-color: #111;
+  overflow: hidden;
+  border: none;
+  color: antiquewhite;
+  background-color: rgba(0, 0, 0, 0);
+  flex-direction: column;
+  justify-content: center;
+
+  position: relative;
+  display: block;
+}
+
+#artDetail {
+  height: 37%;
+  width: 34%;
+  z-index: 1;
+  top: 0%;
+  right: 1%;
+  background-color: #111;
+  overflow: hidden;
+  border: none;
+  color: antiquewhite;
+  background-color: rgba(0, 0, 0, 0);
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  display: block;
+}
+
+#logo {
+  color: antiquewhite;
+  position: absolute;
+  top: 1.5vw;
+  left: 1.5vw;
+  font-size: 0.7vw;
+  z-index: 2;
+}
+
+#logo p {
+  font-size: 0.55vw;
+}
+
+#artBio {
+  padding: 1em;
+  width: 100%;
+  height: 35%;
+  margin-bottom: 0;
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  display: flex;
+  align-items: center;
+  font-size: 0.65vw;
+  padding-bottom: 1.5em;
+  /* margin-bottom: 0.5vw; */
+  /* margin-top: 0.5vw;*/
+}
+
+#artBioLong {
+  padding: 1em;
+  width: 100%;
+  height: 65%;
+  margin-bottom: 0;
+  background-color: #ffffff;
+  border: none;
+  display: flex;
+  text-justify: auto;
+  align-items: center;
+  margin-top: 0.5vw;
+}
+
+#artBioLong p {
+  width: 80%;
+  color: #000000;
+  font-size: 0.65vw;
+}
+
+#artBio p {
+  width: 80%;
+  color: #000000;
+  font-size: 0.75vw;
+}
+
+.webgl {
+  position: fixed;
+  top: 0;
+  left: 0;
+  outline: none;
+}
+
+/*# sourceMappingURL=main.css.map*/
