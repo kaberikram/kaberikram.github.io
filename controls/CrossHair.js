@@ -1,1 +1,0 @@
-import*as THREE from"three";export function addCrossHair(o){const e=new THREE.Mesh(new THREE.RingGeometry(.01,.014,12),new THREE.MeshBasicMaterial({color:16777215,opacity:.7,transparent:!0,side:THREE.DoubleSide}));e.position.x=0*o.aspect,e.position.y=0,e.position.z=-1,o.add(e)}
