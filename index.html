@@ -1,1 +1,47 @@
-<!doctype html><html lang="en"><head><title>three.js - pointerlock controls</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,user-scalable=no,minimum-scale=1,maximum-scale=1"><script src="https://kit.fontawesome.com/6c2b708adc.js" crossorigin="anonymous"></script><style>#blocker{position:absolute;width:100%;height:100%;background-color:rgba(0,0,0,.6)}#instructions{top:0;width:100%;height:100%;display:-webkit-box;display:-moz-box;display:box;-webkit-box-orient:horizontal;-moz-box-orient:horizontal;box-orient:horizontal;-webkit-box-pack:center;-moz-box-pack:center;box-pack:center;-webkit-box-align:center;-moz-box-align:center;box-align:center;color:#fff;text-align:center;font-family:Arial;font-size:14px;line-height:24px;cursor:pointer}</style><script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script defer="defer" src="bundle.5a2bd44ce2b69639f885.js"></script><link href="main.css" rel="stylesheet"></head><body><section id="loading"><div id="loader" class="load"><span>0% Loading...</span></div></section><div id="blocker"><div id="instructions"><span style="font-size:36px">Click to Enter the Town</span><br/><br/>Move: WASD /↑→↓←/TOUCH on Arrows right bottom<br/>Look: MOUSE/TOUCH</div></div><p id="controller-forward"><i class="fal fa-arrow-circle-up"></i></p><p id="controller-right"><i class="fal fa-arrow-circle-left"></i></p><p id="controller-back"><i class="fal fa-arrow-circle-down"></i></p><p id="controller-left"><i class="fal fa-arrow-circle-right"></i></p><script>var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);isMobile&&(document.getElementById("instructions").style.display="none",document.getElementById("blocker").style.display="none")</script><video id="video1" style="display:none"></video><video id="video2" style="display:none"></video><video id="video3" style="display:none"></video></body></html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ikramHakim?</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Code+Latin&display=swa" rel="stylesheet">
+</head>
+
+<body>
+
+    <a target="_self" href="kaberikram.github.io" style="text-decoration : none">
+        <div id="main" onmousemove="m(event)">
+            <div id="hov">Creative Technologist?</div>
+            <div class="alangkah-text">
+                <span style="--i:1;">i</span>
+                <span style="--i:2;">k</span>
+                <span style="--i:3;">r</span>
+                <span style="--i:4;">a</span>
+                <span style="--i:5;">m</span>
+                <span style="--i:6;"> - </span>
+                <span style="--i:7;">h</span>
+                <span style="--i:8;">a</span>
+                <span style="--i:9;">k</span>
+                <span style="--i:10;">i</span>
+                <span style="--i:11;">m</span>
+            </div>
+        </div>
+    </a>
+
+    <div id="hov">Click Anywhere To Start</div>
+    <script>
+        function custom(event) {
+            var el = document.getElementById("hov");
+            el.style.top = event.clientY + "px";
+            el.style.left = event.clientX + "px";
+        }
+
+        document.getElementById("main").addEventListener('mousemove', custom);
+    </script>
+
+</body>
+
+</html>
