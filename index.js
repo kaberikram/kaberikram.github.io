@@ -84,11 +84,6 @@ function initWebCam() {
 
   const option = {
     video: true,
-    // video: {
-    //     deviceId: "hogehoge",
-    //     width: { ideal: 1280 },
-    //     height: { ideal: 720 }
-    // },
     audio: false,
   };
 
@@ -97,13 +92,14 @@ function initWebCam() {
     .getUserMedia(option)
     .then(function (stream) {
       webCam.srcObject = stream;
+      webCam.play(); // Start playing the video
       createParticles();
     })
     .catch(function (e) {
       alert("ERROR: " + e.message);
-      // console.error('ERROR:', e.message);
     });
 }
+
 
 function getImageData(image) {
   const w = image.width;
