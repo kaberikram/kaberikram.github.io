@@ -8,50 +8,93 @@
     <title>ikramHakim?</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Code+Latin&display=swa" rel="stylesheet">
-</head>
-
-<link rel="stylesheet" href="./style.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r110/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r110/examples/js/loaders/GLTFLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r110/examples/js/controls/OrbitControls.js"></script>
-<script src="./index.js"></script>
-</head>
-<body>
-<canvas id="myCanvas"></canvas>
-</body>
-
-<body>
-
-    <a target="_self" href="https://opensea.io/collection/lifeordepth" style="text-decoration : none">
-        <div id="main" onmousemove="m(event)">
-            <div id="hov">Creative Technologist?</div>
-            <div class="alangkah-text">
-                <span style="--i:1;">i</span>
-                <span style="--i:2;">k</span>
-                <span style="--i:3;">r</span>
-                <span style="--i:4;">a</span>
-                <span style="--i:5;">m</span>
-                <span style="--i:6;"> - </span>
-                <span style="--i:7;">h</span>
-                <span style="--i:8;">a</span>
-                <span style="--i:9;">k</span>
-                <span style="--i:10;">i</span>
-                <span style="--i:11;">m</span>
-            </div>
-        </div>
-    </a>
-
-    <div id="hov">Click Anywhere To Start</div>
-    <script>
-        function custom(event) {
-            var el = document.getElementById("hov");
-            el.style.top = event.clientY + "px";
-            el.style.left = event.clientX + "px";
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            position: relative;
         }
 
-        document.getElementById("main").addEventListener('mousemove', custom);
-    </script>
+        canvas {
+            display: block;
+        }
 
+        #textOverlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-family: "M PLUS Code Latin", sans-serif;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+    </style>
+</head>
+
+<body onclick="window.open('https://instagram.com/kaberikram', '_blank')">
+    <div id="textOverlay" class="typing-animation">Hi! I'm a Creative Technologist based in Malaysia.</div>
+    <canvas id="myCanvas"></canvas>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r110/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r110/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r110/examples/js/controls/OrbitControls.js"></script>
+    <script src="./index.js"></script>
+
+    <script>
+        window.addEventListener("load", init); // Wait for loading
+        window.addEventListener("resize", onResize); // When window resized
+
+        // Existing code goes here...
+
+        // Typing animation
+        const textOverlay = document.querySelector("#textOverlay");
+        const text = "Hi! I'm a Creative Technologist based in Malaysia.";
+
+        function typeText() {
+            let index = 0;
+            const type = () => {
+                textOverlay.textContent = text.substr(0, index++);
+                if (index <= text.length) {
+                    setTimeout(type, 100);
+                } else {
+                    setTimeout(erase, 1000);
+                }
+            };
+
+            const erase = () => {
+                textOverlay.textContent = text.substr(0, index--);
+                if (index >= 0) {
+                    setTimeout(erase, 50);
+                } else {
+                    setTimeout(type, 1000);
+                }
+            };
+
+            type();
+        }
+
+        typeText();
+
+        // Cursor-following text
+        const cursorText = document.createElement("div");
+        cursorText.textContent = "click = interlink";
+        cursorText.style.position = "absolute";
+        cursorText.style.pointerEvents = "none";
+        cursorText.style.userSelect = "none";
+        cursorText.style.fontSize = "16px";
+        cursorText.style.fontFamily = "sans-serif";
+        cursorText.style.color = "white";
+        cursorText.style.transform = "translate(-50%, -50%)";
+        document.body.appendChild(cursorText);
+
+        document.addEventListener("mousemove", (event) => {
+            const x = event.clientX;
+            const y = event.clientY;
+            cursorText.style.left = x + "px";
+            cursorText.style.top = y + "px";
+        });
+    </script>
 </body>
 
 </html>

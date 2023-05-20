@@ -166,10 +166,10 @@ function createParticles() {
         type: "f",
         value: 5.0,
       },
-      // texture: {
-      //     type: 't',
-      //     value: hoge
-      // }
+      texture: {
+        type: "t",
+        value: new THREE.VideoTexture(webCam),
+      },
     },
     vertexShader: vertexSource,
     fragmentShader: fragmentSource,
@@ -179,7 +179,6 @@ function createParticles() {
   });
 
   particles = new THREE.Points(geometry, material);
-  
   particles.position.set(0, 0, 0);
   scene.add(particles);
 }
@@ -197,15 +196,13 @@ function drawParticles(t) {
       const gray = (r + g + b) / 3;
 
       particles.geometry.attributes.position.setY(i, gray * 20);
-      particles.geometry.attributes.color.setX(i, g);
+      particles.geometry.attributes.color.setX(i, r);
       particles.geometry.attributes.color.setY(i, g);
-      particles.geometry.attributes.color.setZ(i, g);
+      particles.geometry.attributes.color.setZ(i, b);
     }
     particles.geometry.attributes.position.needsUpdate = true;
-    particles.geometry.attributes.color.needsUpdate = true;function rotate(){
-        particles.rotation.z += 0.003  
-    }
-    rotate()
+    particles.geometry.attributes.color.needsUpdate = true;
+    
   }
 }
 
@@ -240,24 +237,18 @@ void main() {
     // gl_PointSize = size;
 
     // Set vertex position
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
 
 const fragmentSource = `
 varying vec3 vColor;
 varying float vGray;
+uniform sampler2D texture;
+
 void main() {
-    float gray = vGray;
-
-    // Decide whether to draw particle
-    if(gray > 0.3){
-        gray = 0.0;
-    }else{
-        gray = 1.0;
-    }
-
-    // Set vertex color
-    gl_FragColor = vec4(vColor, gray);
+    // Set fragment color
+    gl_FragColor = vec4(vColor, 1.0) * texture2D(texture, gl_PointCoord);
+    // gl_FragColor = vec4(vColor, 1.0) * vGray * 0.5;
 }
 `;
