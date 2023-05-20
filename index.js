@@ -87,18 +87,27 @@ function initWebCam() {
     audio: false,
   };
 
+  // Add touch event listener for mobile devices
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const startVideoPlayback = function () {
+    if (isMobile && webCam.paused) {
+      webCam.play();
+    }
+  };
+  document.addEventListener("touchstart", startVideoPlayback, { once: true });
+
   // Get image from camera
   media = navigator.mediaDevices
     .getUserMedia(option)
     .then(function (stream) {
       webCam.srcObject = stream;
-      webCam.play(); // Start playing the video
       createParticles();
     })
     .catch(function (e) {
       alert("ERROR: " + e.message);
     });
 }
+
 
 
 function getImageData(image) {
