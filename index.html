@@ -19,6 +19,34 @@
             display: block;
         }
 
+        .draggableDiv {
+            position: absolute;
+            z-index: 9;
+            background-color: transparent;
+            /* Set background color to transparent */
+            text-align: center;
+            font-family: "M PLUS Code Latin", sans-serif;
+            color: white;
+            /* Set text color to white */
+            transform: translate(-10%, -10%);
+        }
+
+        .draggableDiv .draggableDivHeader {
+            cursor: grab;
+        }
+
+        .draggableDiv.dragging {
+            cursor: grabbing;
+        }
+
+        .gifImage {
+            width: 100px;
+            /* Set the width of the GIF */
+            height: auto;
+            /* Maintain aspect ratio */
+        }
+
+
         #textOverlay {
             position: absolute;
             top: 50%;
@@ -32,9 +60,23 @@
     </style>
 </head>
 
-<body onclick="window.open('https://instagram.com/kaberikram', '_blank')">
+<body>
     <div id="textOverlay" class="typing-animation">Hi! I'm a Creative Technologist based in Malaysia.</div>
     <canvas id="myCanvas"></canvas>
+    <!-- First draggable GIF -->
+    <div class="draggableDiv" id="draggableDiv1" style="top: 70%; left: 70%;">
+        <div class="draggableDivHeader">reality-knob 1</div>
+        <img class="gifImage" src="gifs/test.gif" alt="Your GIF 1">
+    </div>
+
+    <!-- Second draggable GIF -->
+    <div class="draggableDiv" id="draggableDiv2" style="top: 15%; left: 20%;">
+        <div class="draggableDivHeader">reality-knob 2</div>
+        <img class="gifImage" src="gifs/test.gif" alt="Your GIF 2">
+    </div>
+
+    <!-- Repeat this pattern for the rest of the GIFs -->
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r110/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r110/examples/js/loaders/GLTFLoader.js"></script>
@@ -42,6 +84,55 @@
     <script src="./index.js"></script>
 
     <script>
+
+        // Make the DIV elements draggable:
+        document.querySelectorAll(".draggableDiv").forEach(function (elmnt) {
+            dragElement(elmnt);
+        });
+
+        function dragElement(elmnt) {
+            var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            var header = elmnt.querySelector(".draggableDivHeader");
+
+            if (header) {
+                header.onmousedown = dragMouseDown;
+            } else {
+                elmnt.onmousedown = dragMouseDown;
+            }
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                // get the mouse cursor position at startup:
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                // call a function whenever the cursor moves:
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                // calculate the new cursor position:
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                // set the element's new position:
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                // stop moving when mouse button is released:
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+
+
         window.addEventListener("load", init); // Wait for loading
         window.addEventListener("resize", onResize); // When window resized
 
@@ -78,7 +169,7 @@
 
         // Cursor-following text
         const cursorText = document.createElement("div");
-        cursorText.textContent = "click = interlink";
+        cursorText.textContent = "mouse?";
         cursorText.style.position = "absolute";
         cursorText.style.pointerEvents = "none";
         cursorText.style.userSelect = "none";
