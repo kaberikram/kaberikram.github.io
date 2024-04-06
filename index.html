@@ -29,6 +29,8 @@
             color: white;
             /* Set text color to white */
             transform: translate(-10%, -10%);
+            cursor: grab;
+
         }
 
         .draggableDiv .draggableDivHeader {
@@ -64,19 +66,48 @@
     <div id="textOverlay" class="typing-animation">Hi! I'm a Creative Technologist based in Malaysia.</div>
     <canvas id="myCanvas"></canvas>
     <!-- First draggable GIF -->
-    <div class="draggableDiv" id="draggableDiv1" style="top: 70%; left: 70%;">
-        <div class="draggableDivHeader">reality-knob 1</div>
-        <img class="gifImage" src="gifs/test.gif" alt="Your GIF 1">
+    <div class="draggableDiv" id="draggableDiv1" style="top: 70%; left: 75%;">
+        <div class="draggableDivHeader">reality-knob</div>
+        <img class="gifImage" src="gifs/realityKnob.gif" alt="tangibleARControl">
     </div>
 
-    <!-- Second draggable GIF -->
     <div class="draggableDiv" id="draggableDiv2" style="top: 15%; left: 20%;">
-        <div class="draggableDivHeader">reality-knob 2</div>
-        <img class="gifImage" src="gifs/test.gif" alt="Your GIF 2">
+        <div class="draggableDivHeader">hand-type</div>
+        <img class="gifImage" src="gifs/handtype.gif" alt="type with your hands?">
     </div>
+
+    <div class="draggableDiv" id="draggableDiv3" style="top: 15%; left: 75%;">
+        <div class="draggableDivHeader">reality-knob-2</div>
+        <img class="gifImage" src="gifs/realityknob2.gif" alt="tangibleARControl">
+    </div>
+
+    <div class="draggableDiv" id="draggableDiv4" style="top: 70%; left: 20%;">
+        <div class="draggableDivHeader">Dyson-AR</div>
+        <img class="gifImage" src="gifs/dyson.gif" alt="Vacuum AR Simulation">
+    </div>
+    
+    <div class="draggableDiv" id="draggableDiv5" style="top: 70%; left: 50%;">
+        <div class="draggableDivHeader">hand-tact</div>
+        <img class="gifImage" src="gifs/handtact.gif" alt="tactile tabletop AR">
+    </div>
+
+    <div class="draggableDiv" id="draggableDiv3" style="top: 15%; left: 50%;">
+        <div class="draggableDivHeader">location-based-AR</div>
+        <img class="gifImage" src="gifs/shoot.gif" alt="shooter based AR">
+    </div>
+
+    <div class="draggableDiv" id="draggableDiv1" style="top: 50%; left: 85%;">
+        <div class="draggableDivHeader">contact</div>
+        <p style="font-size: 16px; font-family: 'M PLUS Code Latin', sans-serif; color: white; text-align: left;">
+            <a href="https://instagram.com/kaberikram" target="_blank" style="color: white;">@kaberikram</a><br>
+            <a href="mailto:ikramandhakim@gmail.com" style="color: white;">ikramandhakim@gmail.com</a>
+        </p>
+    </div>
+    
+    
+
 
     <!-- Repeat this pattern for the rest of the GIFs -->
-
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r110/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r110/examples/js/loaders/GLTFLoader.js"></script>
@@ -92,7 +123,7 @@
 
         function dragElement(elmnt) {
             var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            var header = elmnt.querySelector(".draggableDivHeader");
+            var header = elmnt.querySelector(".draggableDiv");
 
             if (header) {
                 header.onmousedown = dragMouseDown;
@@ -167,24 +198,7 @@
 
         typeText();
 
-        // Cursor-following text
-        const cursorText = document.createElement("div");
-        cursorText.textContent = "mouse?";
-        cursorText.style.position = "absolute";
-        cursorText.style.pointerEvents = "none";
-        cursorText.style.userSelect = "none";
-        cursorText.style.fontSize = "16px";
-        cursorText.style.fontFamily = "sans-serif";
-        cursorText.style.color = "white";
-        cursorText.style.transform = "translate(-50%, -50%)";
-        document.body.appendChild(cursorText);
-
-        document.addEventListener("mousemove", (event) => {
-            const x = event.clientX;
-            const y = event.clientY;
-            cursorText.style.left = x + "px";
-            cursorText.style.top = y + "px";
-        });
+ 
     </script>
 </body>
 
