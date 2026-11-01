@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ikram Hakim — Lab</title>
+  <meta name="description" content="A live personal lab of Ikram Hakim's XR and creative-tech interactions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/lab.css">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="../">Ikram Hakim</a>
+    <nav class="nav" aria-label="Site">
+      <a href="../">Home</a>
+      <a href="../progress/">Progress</a>
+      <a href="./" aria-current="page">Lab</a>
+      <a href="mailto:ikramandhakim@gmail.com">Email</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <header class="intro">
+      <p class="kicker">Lab</p>
+      <h1>Live tiles, one clock.</h1>
+      <p class="lede">Playable sketches of Ikram's XR and web work. Drag time and the whole grid listens.</p>
+    </header>
+
+    <section class="grid" aria-label="Interactive lab tiles">
+      <article class="tile tile-time">
+        <div class="tile-stage time-stage" id="time-stage">
+          <div class="time-head">
+            <div>
+              <h2>Bend time</h2>
+              <p>One slider. Every tile reacts.</p>
+            </div>
+            <div class="time-readout" aria-live="off">
+              <span id="time-clock">06:43</span>
+              <span id="time-frame">f.028</span>
+            </div>
+          </div>
+          <div class="ruler" id="ruler">
+            <div class="ruler-track" aria-hidden="true">
+              <div class="ruler-ticks" id="ruler-ticks"></div>
+              <div class="ruler-line" id="ruler-line"></div>
+            </div>
+            <input id="time-slider" type="range" min="0" max="1000" value="280" step="1" aria-label="Bend time">
+          </div>
+        </div>
+      </article>
+
+      <article class="tile tile-frame">
+        <div class="tile-stage" id="frame-stage">
+          <div class="parallax" id="frame-parallax">
+            <div class="parallax-layer layer-back" id="frame-back"></div>
+            <div class="parallax-layer layer-front" id="frame-front"></div>
+          </div>
+          <div class="capture" id="capture">
+            <span class="capture-pill" id="capture-pill">104 × 84</span>
+            <button class="capture-handle" id="capture-handle" type="button" aria-label="Resize capture frame"></button>
+          </div>
+        </div>
+        <footer class="tile-cap">
+          <h2>Frame capture</h2>
+          <p>Drag a corner. The pill is live.</p>
+        </footer>
+      </article>
+
+      <article class="tile tile-peel">
+        <div class="tile-stage" id="peel-stage">
+          <div class="peel-well" aria-hidden="true"></div>
+          <div class="sticker" id="sticker">
+            <div class="sticker-photo"></div>
+            <div class="sticker-curl" id="sticker-curl" aria-hidden="true"></div>
+            <button class="sticker-handle" id="sticker-handle" type="button" aria-label="Peel sticker corner"></button>
+          </div>
+        </div>
+        <footer class="tile-cap">
+          <h2>Sticker peel</h2>
+          <p>Pull a corner, drop to stick. Double-click resets.</p>
+        </footer>
+      </article>
+
+      <article class="tile tile-slit">
+        <div class="tile-stage">
+          <canvas id="slit-canvas" aria-label="Slit-scan of a room"></canvas>
+        </div>
+        <footer class="tile-cap">
+          <h2>Slit-scan</h2>
+          <p>Time smears the room into a strip.</p>
+        </footer>
+      </article>
+
+      <article class="tile tile-warp">
+        <div class="tile-stage">
+          <canvas id="warp-canvas" aria-label="Warped room"></canvas>
+        </div>
+        <footer class="tile-cap">
+          <h2>Warped room</h2>
+          <p>The space stretches with the clock.</p>
+        </footer>
+      </article>
+
+      <article class="tile tile-light">
+        <div class="tile-stage">
+          <canvas id="light-canvas" aria-label="Day to night sky"></canvas>
+        </div>
+        <footer class="tile-cap">
+          <h2>Light</h2>
+          <p>Daylight folds into night.</p>
+        </footer>
+      </article>
+
+      <article class="tile tile-ambient">
+        <div class="tile-stage" id="ambient-stage">
+          <div class="sheets" id="sheets" aria-hidden="true"></div>
+          <div class="frame-counter" id="frame-counter">
+            <span class="fc-label">REC</span>
+            <span id="fc-value">00:00:12.04</span>
+          </div>
+        </div>
+        <footer class="tile-cap">
+          <h2>Depth sheets</h2>
+          <p>A quiet loop, still listening to time.</p>
+        </footer>
+      </article>
+    </section>
+  </main>
+
+  <script type="module" src="js/lab.js"></script>
+</body>
+</html>
