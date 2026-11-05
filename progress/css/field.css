@@ -1,5 +1,6 @@
-/* Field trip, v25.17. Visual defaults match the prototype's final cascade.
-   Live tune values arrive as custom properties from settings.js. */
+/* Field trip, v25.17 plus liquid-glass slab retune.
+   Live tune values arrive as custom properties from settings.js.
+   html.lean-gpu (coarse pointer or max-width 768) uses cheaper tile chrome. */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -47,8 +48,10 @@ a { color: inherit; text-decoration: none; }
   background: transparent;
   transform-style: preserve-3d;
   backface-visibility: hidden;
-  will-change: transform;
 }
+
+html:not(.lean-gpu) .tile,
+html.lean-gpu .tile.foc { will-change: transform; }
 
 .pic {
   position: absolute;
@@ -60,6 +63,7 @@ a { color: inherit; text-decoration: none; }
 
 .lens { position: absolute; inset: -7%; }
 .tile.gc .lens { inset: 0; }
+html.lean-gpu .lens { inset: -3.5%; }
 
 .im {
   position: absolute;
@@ -92,55 +96,26 @@ a { color: inherit; text-decoration: none; }
   color: #8c8f89;
 }
 
-.halo {
-  position: absolute;
-  inset: 30px;
-  border-radius: var(--r, 37px);
-  z-index: -1;
-  pointer-events: none;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 14px 26px -16px rgba(0, 0, 0, 0.32);
-}
-
-.tile.foc .halo {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.06), 0 26px 40px -22px rgba(0, 0, 0, 0.42);
-}
-
 .ir {
   position: absolute;
   inset: 30px;
   border-radius: var(--r, 37px);
   pointer-events: none;
-  mix-blend-mode: overlay;
-  opacity: calc(0.5 * var(--tile-rim, 1));
-  background: conic-gradient(from calc(200deg + var(--dx, 0) * 6deg) at 50% 50%, #ff9a9e00 0deg, #a0c4ff 40deg, #bdb2ff 80deg, #ffc6ff 115deg, #fdffb6 150deg, #caffbf 190deg, #9bf6ff 230deg, #a0c4ff 270deg, #ffd6a5 310deg, #bdb2ff 360deg);
-  -webkit-mask: linear-gradient(90deg, #000, transparent 8%, transparent 92%, #000), linear-gradient(#000, transparent 10%, transparent 90%, #000);
-  mask: linear-gradient(90deg, #000, transparent 8%, transparent 92%, #000), linear-gradient(#000, transparent 10%, transparent 90%, #000);
-}
-
-.tile.foc .ir { opacity: calc(0.8 * var(--tile-rim, 1)); }
-
-.tile.foc .pic::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  border-radius: inherit;
-  background: conic-gradient(from calc(20deg + var(--dx, 0) * 6deg + var(--dy, 0) * 4deg), rgba(160, 196, 255, 0), rgba(160, 196, 255, 0.35), rgba(189, 178, 255, 0.3), rgba(255, 198, 255, 0.22), rgba(202, 255, 191, 0.25), rgba(155, 246, 255, 0.35), rgba(160, 196, 255, 0));
   mix-blend-mode: screen;
-  -webkit-mask: radial-gradient(70% 70% at 50% 50%, transparent 86%, #000 100%);
-  mask: radial-gradient(70% 70% at 50% 50%, transparent 86%, #000 100%);
-  opacity: calc(0.3 * var(--tile-rim, 1));
+  opacity: calc(0.42 * var(--tile-rim, 1));
+  background: linear-gradient(90deg, rgba(255, 72, 64, 0.7), rgba(255, 72, 64, 0) 16%, rgba(48, 210, 255, 0) 84%, rgba(48, 210, 255, 0.7));
+  -webkit-mask: linear-gradient(90deg, #000, transparent 10%, transparent 90%, #000), linear-gradient(#000, transparent 12%, transparent 88%, #000);
+  mask: linear-gradient(90deg, #000, transparent 10%, transparent 90%, #000), linear-gradient(#000, transparent 12%, transparent 88%, #000);
 }
+
+.tile.foc .ir { opacity: calc(0.62 * var(--tile-rim, 1)); }
 
 .gl {
   position: absolute;
   inset: 30px;
   border-radius: var(--r, 37px);
   pointer-events: none;
-  background:
-    var(--spec, none) center / 100% 100% no-repeat,
-    linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  background: linear-gradient(rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.012));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.75),
     inset 0 -1px 0 rgba(255, 255, 255, 0.4),
@@ -150,12 +125,39 @@ a { color: inherit; text-decoration: none; }
 }
 
 .tile.foc .gl {
+  background:
+    var(--spec, none) center / 100% 100% no-repeat,
+    linear-gradient(rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.012));
   box-shadow:
     inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
     inset 0 -1px 0 rgba(255, 255, 255, 0.6),
     inset 1px 0 0 rgba(255, 255, 255, 0.3),
     inset -1px 0 0 rgba(255, 255, 255, 0.3),
     inset 0 0 0 0.75px rgba(0, 0, 0, 0.16);
+}
+
+html.lean-gpu .ir {
+  mix-blend-mode: normal;
+  opacity: calc(0.9 * var(--tile-rim, 1));
+  background: none;
+  -webkit-mask: none;
+  mask: none;
+  box-shadow:
+    inset 2px 0 0 rgba(255, 80, 70, 0.45),
+    inset -2px 0 0 rgba(60, 210, 255, 0.45);
+}
+
+html.lean-gpu .tile.foc .ir {
+  opacity: 1;
+  box-shadow:
+    inset 2px 0 0 rgba(255, 80, 70, 0.55),
+    inset -2px 0 0 rgba(60, 210, 255, 0.55);
+}
+
+html.lean-gpu .tile.foc .gl {
+  background:
+    linear-gradient(125deg, rgba(255, 255, 255, calc(0.22 * var(--tile-spec, 0.7))) 0%, rgba(255, 255, 255, 0) 38%),
+    linear-gradient(rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.012));
 }
 
 .glc {
@@ -329,8 +331,8 @@ html.caption-glass .g {
 }
 
 html.caption-glass .cap .l {
-  color: rgba(255, 240, 230, 0.88);
-  -webkit-text-fill-color: rgba(255, 240, 230, 0.88);
+  color: var(--cap-sub, rgba(255, 240, 230, 0.88));
+  -webkit-text-fill-color: var(--cap-sub, rgba(255, 240, 230, 0.88));
   background: none;
   filter: none;
 }
@@ -344,8 +346,8 @@ html.noglass.caption-glass[data-vig="none"] .g {
 
 html.nocap.caption-glass .g,
 html.noglass.caption-glass .g {
-  color: #fff6f0;
-  -webkit-text-fill-color: #fff6f0;
+  color: var(--cap-ink, #fff6f0);
+  -webkit-text-fill-color: var(--cap-ink, #fff6f0);
 }
 
 html.caption-pastel .g,

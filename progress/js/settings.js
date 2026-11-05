@@ -1,7 +1,9 @@
-// Live look settings. Defaults reproduce v25.17 (Rothko field, white glass caption).
-// The v25.16 preset switches the bottom field to black and the caption to the pastel gradient.
+// Live look settings. Defaults are v25.17 Rothko plus the liquid-glass slab retune
+// (thicker rim, chromatic split, quieter specular). v25.16 still spreads DEFAULTS
+// and only overrides the black-field / pastel caption keys.
 
 const STORAGE_KEY = 'ikram-progress-field-v1'
+const LEAN_QUERY = '(max-width: 768px), (pointer: coarse)'
 
 export const DEFAULTS = {
   pageBg: '#F3F4F1',
@@ -22,9 +24,9 @@ export const DEFAULTS = {
   captionStyle: 'glass',
   fontWeight: 650,
   fontScale: 1,
-  glassStrength: 1,
-  rimIntensity: 1,
-  specular: 1,
+  glassStrength: 0.85,
+  rimIntensity: 1.15,
+  specular: 0.7,
   pastelAmount: 0.05,
   pastel1: '#F2B394',
   pastel2: '#EDD98C',
@@ -32,12 +34,12 @@ export const DEFAULTS = {
   pastel4: '#99BDED',
   bloom: 1,
   motionSpeed: 1,
-  warp: 1,
-  tileRim: 1,
+  warp: 1.4,
+  tileRim: 1.25,
   radiusRatio: 0.28,
-  gap: 56,
+  gap: 44,
   curvature: 0.95,
-  focusScale: 0.14,
+  focusScale: 0.12,
 }
 
 const V25_16 = {
@@ -113,12 +115,27 @@ export function reducedMotion() {
   return matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
+export function isLeanGpu() {
+  return matchMedia(LEAN_QUERY).matches
+}
+
+export function canvasDpr() {
+  const cap = isLeanGpu() ? 1.5 : 2
+  return Math.min(cap, devicePixelRatio || 1)
+}
+
+export function pageHidden() {
+  return document.hidden
+}
+
 export function effectMotion() {
+  if (pageHidden()) return 0
   if (reducedMotion() && !motionUnlocked) return 0
   return state.motionSpeed
 }
 
 export function breatheSeconds() {
+  if (pageHidden()) return 0
   if (reducedMotion() && !motionUnlocked) return 0
   return state.breatheSpeed
 }
@@ -145,6 +162,36 @@ export function hexVec(hex) {
 function luminance(hex) {
   const [r, g, b] = hexRgb(hex)
   return r * 0.299 + g * 0.587 + b * 0.114
+}
+
+function fieldCaptionLum(s) {
+  const parts = [
+    [s.rothko1, s.bloom1 * 0.35],
+    [s.rothko2, s.bloom2],
+    [s.rothko3, s.bloom3],
+    [s.rothko4, s.bloom4 * 0.55],
+  ]
+  let sum = 0
+  let weight = 0
+  for (const [hex, w] of parts) {
+    sum += luminance(hex) * w
+    weight += w
+  }
+  return weight ? sum / weight : luminance(s.pageBg)
+}
+
+function captionSubInk(s) {
+  if (s.vignetteMode === 'none') return 'rgba(98,101,95,0.88)'
+  if (s.vignetteMode === 'black') return 'rgba(255,240,230,0.88)'
+  if (fieldCaptionLum(s) > 125) return 'rgba(42,16,14,0.82)'
+  return 'rgba(255,240,230,0.88)'
+}
+
+function captionFillInk(s) {
+  if (s.vignetteMode === 'none') return '#62655f'
+  if (s.vignetteMode === 'black') return '#fff6f0'
+  if (fieldCaptionLum(s) > 125) return '#3a1814'
+  return '#fff6f0'
 }
 
 function clamp(n, min, max) {
@@ -242,16 +289,20 @@ export function applyCss() {
   root.style.setProperty('--page', s.pageBg)
   root.style.setProperty('--cap-w', String(s.fontWeight))
   root.style.setProperty('--tile-rim', String(s.tileRim))
+  root.style.setProperty('--tile-spec', String(s.specular))
   root.style.setProperty('--pastel-img', pastelImage(s))
   root.style.setProperty('--pastel-sat', (0.45 + 0.55 * s.rimIntensity).toFixed(3))
   root.style.setProperty('--pastel-hi', (0.2 * s.specular).toFixed(3))
   root.style.setProperty('--drift', still ? '0s' : `${11 / Math.max(s.motionSpeed, 0.05)}s`)
+  root.style.setProperty('--cap-sub', captionSubInk(s))
+  root.style.setProperty('--cap-ink', captionFillInk(s))
   root.dataset.vig = s.vignetteMode
   root.classList.toggle('caption-glass', s.captionStyle === 'glass')
   root.classList.toggle('caption-pastel', s.captionStyle === 'pastel')
   root.classList.toggle('is-still', still)
   root.classList.toggle('allow-motion', motionUnlocked || !reducedMotion())
   root.classList.toggle('page-dark', luminance(s.pageBg) < 150)
+  root.classList.toggle('lean-gpu', isLeanGpu())
   paintField(s)
 }
 
@@ -324,6 +375,11 @@ export function bootSettings() {
   if (preset === 'black' || preset === 'v25.16') state = { ...PRESETS['v25.16 Black'] }
   if (preset === 'rothko' || preset === 'v25.17') state = { ...PRESETS['v25.17 Rothko'] }
   applyCss()
+  document.addEventListener('visibilitychange', () => {
+    applyCss()
+    emit()
+  })
+  addEventListener('resize', () => applyCss())
 }
 
 export function wantsDebug() {

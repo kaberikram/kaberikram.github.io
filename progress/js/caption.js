@@ -2,7 +2,7 @@
 // Pastel-gradient (v25.16) is CSS background-clip text plus an SVG displacement / bloom filter.
 // Both read the same live settings.
 
-import { effectMotion, getSettings, hexVec, subscribe } from './settings.js'
+import { canvasDpr, effectMotion, getSettings, hexVec, isLeanGpu, pageHidden, subscribe } from './settings.js'
 
 const VS = `attribute vec2 a;varying vec2 v;void main(){v=a*.5+.5;v.y=1.-v.y;gl_Position=vec4(a,0.,1.);}`
 
@@ -17,7 +17,9 @@ vec3 pastel(vec2 u,float t){vec3 c=vec3(0.);float w=0.;
 vec3 rawField(vec2 u,float t){if(uMode<.5)return uPage;if(uMode<1.5){float y=smoothstep(.1,1.,u.y);return mix(uPage,uBlack,y);}
  float y=u.y;vec3 c=mix(uC1,uC2,smoothstep(.35,.85,y+.06*sin(u.x*5.+t*.3)));c=mix(c,uC3,smoothstep(.8,1.1,y));
  vec3 hi=mix(uC1,vec3(.98,.78,.62),.55);c=mix(c,hi,smoothstep(.25,.0,y)*.6);float sw=.5+.5*sin(u.x*9.+t*.4+sin(y*6.));return c*(.92+.12*sw);}
-vec3 back(vec2 u,float t){vec3 wht=vec3(.985,.975,.965);float frost=uMode<.5?.9:.72;return mix(rawField(u,t),wht,frost)+(pastel(u,t)-.75)*uPastel;}
+vec3 back(vec2 u,float t){vec3 fld=rawField(u,t);float lum=dot(fld,vec3(.2126,.7152,.0722));float k=smoothstep(.18,.58,lum);
+ vec3 ink=mix(vec3(.99,.97,.94),vec3(.17,.07,.08),k);float frost=uMode<.5?.9:mix(.82,.52,k);
+ return mix(fld,ink,frost)+(pastel(u,t)-.75)*uPastel;}
 void main(){vec2 px=1./res;float m=texture2D(M,v).a;float h=texture2D(B,v).a;
  float hx=texture2D(B,v+vec2(px.x*1.5,0.)).a-texture2D(B,v-vec2(px.x*1.5,0.)).a;
  float hy=texture2D(B,v+vec2(0.,px.y*1.5)).a-texture2D(B,v-vec2(0.,px.y*1.5)).a;
@@ -78,6 +80,8 @@ export function initCaption() {
   let drew = false
   let started = 0
   let frozenTime = 3
+  let lastDrawKey = ''
+  let captionFrozen = false
 
   function painter() {
     if (!gl) return null
@@ -179,7 +183,19 @@ export function initCaption() {
     return [...document.querySelectorAll('.cap')].find((el) => el.style.opacity !== '0' && el.querySelector('.g'))
   }
 
+  function lineSettled(title) {
+    const line = title.querySelector('.ln')
+    if (!line) return true
+    const tr = getComputedStyle(line).transform
+    if (!tr || tr === 'none') return true
+    const match = tr.match(/matrix\(([^)]+)\)/)
+    if (!match) return true
+    const n = match[1].split(',').map(Number)
+    return Math.abs(n[0] - 1) < 0.02 && Math.abs(n[1]) < 0.02 && Math.abs(n[2]) < 0.02 && Math.abs(n[3] - 1) < 0.02
+  }
+
   function sync() {
+    if (pageHidden()) return
     updateSvg()
     if (!ready || !gpu) return
     const s = getSettings()
@@ -198,7 +214,12 @@ export function initCaption() {
     const rect = title.getBoundingClientRect()
     const cssW = Math.ceil(rect.width + PAD * 2)
     const cssH = Math.ceil(rect.height + PAD * 2)
-    const dpr = Math.min(2, devicePixelRatio || 1)
+    const dpr = canvasDpr()
+    const motion = isLeanGpu() ? 0 : effectMotion()
+    const drawKey = `${title.textContent}|${Math.round(rect.left)}|${Math.round(rect.top)}|${cssW}x${cssH}`
+    if (drawKey !== lastDrawKey) captionFrozen = false
+    if (isLeanGpu() && drew && drawKey === lastDrawKey && captionFrozen) return
+    lastDrawKey = drawKey
     canvas.style.left = `${rect.left - PAD}px`
     canvas.style.top = `${rect.top - PAD}px`
     canvas.style.width = `${cssW}px`
@@ -248,13 +269,23 @@ export function initCaption() {
     blurCtx.filter = 'none'
     gpu.upload(0, mask)
     gpu.upload(1, blur)
-    const motion = effectMotion()
     const time = motion <= 0.01 ? frozenTime : (performance.now() - started) / 1000 * motion
     gpu.draw(width, height, dpr, time)
     drew = true
+    if (isLeanGpu()) {
+      const fading = [...title.querySelectorAll('.ch')].some((el) => {
+        const op = parseFloat(getComputedStyle(el).opacity)
+        return !Number.isFinite(op) || op < 0.995
+      })
+      captionFrozen = !fading && lineSettled(title)
+    }
   }
 
-  subscribe(() => updateSvg())
+  subscribe(() => {
+    lastDrawKey = ''
+    captionFrozen = false
+    updateSvg()
+  })
 
   const fonts = document.fonts
     ? document.fonts.load('650 42px Inter').then(() => document.fonts.ready)
