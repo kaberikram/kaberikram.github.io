@@ -2,7 +2,7 @@
 // a sphere projection, a forward pop on the focused tile, and depth blur toward the rim.
 
 import { GREY, codeAt, imgUrl, workByCode, LINE } from './works.js'
-import { effectMotion, getSettings } from './settings.js'
+import { effectMotion, getSettings, isLeanGpu, pageHidden } from './settings.js'
 
 function escapeHtml(value) {
   return value.replace(/[&<>"']/g, (ch) => ({
@@ -54,6 +54,7 @@ export function initScene({ glass, caption }) {
   let py = 0
   let pt = 0
   let moved = 0
+  let looping = false
 
   function metrics() {
     const s = getSettings()
@@ -104,11 +105,11 @@ export function initScene({ glass, caption }) {
     if (work.im) {
       const url = imgUrl(work.im)
       el.className = `tile${GREY.has(code) ? ' grey' : ''}`
-      el.innerHTML = `<div class="pic"><div class="lens"><div class="im" data-src="${url}" style="background-image:url(&quot;${url}&quot;)"></div></div></div><div class="ir"></div><div class="gl"></div><div class="halo"></div>`
+      el.innerHTML = `<div class="pic"><div class="lens"><div class="im" data-src="${url}" style="background-image:url(&quot;${url}&quot;)"></div></div></div><div class="ir"></div><div class="gl"></div>`
       glass.bindTile(el)
     } else {
       el.className = 'tile ty'
-      el.innerHTML = `<div class="pic"><b>${escapeHtml(work.t)}</b><span class="m">picture soon</span></div><div class="ir"></div><div class="gl"></div><div class="halo"></div>`
+      el.innerHTML = `<div class="pic"><b>${escapeHtml(work.t)}</b><span class="m">picture soon</span></div><div class="ir"></div><div class="gl"></div>`
     }
     cell.blur = -1
     cell.sized = ''
@@ -254,6 +255,11 @@ export function initScene({ glass, caption }) {
   }
 
   function frame() {
+    if (pageHidden()) {
+      looping = false
+      return
+    }
+    looping = true
     const now = performance.now()
     const m = metrics()
     const need = Math.ceil(innerWidth / m.S) + 4 !== NC || Math.ceil(innerHeight / m.SY) + 4 !== NR
@@ -266,6 +272,16 @@ export function initScene({ glass, caption }) {
       }
       x += (tx - x) * 0.11
       y += (ty - y) * 0.11
+    }
+    const camSettled = Math.hypot(tx - x, ty - y) < 0.2 && Math.hypot(x - ox, y - oy) < 0.12
+    if (!need && isLeanGpu() && !dragging && camSettled && focusedEl) {
+      toneType()
+      glass.sync({ focusedEl, x, y })
+      caption.sync()
+      ox = x
+      oy = y
+      requestAnimationFrame(frame)
+      return
     }
     const ci = Math.floor(x / m.S)
     const cj = Math.floor(y / m.SY)
@@ -305,7 +321,7 @@ export function initScene({ glass, caption }) {
         const rotY = Math.atan(1.25 * Math.tan(clamp(ax, -1.4, 1.4))) * 57.3
         const rotX = -Math.atan(1.25 * Math.tan(clamp(ay, -1.4, 1.4))) * 57.3
         cell.e.style.transform = `translate3d(${X.toFixed(1)}px,${Y.toFixed(1)}px,${Z.toFixed(1)}px) rotateY(${rotY.toFixed(2)}deg) rotateX(${rotX.toFixed(2)}deg) scale(${sc.toFixed(3)})`
-        const blur = Math.min(6, Math.floor(d / (m.S * 0.9)))
+        const blur = isLeanGpu() ? 0 : Math.min(6, Math.floor(d / (m.S * 0.9)))
         if (blur !== cell.blur || GREY.has(code)) {
           cell.blur = blur
           const parts = []
@@ -337,7 +353,7 @@ export function initScene({ glass, caption }) {
     }
     const frameVx = x - ox
     const frameVy = y - oy
-    if (focusedEl) {
+    if (focusedEl && !isLeanGpu()) {
       let tdx = clamp(frameVx * 0.5, -9, 9)
       let tdy = clamp(frameVy * 0.5, -9, 9)
       if (pointerX !== null) {
@@ -451,6 +467,10 @@ export function initScene({ glass, caption }) {
   addEventListener('resize', () => {
     build()
     placeCaps()
+  })
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && !looping) requestAnimationFrame(frame)
   })
 
   placeCaps()
