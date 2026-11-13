@@ -1,31 +1,24 @@
-/* The bar: one white surface that changes width, height and corner as its
-   mode changes (data-mode on #bar: idle, typing, answer, detail). */
+/* The bar: one flat white surface. Fixed width on a desktop; only its height
+   changes as the mode changes (data-mode on #bar: idle, typing, answer, detail).
+   Square-ish corners to match the cards. */
 
 #bar {
-  --bar-w: 460px;
-  --bar-r: 28px;
   left: 50%;
   bottom: max(22px, env(safe-area-inset-bottom));
-  width: min(var(--bar-w), calc(100vw - 24px));
+  width: min(580px, calc(100vw - 24px));
   transform: translateX(-50%);
-  border-radius: var(--bar-r);
-  background: rgba(255, 255, 255, 0.9);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.94);
   -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
-  box-shadow: 0 0 0 1px rgba(40, 30, 25, 0.08), 0 14px 40px rgba(40, 30, 25, 0.14);
+  box-shadow: 0 0 0 1px rgba(40, 30, 25, 0.09), 0 12px 36px rgba(40, 30, 25, 0.12);
   overflow: hidden;
   color: var(--ink);
   font-size: 14px;
   touch-action: manipulation;
   user-select: text;
   -webkit-user-select: text;
-  transition: width 0.55s cubic-bezier(0.2, 0.9, 0.25, 1), border-radius 0.45s ease;
 }
-
-#bar[data-mode="typing"],
-#bar[data-mode="answer"] { --bar-w: 620px; --bar-r: 24px; }
-#bar[data-mode="detail"] { --bar-w: 660px; --bar-r: 22px; }
-#bar.is-open[data-mode="idle"] { --bar-w: 560px; }
 
 /* A section opens by growing from zero height, so the surface stretches
    smoothly instead of jumping. */
@@ -42,8 +35,8 @@
 .row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 7px 7px 20px;
+  gap: 10px;
+  padding: 6px 8px 6px 18px;
 }
 
 .field { position: relative; flex: 1; min-width: 0; height: 36px; }
@@ -83,19 +76,19 @@
 
 .send {
   flex: none;
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   display: grid;
   place-items: center;
   border: 0;
-  border-radius: 50%;
+  border-radius: 8px;
   background: var(--ink);
   color: #fff;
   cursor: pointer;
 }
 
 .plan {
-  padding: 14px 20px 0;
+  padding: 14px 18px 0;
   font-size: 13px;
   font-weight: 500;
   color: #5d5650;
@@ -103,34 +96,32 @@
 
 .plan.quiet { color: #8f8780; }
 
+/* Suggestions wrap instead of scrolling, so nothing is ever cut off. */
 .chips {
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
   padding: 2px 14px 14px;
-  overflow-x: auto;
-  scrollbar-width: none;
 }
-
-.chips::-webkit-scrollbar { display: none; }
 
 .chip, .pill, .opt {
-  flex: none;
-  padding: 7px 13px;
-  border: 0;
-  border-radius: 999px;
-  background: rgba(40, 30, 25, 0.06);
+  padding: 7px 11px;
+  border: 1px solid rgba(40, 30, 25, 0.14);
+  border-radius: 6px;
+  background: transparent;
   color: var(--ink);
   font: 500 12.5px/1.2 var(--ui-font);
-  white-space: nowrap;
   cursor: pointer;
   text-decoration: none;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-.chip:hover, .pill:hover, .opt:hover { background: rgba(40, 30, 25, 0.12); }
-.pill.dark { background: var(--ink); color: #fff; }
+.chip:hover, .pill:hover, .opt:hover { background: rgba(40, 30, 25, 0.06); border-color: rgba(40, 30, 25, 0.28); }
+.pill.dark, .opt.on { background: var(--ink); border-color: var(--ink); color: #fff; }
 .pill.dark:hover { background: #3a3835; }
-.opt.on { background: var(--ink); color: #fff; }
+
+/* Only the first few suggestions show, fewer on a phone. */
+.chip:nth-child(n+4) { display: none; }
 
 button:focus-visible, .pill:focus-visible, #b-input:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--ink) 55%, transparent);
@@ -141,60 +132,58 @@ button:focus-visible, .pill:focus-visible, #b-input:focus-visible {
 
 /* Answer sentence */
 
-.sentence { padding: 16px 20px 0; font-size: 15px; line-height: 1.9; font-weight: 500; }
-.sentence .count { color: #8f8780; font-size: 12.5px; font-weight: 500; white-space: nowrap; }
-.note { padding: 2px 20px 0; font-size: 12.5px; color: #8f8780; }
+.sentence { padding: 14px 18px 0; font-size: 14px; line-height: 1.8; font-weight: 500; }
+.sentence .count { color: #8f8780; font-size: 12.5px; white-space: nowrap; }
+.note { padding: 2px 18px 0; font-size: 12.5px; color: #8f8780; }
 
+/* A blank to fill: plain text with a dotted underline, so punctuation sits
+   against it naturally. */
 .slot {
-  padding: 2px 9px 3px;
-  margin: 0 1px;
+  padding: 0;
   border: 0;
-  border-radius: 8px;
-  background: rgba(40, 30, 25, 0.07);
+  background: transparent;
   color: var(--ink);
   font: inherit;
-  text-decoration: underline;
-  text-decoration-color: rgba(28, 27, 26, 0.35);
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: rgba(28, 27, 26, 0.55);
   text-underline-offset: 4px;
   cursor: pointer;
 }
 
-.slot:hover, .slot.is-open { background: rgba(40, 30, 25, 0.14); }
+.slot:hover, .slot.is-open { text-decoration-style: solid; background: rgba(40, 30, 25, 0.06); }
 
-.options { display: flex; flex-wrap: wrap; gap: 7px; padding: 8px 20px 2px; }
+.options { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 18px 2px; }
 
 /* Detail */
 
-.d-top { display: flex; align-items: center; justify-content: space-between; padding: 16px 14px 0 20px; }
+.d-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 8px 0 18px; }
 
 .d-kind {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #6b635d;
 }
 
-.d-nav { display: inline-flex; align-items: center; gap: 4px; }
+.d-nav { display: inline-flex; align-items: center; gap: 2px; }
 .d-nav button {
   width: 28px;
   height: 28px;
   border: 0;
-  border-radius: 50%;
+  border-radius: 6px;
   background: transparent;
   color: var(--ink);
-  font: 400 20px/1 var(--ui-font);
+  font: 400 19px/1 var(--ui-font);
   cursor: pointer;
 }
 
-.d-nav button:hover { background: rgba(40, 30, 25, 0.08); }
-.d-count { font-size: 12px; color: #8f8780; font-variant-numeric: tabular-nums; padding: 0 2px; }
+.d-nav button:hover { background: rgba(40, 30, 25, 0.07); }
+.d-count { font-size: 12px; color: #8f8780; font-variant-numeric: tabular-nums; padding: 0 4px; }
 
 .d-title {
-  padding: 8px 20px 0;
+  padding: 6px 18px 0;
   font-family: var(--brand-font);
   font-size: 26px;
   font-weight: 700;
@@ -203,26 +192,37 @@ button:focus-visible, .pill:focus-visible, #b-input:focus-visible {
   font-variation-settings: "wdth" 108;
 }
 
-.d-line { padding: 4px 20px 0; color: #6b635d; font-size: 14px; line-height: 1.5; }
-.d-summary { padding: 10px 20px 0; font-size: 14px; line-height: 1.6; }
+.d-line { padding: 4px 18px 0; color: #6b635d; font-size: 14px; line-height: 1.5; }
+.d-summary { padding: 10px 18px 0; font-size: 14px; line-height: 1.6; }
 
-.d-facts { display: flex; flex-wrap: wrap; gap: 6px 28px; padding: 14px 20px 0; }
+/* Facts on the left, the action on the right. */
+.d-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 20px;
+  padding: 16px 18px 16px;
+}
+
+.d-facts { display: flex; flex-wrap: wrap; gap: 6px 26px; }
 .d-facts div { display: grid; gap: 2px; }
-.d-facts dt { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #8f8780; }
+.d-facts dt { font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; color: #8f8780; }
 .d-facts dd { font-size: 13.5px; font-weight: 500; }
 .d-facts:empty { display: none; }
 
-.d-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 20px 16px; }
+.d-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.d-top + .d-title + .d-line + .d-actions { padding: 14px 18px 16px; margin-left: 0; }
 
-#bar[data-mode="detail"] .row { border-top: 1px solid rgba(40, 30, 25, 0.07); }
-#bar[data-mode="answer"] .row { border-top: 1px solid rgba(40, 30, 25, 0.07); margin-top: 8px; }
+#bar[data-mode="detail"] .row,
+#bar[data-mode="answer"] .row { border-top: 1px solid rgba(40, 30, 25, 0.08); margin-top: 8px; }
 
 @media (max-width: 700px) {
-  #bar { bottom: max(12px, env(safe-area-inset-bottom)); --bar-w: calc(100vw - 24px); }
-  #bar[data-mode="idle"] { --bar-w: calc(100vw - 48px); }
+  #bar { bottom: max(12px, env(safe-area-inset-bottom)); }
+  .chip:nth-child(n+3) { display: none; }
   .d-title { font-size: 22px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #bar, .sec { transition: none; }
+  .sec { transition: none; }
 }

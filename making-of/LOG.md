@@ -74,3 +74,11 @@ Said "looks vibecoded as hell": the coloured dot per kind of work (on cards,
 cluster labels, the bar and About) is gone everywhere, and the colours are out
 of the content file. Text-only cards are now a plain warm grey. Kind is still
 shown by the cluster label and the bar's kind name.
+
+## 2026-11-13 · bar rebuilt
+"Something cut off": the suggestion chips ran past the bar's edge and were
+clipped by its rounded corner, the width jumped between states, the detail
+card had a dead right half, and the sentence had gaps before its commas.
+Rebuilt flatter: one fixed width, chips wrap (three on desktop, two on a
+phone) instead of scrolling, square-ish corners to match the cards, facts left
+and action right in the detail card, blanks as dotted-underlined text.

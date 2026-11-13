@@ -244,7 +244,7 @@ const browser = await chromium.launch()
   await page.keyboard.press('Escape')
   await settled(page)
   check(await mode() === 'answer' && !(await state(page)).focus, 'Esc closes the detail and leaves the answer')
-  check((await page.textContent('.sentence')).startsWith("Here's my proudest work of any kind, shown as board"), 'the answer reads as a sentence')
+  check((await page.textContent('.sentence')).startsWith("Here's my proudest work of any kind, shown as a board"), 'the answer reads as a sentence')
 
   await page.click('.slot[data-slot="kind"]')
   await page.click('.opt[data-value="ar"]')
