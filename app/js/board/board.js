@@ -18,14 +18,13 @@ const TX = 6
 const TY = 7
 const EPS = [0.05, 0.05, 0.05, 0.01, 0.0008, 0.003, 0.02, 0.02]
 
-function cardElement(work, kind) {
+function cardElement(work) {
   const el = document.createElement('article')
   el.className = `card${work.cover ? '' : ' is-words'}${work.muted ? ' is-muted' : ''}`
   el.dataset.id = work.id
   el.tabIndex = 0
   el.setAttribute('role', 'button')
   el.setAttribute('aria-label', [work.title, work.line, work.when].filter(Boolean).join(', '))
-  el.style.setProperty('--dab', kind.dab)
   // Each card drifts on its own slow clock so the board never moves in step.
   const seed = hashString(work.id)
   el.style.setProperty('--drift-time', `${7 + (seed % 50) / 10}s`)
@@ -35,7 +34,7 @@ function cardElement(work, kind) {
     ? `<div class="card-pic"><img src="${imgUrl(work.cover)}" alt="" draggable="false" decoding="async"></div>`
     : `<div class="card-pic"><p>${escapeHtml(work.line)}</p></div>`
   const when = work.when ? `<span>${escapeHtml(work.when)}</span>` : ''
-  el.innerHTML = `<div class="card-in">${picture}<div class="card-cap"><i class="dab"></i><b>${escapeHtml(work.title)}</b>${when}</div></div>`
+  el.innerHTML = `<div class="card-in">${picture}<div class="card-cap"><b>${escapeHtml(work.title)}</b>${when}</div></div>`
   return el
 }
 
@@ -43,8 +42,7 @@ function labelElement(label) {
   const el = document.createElement('div')
   el.className = 'label'
   el.setAttribute('aria-hidden', 'true')
-  if (label.dab) el.style.setProperty('--dab', label.dab)
-  el.innerHTML = `${label.dab ? '<i class="dab"></i>' : ''}<span>${escapeHtml(label.text)}</span>`
+  el.innerHTML = `<span>${escapeHtml(label.text)}</span>`
   return el
 }
 
@@ -59,7 +57,7 @@ export function createBoard({ world, content }) {
   const labels = new Map()
 
   for (const work of [...content.works].sort((a, b) => a.proud - b.proud)) {
-    const el = cardElement(work, content.kindById.get(work.kind))
+    const el = cardElement(work)
     world.appendChild(el)
     cards.set(work.id, makeNode(el, true))
   }

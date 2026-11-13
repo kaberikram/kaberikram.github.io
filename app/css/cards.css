@@ -114,7 +114,7 @@ html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
   display: flex;
   align-items: flex-end;
   padding: 14px 14px 13px;
-  background: color-mix(in srgb, var(--dab) 18%, var(--paper));
+  background: #F1ECE8;
 }
 
 .card.is-words .card-pic p {
@@ -157,15 +157,6 @@ html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
   font-variant-numeric: tabular-nums;
 }
 
-/* A dab of paint, one colour per kind of work. */
-.dab {
-  flex: none;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--dab, var(--ink));
-}
-
 .label {
   position: absolute;
   left: 0;
@@ -184,4 +175,3 @@ html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
   pointer-events: none;
 }
 
-.label .dab { width: 0.5em; height: 0.5em; }

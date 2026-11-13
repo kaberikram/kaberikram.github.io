@@ -132,8 +132,6 @@
 .pill.dark:hover { background: #3a3835; }
 .opt.on { background: var(--ink); color: #fff; }
 
-.pill .dab { display: inline-block; margin-right: 7px; vertical-align: 0; }
-
 button:focus-visible, .pill:focus-visible, #b-input:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--ink) 55%, transparent);
   outline-offset: 2px;

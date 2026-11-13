@@ -268,7 +268,6 @@ export function scatter(items, { seed = 7, spread = 1, depth = 1, kinds = [], or
     labels.push({
       id: `label:${group.kind}`,
       text: kind ? kind.label : group.kind,
-      dab: kind ? kind.dab : null,
       pose: {
         x: origin.x + (anchor.x - anchor.hw + 2) / anchor.f,
         y: origin.y + (anchor.y - anchor.hh - 40) / anchor.f,
@@ -361,7 +360,6 @@ export function timeline(items, { seed = 7, spread = 1, origin = ZERO } = {}) {
     labels.push({
       id: `label:year:${group.text}`,
       text: group.text,
-      dab: null,
       pose: { x: x + 4, y: top - 64, z: 0, r: 0, s: 1, o: 1 },
     })
     x += columns * stepX - 34 * spread + groupGap

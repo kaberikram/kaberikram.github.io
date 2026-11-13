@@ -68,3 +68,9 @@ Cover images resized to 1280px wide (1.69 MB to 0.99 MB, same look at the sizes
 shown). Added a GitHub Action that runs `npm test` on every PR. Generated
 `content-checklist.md`: 83 gaps across 19 works, the main thing keeping the
 detail cards thin.
+
+## 2026-11-13 · colour dots removed
+Said "looks vibecoded as hell": the coloured dot per kind of work (on cards,
+cluster labels, the bar and About) is gone everywhere, and the colours are out
+of the content file. Text-only cards are now a plain warm grey. Kind is still
+shown by the cluster label and the bar's kind name.
