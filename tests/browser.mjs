@@ -156,7 +156,7 @@ const browser = await chromium.launch()
   await settled(page)
 
   // Drag the board.
-  const before = await page.evaluate(() => ({ x: window.__progress.camera.x, s: window.__progress.camera.scaleAt(0) }))
+  const before = await page.evaluate(() => ({ x: window.__progress.camera.x, s: window.__progress.camera.scaleAt(window.__progress.camera.pivot) }))
   await page.mouse.move(700, 120)
   await page.mouse.down()
   await page.mouse.move(600, 120, { steps: 6 })
@@ -186,15 +186,37 @@ const browser = await chromium.launch()
   check(!(await state(page)).focus, 'dragging a card does not focus it')
   check(await page.evaluate(() => !document.querySelector('.card.is-held')), 'nothing is left held')
 
-  // Zoom.
-  const scaleBefore = await page.evaluate(() => window.__progress.camera.scaleAt(0))
-  await page.mouse.move(720, 450)
-  await page.keyboard.down('Control')
-  await page.mouse.wheel(0, -200)
-  await page.keyboard.up('Control')
+  // Scrolling travels in depth.
+  await page.keyboard.press('Home')
   await settled(page)
-  const scaleAfter = await page.evaluate(() => window.__progress.camera.scaleAt(0))
-  check(scaleAfter > scaleBefore * 1.3, 'ctrl + scroll zooms in')
+  const depthBefore = await page.evaluate(() => window.__progress.camera.z)
+  await page.mouse.move(720, 450)
+  for (let i = 0; i < 5; i++) await page.mouse.wheel(0, -200)
+  await settled(page)
+  const depthAfter = await page.evaluate(() => window.__progress.camera.z)
+  check(depthAfter > depthBefore + 400, `scrolling moves the camera forward through the space (${Math.round(depthAfter - depthBefore)} units)`)
+  const passed = await page.evaluate(() => [...document.querySelectorAll('.card')].filter((el) => el.style.visibility === 'hidden' || el.style.pointerEvents === 'none').length)
+  check(passed > 0, `cards the camera has passed are hidden and take no clicks (${passed})`)
+  await page.keyboard.press('Home')
+  await settled(page)
+  check(await page.evaluate(() => [...document.querySelectorAll('.card')].every((el) => el.style.visibility !== 'hidden' && el.style.pointerEvents !== 'none')), 'home brings every card back')
+
+  // The camera goes to the work: a far card is reached by travelling, not fetched.
+  const far = await page.evaluate(() => {
+    const p = window.__progress
+    const el = document.querySelector('.card[data-id="IH0307"]')
+    const depth = (node) => new DOMMatrix(node.style.transform).m43
+    const before = { cam: p.camera.z, card: depth(el) }
+    p.director.focus('IH0307')
+    return before
+  })
+  await settled(page)
+  const farAfter = await page.evaluate(() => ({ cam: window.__progress.camera.z, card: new DOMMatrix(document.querySelector('.card[data-id="IH0307"]').style.transform).m43 }))
+  check(farAfter.cam - far.cam > 900, `focusing the farthest card flies the camera deep (${Math.round(farAfter.cam - far.cam)} units)`)
+  check(Math.abs(farAfter.card - far.card) < 100, `while the card itself barely moves (${Math.round(farAfter.card - far.card)} units)`)
+  check(await page.evaluate(() => document.querySelectorAll('.card.is-fore').length) > 0, 'cards in front of it go out of focus')
+  await page.keyboard.press('Home')
+  await settled(page)
 
   // Links.
   await page.evaluate(() => { location.hash = '#k=ar' })

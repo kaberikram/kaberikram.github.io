@@ -64,6 +64,11 @@ html.no-breathe .card-in { animation: none; }
 .card[data-lift="5"] { --shadow-y: 22px; --shadow-blur: 54px; --shadow-alpha: 0.16; }
 .card[data-lift="6"] { --shadow-y: 32px; --shadow-blur: 72px; --shadow-alpha: 0.2; }
 
+/* In front of the focal depth: soft and see-through, like something close to
+   a lens, so it never hides what you came to look at. */
+.card.is-fore .card-in { --blur: 3px; opacity: 0.45; }
+.card-in { transition: box-shadow 0.35s ease, scale 0.25s ease, filter 0.4s ease, opacity 0.4s ease; }
+
 html.is-lean .card-in { --blur: 0px; filter: none; }
 
 @media (hover: hover) {

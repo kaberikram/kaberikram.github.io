@@ -82,3 +82,24 @@ fixed only the chips: they wrap instead of scrolling, two in the idle pill and
 a third once it is open (two on a phone). Kept one invisible fix, the sentence
 now says "shown as a board". A new test checks no chip crosses the bar's edge
 in any state, on desktop and phone.
+
+## 2026-11-13 · the board becomes a space
+"All the tiles lay on the canvas, seems flat, there's no depth in z. I want it
+to feel like real 3D spatial, so when the camera moves it's moving spatially."
+
+Why it was flat: the camera never travelled in depth (focus fetched the card to
+a front plane), the lens was long, depth cues were fixed per card, and the lean
+was 2 degrees.
+
+Now: depth runs continuously from the proudest work (near) to the least (far
+back, 1350 units), every card the same real size. Wider lens. Focusing flies
+the camera to the card where it lives, passing others on the way; long trips
+pull back and push in. Haze, blur and shadow are measured from the camera, so
+things sharpen as you approach; cards in front of the focal depth go soft and
+see-through; cards at the eye fade out. The lean pivots on what you look at
+(up to 5 degrees), so near and far slide against each other. Scrolling travels
+in depth along the ray under the pointer.
+
+Also read a teardown of tsubi.club and diana.lu. Taken: one signature done
+fully (this camera), one motion language. Later, maybe: a small recorded sound
+kit with mute, cued by flights. Left: their palettes, fonts, cursors, wording.

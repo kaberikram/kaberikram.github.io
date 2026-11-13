@@ -24,7 +24,7 @@ try {
   const settings = getSettings()
 
   const camera = createCamera({
-    perspective: 1100,
+    perspective: 800,
     stiffness: settings.camStiffness,
     damping: settings.camDamping,
   })
@@ -44,7 +44,11 @@ try {
     return moving
   })
   ticker.add(() => input.step())
-  ticker.add((dt) => board.step(dt))
+  ticker.add((dt) => {
+    const moving = board.step(dt)
+    board.look((z) => camera.distanceTo(z), camera.distanceTo(camera.pivot))
+    return moving
+  })
 
   subscribe((next, changed) => {
     camera.setSpring(next.camStiffness, next.camDamping)

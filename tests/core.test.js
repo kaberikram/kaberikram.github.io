@@ -104,17 +104,65 @@ test('fit() reports when the view had to be clamped', () => {
   assert.ok(Math.abs(cam.scale - 0.43) < 1e-9)
 })
 
-test('zoom stays inside its limits and holds the point under the cursor', () => {
-  const camera = createCamera({ perspective: 1100 })
+test('travelling in depth follows the ray under the pointer', () => {
+  const camera = createCamera({ perspective: 800 })
   camera.resize(1440, 900)
-  camera.jump({ x: 0, y: 0, z: 0 })
-  const before = camera.screenToWorld(1100, 300, 0)
-  camera.zoomAt(1100, 300, 1.6, { immediate: true })
-  const after = camera.screenToWorld(1100, 300, 0)
-  assert.ok(Math.abs(before.x - after.x) < 1e-6)
-  assert.ok(Math.abs(before.y - after.y) < 1e-6)
-  for (let i = 0; i < 40; i++) camera.zoomAt(700, 400, 2, { immediate: true })
-  assert.ok(camera.scaleAt(0) <= MAX_SCALE + 1e-9)
-  for (let i = 0; i < 40; i++) camera.zoomAt(700, 400, 0.5, { immediate: true })
-  assert.ok(camera.scaleAt(0) >= MIN_SCALE - 1e-9)
+  camera.setRange(-4000, 3000)
+  camera.jump({ x: 0, y: 0, z: -800 })
+  // Whatever sits under the pointer, at any depth, stays under it.
+  const near = camera.screenToWorld(1100, 300, 200)
+  const far = camera.screenToWorld(1100, 300, -900)
+  camera.dolly(1100, 300, 500, { immediate: true })
+  assert.equal(camera.z, -300)
+  for (const [point, depth] of [[near, 200], [far, -900]]) {
+    const screen = camera.worldToScreen(point.x, point.y, depth)
+    assert.ok(Math.abs(screen.x - 1100) < 1e-6 && Math.abs(screen.y - 300) < 1e-6)
+  }
+})
+
+test('the camera stays inside its travel range, and can pass what it looks at', () => {
+  const camera = createCamera({ perspective: 800 })
+  camera.resize(1440, 900)
+  camera.setRange(-3000, 1500)
+  camera.setPivot(-400, { immediate: true })
+  camera.jump({ z: -800 })
+  for (let i = 0; i < 60; i++) camera.zoomAt(700, 400, 1.5, { immediate: true })
+  assert.equal(camera.z, 1500, 'flies on past the pivot depth to the far limit')
+  for (let i = 0; i < 60; i++) camera.zoomAt(700, 400, 0.5, { immediate: true })
+  assert.equal(camera.z, -3000)
+  assert.ok(camera.distanceTo(-400) > 0)
+})
+
+test('the lean turns about what the camera is looking at', () => {
+  const camera = createCamera({ perspective: 800 })
+  camera.resize(1440, 900)
+  camera.jump({ x: 0, y: 0, z: -800 })
+  camera.setPivot(-300, { immediate: true })
+  const level = { pivot: camera.worldToScreen(0, 0, -300), near: camera.worldToScreen(0, 0, 250), far: camera.worldToScreen(0, 0, -1100) }
+  camera.tiltTo(0, 5)
+  for (let i = 0; i < 300; i++) camera.step(1 / 60)
+  const leaning = { pivot: camera.worldToScreen(0, 0, -300), near: camera.worldToScreen(0, 0, 250), far: camera.worldToScreen(0, 0, -1100) }
+  assert.ok(Math.abs(leaning.pivot.x - level.pivot.x) < 1e-6, 'the pivot depth does not move')
+  // Near and far slide opposite ways: that is the parallax.
+  assert.ok((leaning.near.x - level.near.x) * (leaning.far.x - level.far.x) < 0)
+  assert.ok(Math.abs(leaning.near.x - level.near.x) > 10)
+})
+
+test('a long flight pulls back before it pushes in', () => {
+  const camera = createCamera({ perspective: 800 })
+  camera.resize(1440, 900)
+  camera.setRange(-4000, 3000)
+  camera.jump({ x: 0, y: 0, z: -200 })
+  camera.to({ x: 2600, y: 0, z: 0 }, { arc: true })
+  let lowest = Infinity
+  let frames = 0
+  while (camera.step(1 / 60) && frames++ < 900) lowest = Math.min(lowest, camera.z)
+  assert.ok(lowest < -350, `pulled back to ${lowest.toFixed(0)}`)
+  assert.equal(camera.z, 0)
+  assert.equal(camera.x, 2600)
+  // A short hop does not arc.
+  camera.to({ x: 2700, z: 100 }, { arc: true })
+  lowest = Infinity
+  while (camera.step(1 / 60)) lowest = Math.min(lowest, camera.z)
+  assert.ok(lowest >= -1)
 })

@@ -14,14 +14,18 @@ const GOLDEN = Math.PI * (3 - Math.sqrt(5))
 const ZERO = { x: 0, y: 0 }
 
 // Must match the camera (js/core/camera.js).
-const PERSPECTIVE = 1100
+const PERSPECTIVE = 800
 
 // Cards sit at different depths, so nearer ones look bigger and sit further
 // from the centre of the view than their world position suggests. Arrangements
 // with depth are therefore spaced as they will be *seen* from a typical camera
 // distance, then converted back to world positions. `magnify` is how much
 // larger something at depth z looks than something on the z = 0 plane.
-const SEEN_FROM = { scatter: -900, fan: -350 }
+export const SEEN_FROM = { scatter: -800, fan: -250 }
+
+// How deep the home board runs: the proudest work is nearest, the least is far
+// back. Multiplied by the depth setting.
+export const DEPTH = { near: 250, far: -1100 }
 
 function magnify(z, cameraZ) {
   return (PERSPECTIVE - cameraZ) / (PERSPECTIVE - z - cameraZ)
@@ -164,13 +168,6 @@ export function scatter(items, { seed = 7, spread = 1, depth = 1, kinds = [], or
     placed.push(group)
   })
 
-  // Three depth planes, nearest for the proudest third. Distinct planes read
-  // as depth far more clearly than a smooth slope, and keep the board orderly.
-  const PLANES = [
-    { z: 150, s: 1.1 },
-    { z: -40, s: 1 },
-    { z: -240, s: 0.92 },
-  ]
   const ratio = shape === 'wide' ? 1.9 : shape === 'square' ? 1.2 : 0.55
   const gapX = 16 + 18 * spread
   const gapY = 16 + 18 * spread
@@ -181,9 +178,10 @@ export function scatter(items, { seed = 7, spread = 1, depth = 1, kinds = [], or
     const cols = Math.max(1, Math.min(group.items.length, Math.round(Math.sqrt(group.items.length * ratio))))
     const rows = Math.ceil(group.items.length / cols)
     group.items.forEach((item, j) => {
-      const rank = rankOf.get(item.id)
-      const plane = PLANES[Math.min(2, Math.floor((rank / n) * 3))]
-      const z = plane.z * depth
+      // Depth runs evenly from the proudest work, nearest, to the least, far
+      // back. Every card is the same real size; distance is what makes it small.
+      const t = n > 1 ? rankOf.get(item.id) / (n - 1) : 0
+      const z = lerp(DEPTH.near, DEPTH.far, t) * depth
       const f = magnify(z, from)
       const col = j % cols
       const row = Math.floor(j / cols)
@@ -191,13 +189,13 @@ export function scatter(items, { seed = 7, spread = 1, depth = 1, kinds = [], or
       bodies.push({
         item,
         group,
-        s: plane.s,
+        s: 1,
         z,
         f,
-        x: group.cx + (col - (inRow - 1) / 2) * (CARD.w * 1.06 + gapX),
-        y: group.cy + (row - (rows - 1) / 2) * (CARD.h * 1.06 + gapY),
-        hw: (CARD.w * plane.s * f) / 2,
-        hh: (CARD.h * plane.s * f) / 2,
+        x: group.cx + (col - (inRow - 1) / 2) * (CARD.w * 0.9 + gapX),
+        y: group.cy + (row - (rows - 1) / 2) * (CARD.h * 0.9 + gapY),
+        hw: (CARD.w * f) / 2,
+        hh: (CARD.h * f) / 2,
       })
     })
   }
@@ -231,8 +229,8 @@ export function scatter(items, { seed = 7, spread = 1, depth = 1, kinds = [], or
     }
     if (pass < passes - 30) {
       for (const body of bodies) {
-        body.x += (body.group.cx - body.x) * 0.014 / sideways
-        body.y += (body.group.cy - body.y) * 0.014 * sideways
+        body.x += (body.group.cx - body.x) * 0.03 / sideways
+        body.y += (body.group.cy - body.y) * 0.03 * sideways
       }
     }
   }

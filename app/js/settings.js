@@ -2,7 +2,8 @@
 // as custom properties and read by the camera, the board and the arrangements.
 // The Tune panel (D key, or ?debug) edits it.
 
-const STORAGE_KEY = 'ikram-board-v1'
+// Bumped when defaults change meaning, so stale saved values are dropped.
+const STORAGE_KEY = 'ikram-board-v2'
 const LEAN_QUERY = '(max-width: 768px), (pointer: coarse)'
 
 export const DEFAULTS = {
@@ -16,11 +17,11 @@ export const DEFAULTS = {
   cardRadius: 0,
   labelSize: 20,
   spread: 0.6,
-  depth: 2.07,
-  tilt: 2,
+  depth: 1,
+  tilt: 5,
   bank: 1,
-  camStiffness: 90,
-  camDamping: 20,
+  camStiffness: 58,
+  camDamping: 16,
   cardStiffness: 130,
   cardDamping: 19,
   stagger: 26,
@@ -33,7 +34,7 @@ const BOUNDS = {
   labelSize: [12, 64],
   spread: [0.3, 2],
   depth: [0, 2.5],
-  tilt: [0, 8],
+  tilt: [0, 10],
   bank: [0, 3],
   camStiffness: [20, 400],
   camDamping: [4, 60],

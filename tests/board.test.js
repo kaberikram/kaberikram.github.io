@@ -4,7 +4,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 import { prepareContent } from '../app/js/content.js'
-import { CARD, LAYOUTS, asSeen, fan, shapeFor, worstOverlap } from '../app/js/board/layouts.js'
+import { CARD, DEPTH, LAYOUTS, SEEN_FROM, asSeen, fan, shapeFor, worstOverlap } from '../app/js/board/layouts.js'
 import {
   HOME,
   fromHash,
@@ -86,10 +86,10 @@ for (const [name, build] of Object.entries(arrangements)) {
 // Scatter and fan have depth, so they are judged the way they are seen.
 test('no arrangement lets one card cover another, on any screen shape', () => {
   for (const shape of SHAPES) {
-    assert.equal(worstOverlap(asSeen(arrangements.scatter(shape).poses.values(), -900)), 0, `scatter ${shape}`)
+    assert.equal(worstOverlap(asSeen(arrangements.scatter(shape).poses.values(), SEEN_FROM.scatter)), 0, `scatter ${shape}`)
     assert.equal(worstOverlap(arrangements.grid(shape).poses.values()), 0, `grid ${shape}`)
     assert.equal(worstOverlap(arrangements.timeline(shape).poses.values()), 0, `timeline ${shape}`)
-    assert.equal(worstOverlap(asSeen(arrangements.fan(shape).poses.values(), -350)), 0, `fan ${shape}`)
+    assert.equal(worstOverlap(asSeen(arrangements.fan(shape).poses.values(), SEEN_FROM.fan)), 0, `fan ${shape}`)
   }
 })
 
@@ -106,12 +106,21 @@ test('the home board suits the screen it is on', () => {
   assert.equal(shapeFor(390, 676), 'tall')
 })
 
-test('scatter: the proudest work is nearest and largest', () => {
+test('scatter: depth runs evenly from the proudest work to the least', () => {
   const { poses } = arrangements.scatter()
-  const first = poses.get(byProud[0].id)
-  const last = poses.get(byProud[byProud.length - 1].id)
-  assert.ok(first.s > last.s)
-  assert.ok(first.z > last.z)
+  const depths = byProud.map((work) => poses.get(work.id).z)
+  assert.equal(depths[0], DEPTH.near)
+  assert.equal(depths[depths.length - 1], DEPTH.far)
+  for (let i = 1; i < depths.length; i++) assert.ok(depths[i] < depths[i - 1], 'each rank sits further back')
+  // Real space: every card is the same size. Distance alone makes it look small.
+  for (const pose of poses.values()) assert.equal(pose.s, 1)
+  const seen = asSeen([poses.get(byProud[0].id), poses.get(byProud[byProud.length - 1].id)], SEEN_FROM.scatter)
+  assert.ok(seen[0].s > seen[1].s * 1.8, 'the nearest looks about twice the size of the farthest')
+})
+
+test('the depth setting stretches the space', () => {
+  const deep = LAYOUTS.scatter(works, { ...options, depth: 2 }).poses
+  assert.equal(deep.get(byProud[byProud.length - 1].id).z, DEPTH.far * 2)
 })
 
 test('scatter: one label per kind of work, and it is centred on the origin', () => {
