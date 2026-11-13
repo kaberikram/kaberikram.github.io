@@ -49,3 +49,8 @@ stole keyboard focus mid-sentence. Found while filming it; fixed the same hour.
 
 Next: card design, then the Claude fallback for asks the on-device brain can't
 read.
+
+## 2026-11-13 · tooling
+`tools/capture.mjs` films any tag or commit (stills, optional clip);
+`tools/demo.mjs` renders a scripted 60fps demo by stepping the browser's clock.
+First demo: deal-in, ask for proudest work, fly-to, step, edit a blank, timeline.

@@ -30,6 +30,20 @@ node tools/capture.mjs --current             the working tree, uncommitted
 node tools/capture.mjs --path /index.html    a different page (older homepage)
 ```
 
+## A 60fps motion demo
+
+```
+node tools/demo.mjs --out demo.mp4          the working tree
+node tools/demo.mjs --ref v2-bar --out old.mp4
+```
+
+Steps the browser's clock exactly 1/60s per frame and captures each one, so
+motion is truly 60fps (a normal headless recording is about 25). Edit the
+SCRIPT section of `tools/demo.mjs` to change what it does. Videos are not
+committed: they are large, and this folder is published with the site.
+
+## How the stills are made
+
 It checks each version out into a temporary folder, so your working tree is
 never touched. Needs Playwright and Chromium.
 
