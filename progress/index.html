@@ -1,61 +1,46 @@
 <!doctype html>
-<html lang="en" class="caption-glass" data-vig="rothko">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Ikram Hakim — progress</title>
-  <meta name="description" content="A work-in-progress field trip through Ikram Hakim's pieces.">
+  <title>Ikram Hakim</title>
+  <meta name="description" content="Ikram Hakim, creative technologist. AR, mixed reality and creative web work on an open board.">
+  <meta name="theme-color" content="#F1E7E2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Inter:wght@400..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/field.css">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Inter:wght@400..700&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../app/css/base.css">
+  <link rel="stylesheet" href="../app/css/cards.css">
+  <link rel="preload" href="../app/content/content.json" as="fetch" crossorigin>
+  <link rel="modulepreload" href="../app/js/main.js">
 </head>
 <body>
-  <div id="stage"><div id="world"></div></div>
-  <div class="vig" aria-hidden="true"></div>
-  <div id="field" data-mode="rothko" aria-hidden="true"></div>
+  <div id="field" aria-hidden="true"></div>
 
-  <div class="ui brand"><span class="nm">Ikram Hakim</span></div>
+  <main id="stage" aria-label="Work board">
+    <div id="world"></div>
+  </main>
+
+  <header class="ui brand"><h1>Ikram Hakim</h1></header>
   <nav class="ui" id="nav" aria-label="Contact">
     <a href="mailto:ikramandhakim@gmail.com">ikramandhakim@gmail.com</a>
   </nav>
-  <div class="ui tools">
-    <button class="rb" id="cam" type="button" title="Camera off — click to ask" aria-label="Camera off">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#151615" stroke-width="1.6"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10l6-3v10l-6-3"/><line x1="2" y1="3" x2="22" y2="21"/></svg>
-    </button>
-    <button class="rb" id="mic" type="button" title="Mic off — click to ask" aria-label="Mic off">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#151615" stroke-width="1.6"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v4"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
-    </button>
+
+  <p class="ui" id="hint">
+    <span class="mouse">Drag to wander · click a card · arrows to step · 1–4 to rearrange</span>
+    <span class="touch">Drag to wander · pinch to zoom · tap a card</span>
+  </p>
+
+  <div id="fail">
+    <p>The board didn't load.<br>You can still reach me at <a href="mailto:ikramandhakim@gmail.com">ikramandhakim@gmail.com</a>.</p>
   </div>
 
-  <div id="lens" aria-hidden="true"></div>
-  <div class="cap" id="capA"></div>
-  <div class="cap" id="capB" style="opacity:0"></div>
+  <noscript>
+    <p style="position:fixed;inset:0;display:grid;place-items:center;padding:24px;text-align:center;font:15px/1.6 sans-serif">
+      This board needs JavaScript. You can reach me at ikramandhakim@gmail.com.
+    </p>
+  </noscript>
 
-  <div id="detail">
-    <div class="dtop">
-      <b>Ikram Hakim</b>
-      <button id="close" type="button">Close</button>
-    </div>
-    <div class="dwrap" id="dbody"></div>
-  </div>
-
-  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
-    <defs>
-      <filter id="herglass" x="-20%" y="-60%" width="140%" height="220%" color-interpolation-filters="sRGB">
-        <feTurbulence id="herturb" type="fractalNoise" baseFrequency="0.012 0.03" numOctaves="2" seed="3" result="n"/>
-        <feDisplacementMap id="herdisp" in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G" result="d"/>
-        <feGaussianBlur id="herb1" in="d" stdDeviation="7" result="b1"/>
-        <feGaussianBlur id="herb2" in="d" stdDeviation="2.2" result="b2"/>
-        <feComponentTransfer in="b1" result="b1s"><feFuncA id="herslope" type="linear" slope="0.6"/></feComponentTransfer>
-        <feMerge>
-          <feMergeNode in="b1s"/>
-          <feMergeNode in="d"/>
-        </feMerge>
-      </filter>
-    </defs>
-  </svg>
-
-  <script type="module" src="js/main.js"></script>
+  <script type="module" src="../app/js/main.js"></script>
 </body>
 </html>

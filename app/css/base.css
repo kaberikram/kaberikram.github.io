@@ -1,0 +1,257 @@
+/* The page: a warm canvas, a stage with depth, and very little chrome.
+   Colours and sizes arrive as custom properties from js/settings.js. */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --canvas: #F1E7E2;
+  --paper: #FFFFFF;
+  --ink: #1C1B1A;
+  --muted: #8A827C;
+  --card-radius: 16px;
+  --label-size: 40px;
+  --bloom-opacity: 0.62;
+  --ui-font: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --brand-font: Archivo, Inter, Helvetica, sans-serif;
+  --hand-font: "Shadows Into Light", "Bradley Hand", "Segoe Print", cursive;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--ui-font);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* The sunset behind everything. Drifts on the compositor, so it costs no script. */
+#field {
+  position: fixed;
+  inset: -8%;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--bloom);
+  background-repeat: no-repeat;
+  opacity: var(--bloom-opacity);
+  animation: bloom 28s ease-in-out infinite alternate;
+}
+
+@keyframes bloom {
+  to { transform: translate3d(1.5%, -2%, 0) scale(1.06); }
+}
+
+#stage {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  perspective: 1100px;
+  perspective-origin: 50% 50%;
+  cursor: grab;
+  outline: none;
+}
+
+#stage.is-dragging { cursor: grabbing; }
+
+#world {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Reduced motion: views cut instead of fly, with a short fade to soften the cut. */
+html.reduced-motion #field { animation: none; }
+
+.ui { position: fixed; z-index: 10; }
+
+.brand { left: 24px; top: 26px; pointer-events: none; }
+
+.brand h1 {
+  font-family: var(--brand-font);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variation-settings: "wdth" 125;
+}
+
+#nav {
+  right: 24px;
+  top: 27px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+#nav a { padding: 6px 0; }
+#nav a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Stands where the bar will live. For now it only says how to move. */
+#hint {
+  left: 50%;
+  bottom: max(26px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  max-width: calc(100vw - 32px);
+  padding: 11px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 0 0.5px rgba(70, 40, 30, 0.1), 0 8px 24px rgba(70, 40, 30, 0.1);
+  color: #5d5650;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+#hint .touch { display: none; }
+html.is-lean #hint .mouse { display: none; }
+html.is-lean #hint .touch { display: inline; }
+
+#fail {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.6;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+#fail a { text-decoration: underline; }
+html.failed #fail { display: grid; }
+html.failed #hint { display: none; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  .brand { left: 18px; top: 20px; }
+  #nav { right: 18px; top: 21px; font-size: 13px; }
+}
+
+/* Tune panel */
+
+#tune-toggle {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 40;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(21, 22, 21, 0.18);
+  background: rgba(255, 255, 255, 0.92);
+  color: #151615;
+  font: 600 11px/1 var(--ui-font);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#tune-toggle.on { background: #151615; color: #fff; }
+
+#tune-panel {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 70;
+  width: min(320px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(22, 20, 18, 0.9);
+  color: #f6f1ea;
+  font: 12px/1.35 var(--ui-font);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.28);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  touch-action: pan-y;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+#tune-panel[hidden] { display: none !important; }
+
+.tune-head, .tune-views, .tune-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tune-head { justify-content: space-between; }
+.tune-head span { color: #b7b1a8; }
+
+.tune-body { overflow: auto; padding-right: 4px; }
+
+.tune-body h2 {
+  margin: 12px 0 6px;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #d7c3ae;
+}
+
+.tune-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+  margin: 6px 0;
+}
+
+.tune-row span { display: flex; justify-content: space-between; gap: 8px; }
+.tune-row output { color: #b7b1a8; font-variant-numeric: tabular-nums; }
+.tune-row input { width: 100%; }
+.tune-row input[type="color"] { height: 28px; padding: 0; border: 0; background: transparent; }
+
+#tune-panel button, .tune-json {
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #2a2724;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.tune-json {
+  width: 100%;
+  min-height: 88px;
+  resize: vertical;
+  cursor: text;
+}
+
+.tune-status { color: #b7b1a8; min-height: 1.2em; }
+
+#tune-panel button[hidden], .tune-json[hidden] { display: none !important; }
+
+@media (max-width: 700px) {
+  #tune-toggle { top: 56px; right: 18px; bottom: auto; }
+}
