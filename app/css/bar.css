@@ -103,15 +103,17 @@
 
 .plan.quiet { color: #8f8780; }
 
+/* Suggestions wrap instead of scrolling, so nothing runs past the rounded
+   edge. Two show in the idle pill, a third once the bar is open. */
 .chips {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  padding: 2px 14px 14px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  padding: 2px 16px 16px;
 }
 
-.chips::-webkit-scrollbar { display: none; }
+.chip:nth-child(n+3) { display: none; }
+#bar.is-open .chip:nth-child(3) { display: block; }
 
 .chip, .pill, .opt {
   flex: none;
@@ -220,6 +222,7 @@ button:focus-visible, .pill:focus-visible, #b-input:focus-visible {
 #bar[data-mode="answer"] .row { border-top: 1px solid rgba(40, 30, 25, 0.07); margin-top: 8px; }
 
 @media (max-width: 700px) {
+  #bar.is-open .chip:nth-child(3) { display: none; }
   #bar { bottom: max(12px, env(safe-area-inset-bottom)); --bar-w: calc(100vw - 24px); }
   #bar[data-mode="idle"] { --bar-w: calc(100vw - 48px); }
   .d-title { font-size: 22px; }

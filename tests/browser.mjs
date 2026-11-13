@@ -46,6 +46,20 @@ async function open(browser, options = {}, suffix = '') {
   return { context, page, errors }
 }
 
+
+// Every suggestion chip must sit inside the bar, clear of its rounded edge.
+async function chipsInside(page, label) {
+  const bad = await page.evaluate(() => {
+    const bar = document.querySelector('#bar').getBoundingClientRect()
+    return [...document.querySelectorAll('.chip')]
+      .filter((chip) => chip.offsetParent !== null)
+      .map((chip) => ({ text: chip.textContent, box: chip.getBoundingClientRect() }))
+      .filter(({ box }) => box.left < bar.left + 12 || box.right > bar.right - 12 || box.bottom > bar.bottom - 12)
+      .map(({ text }) => text)
+  })
+  check(bad.length === 0, `${label}: no suggestion runs past the bar edge${bad.length ? ` (${bad.join(', ')})` : ''}`)
+}
+
 async function centreOf(page, id) {
   return page.evaluate((cardId) => {
     const r = document.querySelector(`.card[data-id="${cardId}"]`).getBoundingClientRect()
@@ -142,7 +156,7 @@ const browser = await chromium.launch()
   await settled(page)
 
   // Drag the board.
-  const before = await page.evaluate(() => ({ x: window.__progress.camera.x, s: window.__progress.camera.scaleAt(0) }))
+  const before = await page.evaluate(() => ({ x: window.__progress.camera.x, s: window.__progress.camera.scaleAt(window.__progress.camera.pivot) }))
   await page.mouse.move(700, 120)
   await page.mouse.down()
   await page.mouse.move(600, 120, { steps: 6 })
@@ -172,15 +186,37 @@ const browser = await chromium.launch()
   check(!(await state(page)).focus, 'dragging a card does not focus it')
   check(await page.evaluate(() => !document.querySelector('.card.is-held')), 'nothing is left held')
 
-  // Zoom.
-  const scaleBefore = await page.evaluate(() => window.__progress.camera.scaleAt(0))
-  await page.mouse.move(720, 450)
-  await page.keyboard.down('Control')
-  await page.mouse.wheel(0, -200)
-  await page.keyboard.up('Control')
+  // Scrolling travels in depth.
+  await page.keyboard.press('Home')
   await settled(page)
-  const scaleAfter = await page.evaluate(() => window.__progress.camera.scaleAt(0))
-  check(scaleAfter > scaleBefore * 1.3, 'ctrl + scroll zooms in')
+  const depthBefore = await page.evaluate(() => window.__progress.camera.z)
+  await page.mouse.move(720, 450)
+  for (let i = 0; i < 5; i++) await page.mouse.wheel(0, -200)
+  await settled(page)
+  const depthAfter = await page.evaluate(() => window.__progress.camera.z)
+  check(depthAfter > depthBefore + 400, `scrolling moves the camera forward through the space (${Math.round(depthAfter - depthBefore)} units)`)
+  const passed = await page.evaluate(() => [...document.querySelectorAll('.card')].filter((el) => el.style.visibility === 'hidden' || el.style.pointerEvents === 'none').length)
+  check(passed > 0, `cards the camera has passed are hidden and take no clicks (${passed})`)
+  await page.keyboard.press('Home')
+  await settled(page)
+  check(await page.evaluate(() => [...document.querySelectorAll('.card')].every((el) => el.style.visibility !== 'hidden' && el.style.pointerEvents !== 'none')), 'home brings every card back')
+
+  // The camera goes to the work: a far card is reached by travelling, not fetched.
+  const far = await page.evaluate(() => {
+    const p = window.__progress
+    const el = document.querySelector('.card[data-id="IH0307"]')
+    const depth = (node) => new DOMMatrix(node.style.transform).m43
+    const before = { cam: p.camera.z, card: depth(el) }
+    p.director.focus('IH0307')
+    return before
+  })
+  await settled(page)
+  const farAfter = await page.evaluate(() => ({ cam: window.__progress.camera.z, card: new DOMMatrix(document.querySelector('.card[data-id="IH0307"]').style.transform).m43 }))
+  check(farAfter.cam - far.cam > 900, `focusing the farthest card flies the camera deep (${Math.round(farAfter.cam - far.cam)} units)`)
+  check(Math.abs(farAfter.card - far.card) < 100, `while the card itself barely moves (${Math.round(farAfter.card - far.card)} units)`)
+  check(await page.evaluate(() => document.querySelectorAll('.card.is-fore').length) > 0, 'cards in front of it go out of focus')
+  await page.keyboard.press('Home')
+  await settled(page)
 
   // Links.
   await page.evaluate(() => { location.hash = '#k=ar' })
@@ -214,6 +250,11 @@ const browser = await chromium.launch()
   await settled(page)
   const mode = () => page.getAttribute('#bar', 'data-mode')
   check(await mode() === 'idle', 'the bar starts as a pill with suggestions')
+  await chipsInside(page, 'idle')
+  await page.click('#b-input')
+  await page.waitForTimeout(700)
+  await chipsInside(page, 'focused')
+  await page.keyboard.press('Escape')
 
   const before = await page.evaluate(() => history.length)
   await page.keyboard.press('/')
@@ -244,7 +285,7 @@ const browser = await chromium.launch()
   await page.keyboard.press('Escape')
   await settled(page)
   check(await mode() === 'answer' && !(await state(page)).focus, 'Esc closes the detail and leaves the answer')
-  check((await page.textContent('.sentence')).startsWith("Here's my proudest work of any kind, shown as board"), 'the answer reads as a sentence')
+  check((await page.textContent('.sentence')).startsWith("Here's my proudest work of any kind, shown as a board"), 'the answer reads as a sentence')
 
   await page.click('.slot[data-slot="kind"]')
   await page.click('.opt[data-value="ar"]')
@@ -337,6 +378,12 @@ const browser = await chromium.launch()
   await settled(page)
   const first = await centreOf(page, 'IH0204')
   check(first.w >= 112, `cards are readable at home (${Math.round(first.w)}px wide)`)
+  await chipsInside(page, 'phone idle')
+  await page.tap('#b-input')
+  await page.waitForTimeout(700)
+  await chipsInside(page, 'phone focused')
+  await page.evaluate(() => document.activeElement.blur())
+  await page.waitForTimeout(500)
   check(Math.abs(first.x - 195) < 6, 'home opens on the proudest work')
   await page.touchscreen.tap(first.x, first.y)
   await settled(page)

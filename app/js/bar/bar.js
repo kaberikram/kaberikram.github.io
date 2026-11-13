@@ -200,12 +200,12 @@ export function createBar({ content, director, mount }) {
     } else {
       const where = c.kind ? `in ${kindLabel(c.kind)}` : 'of any kind'
       const extra = [...c.tags, c.years ? (c.years[0] === c.years[1] ? String(c.years[0]) : `${c.years[0]}–${c.years[1]}`) : null].filter(Boolean)
-      html = `<p class="sentence">Here's my ${slot('sort', sortText(c.sort))} work ${slot('kind', where)}, shown as ${slot('layout', LAYOUT_TEXT[c.layout].replace(/^an? /, ''))}. <span class="count">${state.results.length} piece${state.results.length === 1 ? '' : 's'}${extra.length ? ` · ${escapeHtml(extra.join(', '))}` : ''}</span></p>`
+      html = `<p class="sentence">Here's my ${slot('sort', sortText(c.sort))} work ${slot('kind', where)}, shown as ${slot('layout', LAYOUT_TEXT[c.layout])}. <span class="count">${state.results.length} piece${state.results.length === 1 ? '' : 's'}${extra.length ? ` · ${escapeHtml(extra.join(', '))}` : ''}</span></p>`
       if (note) html += `<p class="note">${escapeHtml(note.text)}</p>`
     }
     if (openSlot) {
       const options = optionsFor(openSlot, c)
-      html += `<div class="options" data-for="${openSlot}">${options.map(([value, text, on]) => `<button type="button" class="opt${on ? ' on' : ''}" data-value="${escapeHtml(value)}">${escapeHtml(text.replace(/^an? /, ''))}</button>`).join('')}</div>`
+      html += `<div class="options" data-for="${openSlot}">${options.map(([value, text, on]) => `<button type="button" class="opt${on ? ' on' : ''}" data-value="${escapeHtml(value)}">${escapeHtml(text)}</button>`).join('')}</div>`
     }
     answer.innerHTML = html
   }

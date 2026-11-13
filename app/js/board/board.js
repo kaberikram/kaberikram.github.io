@@ -16,16 +16,20 @@ const S = 4
 const O = 5
 const TX = 6
 const TY = 7
+// A card closer to the eye than NEAR_HIDE is invisible; it fades in over the
+// next NEAR_FADE units.
+const NEAR_HIDE = 110
+const NEAR_FADE = 240
+
 const EPS = [0.05, 0.05, 0.05, 0.01, 0.0008, 0.003, 0.02, 0.02]
 
-function cardElement(work, kind) {
+function cardElement(work) {
   const el = document.createElement('article')
   el.className = `card${work.cover ? '' : ' is-words'}${work.muted ? ' is-muted' : ''}`
   el.dataset.id = work.id
   el.tabIndex = 0
   el.setAttribute('role', 'button')
   el.setAttribute('aria-label', [work.title, work.line, work.when].filter(Boolean).join(', '))
-  el.style.setProperty('--dab', kind.dab)
   // Each card drifts on its own slow clock so the board never moves in step.
   const seed = hashString(work.id)
   el.style.setProperty('--drift-time', `${7 + (seed % 50) / 10}s`)
@@ -35,7 +39,7 @@ function cardElement(work, kind) {
     ? `<div class="card-pic"><img src="${imgUrl(work.cover)}" alt="" draggable="false" decoding="async"></div>`
     : `<div class="card-pic"><p>${escapeHtml(work.line)}</p></div>`
   const when = work.when ? `<span>${escapeHtml(work.when)}</span>` : ''
-  el.innerHTML = `<div class="card-in">${picture}<div class="card-cap"><i class="dab"></i><b>${escapeHtml(work.title)}</b>${when}</div></div>`
+  el.innerHTML = `<div class="card-in">${picture}<div class="card-cap"><b>${escapeHtml(work.title)}</b>${when}</div></div>`
   return el
 }
 
@@ -43,15 +47,14 @@ function labelElement(label) {
   const el = document.createElement('div')
   el.className = 'label'
   el.setAttribute('aria-hidden', 'true')
-  if (label.dab) el.style.setProperty('--dab', label.dab)
-  el.innerHTML = `${label.dab ? '<i class="dab"></i>' : ''}<span>${escapeHtml(label.text)}</span>`
+  el.innerHTML = `<span>${escapeHtml(label.text)}</span>`
   return el
 }
 
 function makeNode(el, isCard) {
   const sp = new Springs(8, { eps: EPS })
   sp.set(S, 1)
-  return { el, isCard, sp, active: false, pending: null, delay: 0, lift: -1, shown: true }
+  return { el, isCard, sp, active: false, pending: null, delay: 0, lift: -1, shown: true, near: 1, blocked: false }
 }
 
 export function createBoard({ world, content }) {
@@ -59,7 +62,7 @@ export function createBoard({ world, content }) {
   const labels = new Map()
 
   for (const work of [...content.works].sort((a, b) => a.proud - b.proud)) {
-    const el = cardElement(work, content.kindById.get(work.kind))
+    const el = cardElement(work)
     world.appendChild(el)
     cards.set(work.id, makeNode(el, true))
   }
@@ -67,21 +70,12 @@ export function createBoard({ world, content }) {
   function write(node) {
     const v = node.sp.value
     node.el.style.transform = `translate3d(${v[X].toFixed(2)}px,${v[Y].toFixed(2)}px,${v[Z].toFixed(2)}px) rotateX(${v[TX].toFixed(2)}deg) rotateY(${v[TY].toFixed(2)}deg) rotateZ(${v[R].toFixed(3)}deg) scale(${v[S].toFixed(4)})`
-    const opacity = clamp(v[O], 0, 1)
+    const opacity = clamp(v[O], 0, 1) * node.near
     node.el.style.opacity = opacity.toFixed(3)
     const shown = opacity > 0.01
     if (shown !== node.shown) {
       node.shown = shown
       node.el.style.visibility = shown ? '' : 'hidden'
-    }
-    if (node.isCard) {
-      // The shadow deepens in a few steps as a card comes forward. Stepping it
-      // keeps the per-frame work to a transform and an opacity.
-      const lift = clamp(Math.round((v[Z] + 360) / 130), 0, 6)
-      if (lift !== node.lift) {
-        node.lift = lift
-        node.el.dataset.lift = String(lift)
-      }
     }
   }
 
@@ -242,6 +236,45 @@ export function createBoard({ world, content }) {
       node.sp.to(TX, tx)
       node.sp.to(TY, ty)
       start(node)
+    },
+
+    // Depth as the camera sees it right now. Called every frame the camera or a
+    // card moves. `distanceTo(z)` is how far a depth is from the eye, and
+    // `focal` is the distance to what the camera is looking at.
+    //
+    // Cards near the focal distance are sharp with a full shadow; farther ones
+    // take on haze and blur in steps; anything about to hit the eye fades out
+    // and stops taking clicks, so it never blocks the view.
+    look(distanceTo, focal) {
+      const update = (node) => {
+        const distance = distanceTo(node.sp.value[Z])
+        const near = Math.round(clamp((distance - NEAR_HIDE) / NEAR_FADE, 0, 1) * 20) / 20
+        if (near !== node.near) {
+          node.near = near
+          write(node)
+        }
+        const blocked = near < 0.35
+        if (blocked !== node.blocked) {
+          node.blocked = blocked
+          node.el.style.pointerEvents = blocked ? 'none' : ''
+        }
+        if (!node.isCard) return
+        // Octaves beyond (+) or in front of (-) the focal distance.
+        const beyond = Math.log2(Math.max(1, distance) / Math.max(1, focal))
+        const lift = clamp(Math.round(4 - beyond * 5), 0, 6)
+        if (lift !== node.lift) {
+          node.lift = lift
+          node.el.dataset.lift = String(lift)
+        }
+        // Well in front of what is being looked at: out of focus, see-through.
+        const fore = beyond < -0.7
+        if (fore !== node.fore) {
+          node.fore = fore
+          node.el.classList.toggle('is-fore', fore)
+        }
+      }
+      for (const node of cards.values()) update(node)
+      for (const node of labels.values()) update(node)
     },
 
     step(dt) {

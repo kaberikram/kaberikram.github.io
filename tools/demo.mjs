@@ -278,6 +278,17 @@ await hold(450)
 await click('.opt[data-value="ar"]', 420)
 await hold(1500)
 
+// 5b. Name a work that sits far back: the camera travels through the space to it.
+await press('Escape')
+await press('/')
+await hold(200)
+await type('astral angels')
+await hold(400)
+await press('Enter')
+await hold(2600)
+await press('Escape')
+await hold(1200)
+
 // 6. Ask for the timeline.
 await press('Escape')
 await press('/')

@@ -30,23 +30,19 @@
   "kinds": [
     {
       "id": "ar",
-      "label": "AR / Lenses",
-      "dab": "#E4452E"
+      "label": "AR / Lenses"
     },
     {
       "id": "xr",
-      "label": "XR / Mixed reality",
-      "dab": "#7F92E6"
+      "label": "XR / Mixed reality"
     },
     {
       "id": "web",
-      "label": "Web / Creative dev",
-      "dab": "#F2A531"
+      "label": "Web / Creative dev"
     },
     {
       "id": "product",
-      "label": "Product / UI",
-      "dab": "#2B2D5C"
+      "label": "Product / UI"
     }
   ],
   "works": [

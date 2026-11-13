@@ -36,7 +36,7 @@ const GROUPS = [
     controls: [
       { key: 'spread', type: 'range', label: 'Spacing', min: 0.3, max: 2, step: 0.01 },
       { key: 'depth', type: 'range', label: 'Depth', min: 0, max: 2.5, step: 0.01 },
-      { key: 'tilt', type: 'range', label: 'Lean to pointer', min: 0, max: 8, step: 0.1, unit: '°' },
+      { key: 'tilt', type: 'range', label: 'Lean to pointer', min: 0, max: 10, step: 0.1, unit: '°' },
       { key: 'bank', type: 'range', label: 'Lean into moves', min: 0, max: 3, step: 0.01 },
     ],
   },

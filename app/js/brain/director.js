@@ -5,8 +5,11 @@
 import { CARD, LAYOUTS, fan, shapeFor, stack } from '../board/layouts.js'
 import { HOME, fromHash, hasFilter, sameView, sanitizeCommand, select, toHash, vocabOf } from './command.js'
 import { getSettings, isLean, reducedMotion } from '../settings.js'
+import { MAX_SCALE, MIN_SCALE } from '../core/camera.js'
 
 const SEED = 7
+// How far a focused card steps toward the camera.
+const FOCUS_STEP = 60
 
 export function createDirector({ content, board, camera, ticker }) {
   const vocab = vocabOf(content)
@@ -54,26 +57,40 @@ export function createDirector({ content, board, camera, ticker }) {
       : LAYOUTS[cmd.layout](selected, { ...opts, origin })
     const poses = new Map()
     for (const [id, pose] of home.poses) {
-      poses.set(id, { ...pose, z: pose.z - 420, s: pose.s * 0.92, o: 0.34, dim: true })
+      poses.set(id, { ...pose, z: pose.z - 700, o: 0.34, dim: true })
     }
     for (const [id, pose] of front.poses) poses.set(id, pose)
     return { poses, labels: front.labels, bounds: front.bounds, results }
   }
 
-  // The focused card comes to the front plane, squared up. The rest give way.
+  // The focused card stays where it lives and takes one small step toward
+  // you. The camera travels to it; the card is not fetched to the camera.
   function withFocus(poses, id) {
     if (!id) return poses
     const out = new Map()
     for (const [key, pose] of poses) {
-      if (key === id) {
-        out.set(key, { ...pose, z: 230, r: 0, s: Math.max(pose.s, 1) * 1.08, o: 1, dim: false, focus: true })
-      } else if (pose.dim) {
-        out.set(key, pose)
-      } else {
-        out.set(key, { ...pose, z: pose.z - 70, o: Math.min(pose.o, 0.7), soft: true })
-      }
+      if (key === id) out.set(key, { ...pose, z: pose.z + FOCUS_STEP, r: 0, o: 1, dim: false, focus: true })
+      else out.set(key, pose)
     }
     return out
+  }
+
+  // Tell the camera what it is looking at and how far it may travel.
+  function aimCamera(view, poses, focus, still) {
+    let near = -Infinity
+    let far = Infinity
+    let sum = 0
+    for (const id of view.results) {
+      const pose = poses.get(id)
+      near = Math.max(near, pose.z)
+      far = Math.min(far, pose.z)
+      sum += pose.z
+    }
+    const middle = view.results.length ? sum / view.results.length : 0
+    camera.setPivot(focus ? poses.get(focus).z : middle, { immediate: still })
+    // Back far enough to see everything; in until the farthest card is close.
+    const P = camera.perspective
+    camera.setRange(P - P / MIN_SCALE - near, P - P / MAX_SCALE - far)
   }
 
   function narrow() {
@@ -165,10 +182,11 @@ export function createDirector({ content, board, camera, ticker }) {
       instant: still,
     })
 
+    aimCamera(view, poses, focus, still)
     if (!keepCamera) {
       const cam = focus ? frameCard(poses.get(focus)) : frameView(view, poses)
       if (still) camera.jump(cam)
-      else camera.to(cam)
+      else camera.to(cam, { arc: true })
     }
 
     state = { command: cmd, results: view.results, focus: focus || null, panel }
@@ -204,6 +222,7 @@ export function createDirector({ content, board, camera, ticker }) {
       }
       const { cmd, view } = resolve(asked)
       const poses = withFocus(view.poses, cmd.focus)
+      aimCamera(view, poses, cmd.focus, true)
       const cam = cmd.focus ? frameCard(poses.get(cmd.focus)) : frameView(view, poses)
       camera.jump(cam)
       const sorted = [...works].sort((a, b) => a.proud - b.proud)

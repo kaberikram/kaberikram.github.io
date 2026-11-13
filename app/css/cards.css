@@ -64,6 +64,11 @@ html.no-breathe .card-in { animation: none; }
 .card[data-lift="5"] { --shadow-y: 22px; --shadow-blur: 54px; --shadow-alpha: 0.16; }
 .card[data-lift="6"] { --shadow-y: 32px; --shadow-blur: 72px; --shadow-alpha: 0.2; }
 
+/* In front of the focal depth: soft and see-through, like something close to
+   a lens, so it never hides what you came to look at. */
+.card.is-fore .card-in { --blur: 3px; opacity: 0.45; }
+.card-in { transition: box-shadow 0.35s ease, scale 0.25s ease, filter 0.4s ease, opacity 0.4s ease; }
+
 html.is-lean .card-in { --blur: 0px; filter: none; }
 
 @media (hover: hover) {
@@ -114,7 +119,7 @@ html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
   display: flex;
   align-items: flex-end;
   padding: 14px 14px 13px;
-  background: color-mix(in srgb, var(--dab) 18%, var(--paper));
+  background: #F1ECE8;
 }
 
 .card.is-words .card-pic p {
@@ -157,15 +162,6 @@ html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
   font-variant-numeric: tabular-nums;
 }
 
-/* A dab of paint, one colour per kind of work. */
-.dab {
-  flex: none;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--dab, var(--ink));
-}
-
 .label {
   position: absolute;
   left: 0;
@@ -184,4 +180,3 @@ html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
   pointer-events: none;
 }
 
-.label .dab { width: 0.5em; height: 0.5em; }

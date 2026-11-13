@@ -1,4 +1,4 @@
-// Hands on the board: drag to wander, pinch or ctrl-scroll to zoom, click a
+// Hands on the board: drag to wander, scroll or pinch to travel in depth, click a
 // card to bring it forward, pick a card up and put it somewhere else, arrow
 // keys to step between cards. Everything here ends in a camera move or a
 // director call. It never positions cards itself, apart from the one being held.
@@ -91,8 +91,9 @@ export function initInput({ stage, camera, board, director, ticker }) {
     if (e.pointerType === 'mouse' && !isLean()) {
       // The whole board leans a little toward the pointer.
       const tilt = getSettings().tilt
-      const nx = e.clientX / camera.view.w - 0.5
-      const ny = e.clientY / camera.view.h - 0.5
+      // -1 to 1 across the screen, so the edges give the full lean.
+      const nx = (e.clientX / camera.view.w - 0.5) * 2
+      const ny = (e.clientY / camera.view.h - 0.5) * 2
       camera.tiltTo(-ny * tilt, nx * tilt)
       ticker.wake()
     }
@@ -108,7 +109,7 @@ export function initInput({ stage, camera, board, director, ticker }) {
       const dist = Math.hypot(a.x - b.x, a.y - b.y) || 1
       const mx = (a.x + b.x) / 2
       const my = (a.y + b.y) / 2
-      const scale = camera.scaleAt(0)
+      const scale = camera.scaleAt(camera.pivot)
       camera.jump({ x: camera.x - (mx - pinch.mx) / scale, y: camera.y - (my - pinch.my) / scale })
       camera.zoomAt(mx, my, dist / pinch.dist, { immediate: true })
       pinch.dist = dist
@@ -137,7 +138,8 @@ export function initInput({ stage, camera, board, director, ticker }) {
     }
 
     if (drag.mode === 'pan') {
-      const scale = camera.scaleAt(0)
+      // Measured at the depth being looked at, so that depth follows the hand.
+      const scale = camera.scaleAt(camera.pivot)
       camera.jump({ x: camera.x - dx / scale, y: camera.y - dy / scale })
       ticker.wake()
     } else if (drag.mode === 'card') {
@@ -163,7 +165,7 @@ export function initInput({ stage, camera, board, director, ticker }) {
     } else if (ended.mode === 'pan') {
       // Let go mid-move and the board glides on a little.
       if (performance.now() - ended.t < 80) {
-        const scale = camera.scaleAt(0)
+        const scale = camera.scaleAt(camera.pivot)
         camera.to({
           x: camera.x - (ended.vx * 0.22) / scale,
           y: camera.y - (ended.vy * 0.22) / scale,
@@ -193,15 +195,21 @@ export function initInput({ stage, camera, board, director, ticker }) {
     if (typingTarget(e.target)) return
     e.preventDefault()
     const unit = e.deltaMode === 1 ? 30 : 1
-    if (e.ctrlKey || e.metaKey) {
-      // Trackpad pinch arrives as ctrl + wheel.
-      camera.zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * unit * 0.0045))
-    } else {
+    if (e.shiftKey) {
+      // Shift + scroll slides sideways.
       const target = camera.target
-      const scale = camera.scaleAt(0, target.z)
-      const dx = (e.shiftKey ? e.deltaY : e.deltaX) * unit
-      const dy = e.shiftKey ? 0 : e.deltaY * unit
-      camera.to({ x: target.x + dx / scale, y: target.y + dy / scale })
+      const scale = camera.scaleAt(camera.pivot, target.z)
+      camera.to({ x: target.x + (e.deltaY * unit) / scale, y: target.y })
+    } else {
+      // Scrolling travels through the space, toward whatever is under the
+      // pointer. A trackpad pinch arrives as ctrl + wheel and moves faster.
+      const rate = e.ctrlKey || e.metaKey ? 0.0045 : 0.0016
+      camera.zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * unit * rate))
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        const target = camera.target
+        const scale = camera.scaleAt(camera.pivot, target.z)
+        camera.to({ x: target.x + (e.deltaX * unit) / scale, y: target.y })
+      }
     }
     ticker.wake()
   }, { passive: false })
