@@ -249,7 +249,7 @@ export function createBar({ content, director, mount }) {
     const mail = `mailto:${content.owner.email}?subject=${encodeURIComponent(`About ${work.title}`)}`
     detail.innerHTML = `
       <div class="d-top">
-        <span class="d-kind">${escapeHtml(kindLabel(work.kind))}</span>
+        <span class="d-kind"><i class="dab" style="--dab:${content.kindById.get(work.kind).dab}"></i>${escapeHtml(kindLabel(work.kind))}</span>
         <span class="d-nav">
           ${many ? `<button type="button" data-act="prev" aria-label="Previous work">‹</button><span class="d-count">${at + 1} of ${state.results.length}</span><button type="button" data-act="next" aria-label="Next work">›</button>` : ''}
           <button type="button" data-act="close" aria-label="Close">×</button>
@@ -258,10 +258,8 @@ export function createBar({ content, director, mount }) {
       <h2 class="d-title">${escapeHtml(work.title)}</h2>
       <p class="d-line">${escapeHtml(work.line)}</p>
       ${work.summary ? `<p class="d-summary">${escapeHtml(work.summary)}</p>` : ''}
-      <div class="d-foot">
-        <dl class="d-facts">${fact('When', work.when)}${fact('Role', work.role)}${fact('Made with', (work.tools || []).join(', '))}</dl>
-        <div class="d-actions">${links}<a class="pill dark" href="${mail}">Ask me about this</a></div>
-      </div>`
+      <dl class="d-facts">${fact('When', work.when)}${fact('Role', work.role)}${fact('Made with', (work.tools || []).join(', '))}</dl>
+      <div class="d-actions">${links}<a class="pill dark" href="${mail}">Ask me about this</a></div>`
   }
 
   function renderPanel(name) {
@@ -270,7 +268,7 @@ export function createBar({ content, director, mount }) {
         <div class="d-top"><span class="d-kind">About</span><span class="d-nav"><button type="button" data-act="close" aria-label="Close">×</button></span></div>
         <h2 class="d-title">${escapeHtml(content.about.headline)}</h2>
         <p class="d-line">Here is what I make. Pick one to see it.</p>
-        <div class="d-actions">${content.kinds.map((kind) => `<button type="button" class="pill" data-kind="${kind.id}">${escapeHtml(kind.label)}</button>`).join('')}</div>`
+        <div class="d-actions">${content.kinds.map((kind) => `<button type="button" class="pill" data-kind="${kind.id}"><i class="dab" style="--dab:${kind.dab}"></i>${escapeHtml(kind.label)}</button>`).join('')}</div>`
     } else {
       const c = content.contact
       detail.innerHTML = `

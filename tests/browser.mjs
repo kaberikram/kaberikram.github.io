@@ -46,6 +46,20 @@ async function open(browser, options = {}, suffix = '') {
   return { context, page, errors }
 }
 
+
+// Every suggestion chip must sit inside the bar, clear of its rounded edge.
+async function chipsInside(page, label) {
+  const bad = await page.evaluate(() => {
+    const bar = document.querySelector('#bar').getBoundingClientRect()
+    return [...document.querySelectorAll('.chip')]
+      .filter((chip) => chip.offsetParent !== null)
+      .map((chip) => ({ text: chip.textContent, box: chip.getBoundingClientRect() }))
+      .filter(({ box }) => box.left < bar.left + 12 || box.right > bar.right - 12 || box.bottom > bar.bottom - 12)
+      .map(({ text }) => text)
+  })
+  check(bad.length === 0, `${label}: no suggestion runs past the bar edge${bad.length ? ` (${bad.join(', ')})` : ''}`)
+}
+
 async function centreOf(page, id) {
   return page.evaluate((cardId) => {
     const r = document.querySelector(`.card[data-id="${cardId}"]`).getBoundingClientRect()
@@ -214,6 +228,11 @@ const browser = await chromium.launch()
   await settled(page)
   const mode = () => page.getAttribute('#bar', 'data-mode')
   check(await mode() === 'idle', 'the bar starts as a pill with suggestions')
+  await chipsInside(page, 'idle')
+  await page.click('#b-input')
+  await page.waitForTimeout(700)
+  await chipsInside(page, 'focused')
+  await page.keyboard.press('Escape')
 
   const before = await page.evaluate(() => history.length)
   await page.keyboard.press('/')
@@ -337,6 +356,12 @@ const browser = await chromium.launch()
   await settled(page)
   const first = await centreOf(page, 'IH0204')
   check(first.w >= 112, `cards are readable at home (${Math.round(first.w)}px wide)`)
+  await chipsInside(page, 'phone idle')
+  await page.tap('#b-input')
+  await page.waitForTimeout(700)
+  await chipsInside(page, 'phone focused')
+  await page.evaluate(() => document.activeElement.blur())
+  await page.waitForTimeout(500)
   check(Math.abs(first.x - 195) < 6, 'home opens on the proudest work')
   await page.touchscreen.tap(first.x, first.y)
   await settled(page)

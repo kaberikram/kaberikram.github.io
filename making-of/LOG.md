@@ -75,10 +75,10 @@ cluster labels, the bar and About) is gone everywhere, and the colours are out
 of the content file. Text-only cards are now a plain warm grey. Kind is still
 shown by the cluster label and the bar's kind name.
 
-## 2026-11-13 · bar rebuilt
-"Something cut off": the suggestion chips ran past the bar's edge and were
-clipped by its rounded corner, the width jumped between states, the detail
-card had a dead right half, and the sentence had gaps before its commas.
-Rebuilt flatter: one fixed width, chips wrap (three on desktop, two on a
-phone) instead of scrolling, square-ish corners to match the cards, facts left
-and action right in the detail card, blanks as dotted-underlined text.
+## 2026-11-13 · bar: back to the original, chips fixed
+The flatter rebuild lost what worked: "rounded looks better, the original bar
+was great, just that the chips run off." Restored the original rounded bar and
+fixed only the chips: they wrap instead of scrolling, two in the idle pill and
+a third once it is open (two on a phone). Kept one invisible fix, the sentence
+now says "shown as a board". A new test checks no chip crosses the bar's edge
+in any state, on desktop and phone.
