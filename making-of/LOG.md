@@ -62,3 +62,9 @@ Fixed by giving the page its own clock (timers, animation frames and CSS
 animation time all advance exactly 1/60s per step). Rendering it also showed
 a real flaw: the opening deal skipped its stagger, so every card flew out at
 once. It now deals out proudest-first.
+
+## 2026-11-13 · housekeeping
+Cover images resized to 1280px wide (1.69 MB to 0.99 MB, same look at the sizes
+shown). Added a GitHub Action that runs `npm test` on every PR. Generated
+`content-checklist.md`: 83 gaps across 19 works, the main thing keeping the
+detail cards thin.
