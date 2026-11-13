@@ -1,0 +1,188 @@
+/* Paper cards and the handwritten labels beside them.
+   A card is 260 x 216 at scale 1. js/board/layouts.js (CARD) must agree. */
+
+.card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 260px;
+  height: 216px;
+  margin: -108px 0 0 -130px;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  /* Shadow and haze for the current depth step (data-lift, set in board.js). */
+  --shadow-y: 6px;
+  --shadow-blur: 16px;
+  --shadow-alpha: 0.09;
+  --haze: 0;
+}
+
+.card.is-moving { will-change: transform, opacity; }
+
+.card-in {
+  position: absolute;
+  inset: 0;
+  padding: 8px 8px 0;
+  border-radius: var(--card-radius);
+  background: var(--paper);
+  box-shadow:
+    0 0 0 0.5px rgba(70, 40, 30, 0.1),
+    0 1px 2px rgba(70, 40, 30, 0.06),
+    0 var(--shadow-y) var(--shadow-blur) rgba(70, 40, 30, var(--shadow-alpha));
+  transition: box-shadow 0.35s ease, scale 0.25s ease, filter 0.4s ease;
+  animation: drift var(--drift-time, 8s) ease-in-out var(--drift-delay, 0s) infinite alternate;
+}
+
+/* Far cards take on a little of the canvas colour, the way distance does. */
+.card-in::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--canvas);
+  opacity: var(--haze);
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+@keyframes drift {
+  from { translate: 0 -2.5px; }
+  to { translate: 0 2.5px; }
+}
+
+html.no-breathe .card-in { animation: none; }
+
+.card[data-lift="0"] { --shadow-y: 2px; --shadow-blur: 6px; --shadow-alpha: 0.06; --haze: 0.2; }
+.card[data-lift="1"] { --shadow-y: 4px; --shadow-blur: 10px; --shadow-alpha: 0.07; --haze: 0.1; }
+.card[data-lift="2"] { --shadow-y: 7px; --shadow-blur: 18px; --shadow-alpha: 0.09; }
+.card[data-lift="3"] { --shadow-y: 12px; --shadow-blur: 28px; --shadow-alpha: 0.12; }
+.card[data-lift="4"] { --shadow-y: 20px; --shadow-blur: 44px; --shadow-alpha: 0.15; }
+.card[data-lift="5"] { --shadow-y: 30px; --shadow-blur: 64px; --shadow-alpha: 0.19; }
+
+@media (hover: hover) {
+  .card:hover .card-in { scale: 1.025; }
+  .card.is-focus:hover .card-in,
+  .card.is-held .card-in { scale: 1; }
+}
+
+/* Keyboard focus: a quiet ring. The card the board has brought forward needs
+   none, since being large and central already says where you are. */
+.card:focus-visible .card-in {
+  outline: 1.5px solid color-mix(in srgb, var(--ink) 45%, transparent);
+  outline-offset: 4px;
+}
+
+.card.is-focus:focus-visible .card-in { outline: none; }
+
+.card.is-held { cursor: grabbing; }
+
+/* Cards that are not part of the current answer sink back and soften.
+   Cards beside a focused one soften a little, like a shallow depth of field.
+   Phones skip the blur: it is the costly part. */
+.card.is-soft .card-in { filter: blur(1.5px); }
+.card.is-dim .card-in { filter: blur(2.5px) saturate(0.7); }
+html.is-lean .card.is-soft .card-in { filter: none; }
+html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
+
+.card-pic {
+  height: 162px;
+  border-radius: max(2px, calc(var(--card-radius) - 6px));
+  overflow: hidden;
+  background: #EEE8E3;
+}
+
+.card-pic img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 40%;
+  pointer-events: none;
+}
+
+.card.is-muted img { filter: grayscale(1); }
+
+/* No picture yet: the card says its one line large, on its kind's colour. */
+.card.is-words .card-pic {
+  display: flex;
+  align-items: flex-end;
+  padding: 14px 14px 13px;
+  background: color-mix(in srgb, var(--dab) 18%, var(--paper));
+}
+
+.card.is-words .card-pic p {
+  font-family: var(--brand-font);
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  font-variation-settings: "wdth" 118;
+  text-wrap: balance;
+}
+
+.card-cap {
+  height: 46px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 6px 2px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.card-cap b {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Room for descenders inside the clipped line. */
+  padding: 3px 0;
+}
+
+.card-cap span {
+  flex: none;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A dab of paint, one colour per kind of work. */
+.dab {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--dab, var(--ink));
+}
+
+.label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 4px 0 2px;
+  border-bottom: 2px solid var(--ink);
+  transform-origin: 0 0;
+  color: var(--ink);
+  font-family: var(--hand-font);
+  font-size: var(--label-size);
+  line-height: 1.15;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.label .dab {
+  width: 0.62em;
+  height: 0.46em;
+  border-radius: 50%;
+  rotate: -14deg;
+}
