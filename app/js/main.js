@@ -7,6 +7,7 @@ import { createCamera } from './core/camera.js'
 import { createBoard } from './board/board.js'
 import { initInput } from './board/input.js'
 import { createDirector } from './brain/director.js'
+import { createBar } from './bar/bar.js'
 import { initTune } from './dev/tune.js'
 
 bootSettings()
@@ -57,9 +58,13 @@ try {
   // from there. preventScroll: the camera already brought it into view.
   director.subscribe((state) => {
     if (!state.focus) return
+    // Never pull focus out of the bar: the board previews while you type.
+    if (document.activeElement && document.activeElement.closest('#bar')) return
     const node = board.cards.get(state.focus)
     if (node && document.activeElement !== node.el) node.el.focus({ preventScroll: true })
   })
+
+  createBar({ content, director, mount: document.getElementById('bar') })
 
   initTune({
     views: [

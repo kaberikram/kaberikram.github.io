@@ -164,34 +164,47 @@ export function scatter(items, { seed = 7, spread = 1, depth = 1, kinds = [], or
     placed.push(group)
   })
 
+  // Three depth planes, nearest for the proudest third. Distinct planes read
+  // as depth far more clearly than a smooth slope, and keep the board orderly.
+  const PLANES = [
+    { z: 150, s: 1.1 },
+    { z: -40, s: 1 },
+    { z: -240, s: 0.92 },
+  ]
+  const ratio = shape === 'wide' ? 1.9 : shape === 'square' ? 1.2 : 0.55
+  const gapX = 16 + 18 * spread
+  const gapY = 16 + 18 * spread
+
   // Everything below is in "as seen" space until the last step.
   const bodies = []
   for (const group of groups) {
+    const cols = Math.max(1, Math.min(group.items.length, Math.round(Math.sqrt(group.items.length * ratio))))
+    const rows = Math.ceil(group.items.length / cols)
     group.items.forEach((item, j) => {
-      const t = n > 1 ? rankOf.get(item.id) / (n - 1) : 0
-      const s = lerp(1.16, 0.88, t ** 0.8)
-      const z = (lerp(110, -240, t) + jitter(seed, item.id, 'z') * 35) * depth
+      const rank = rankOf.get(item.id)
+      const plane = PLANES[Math.min(2, Math.floor((rank / n) * 3))]
+      const z = plane.z * depth
       const f = magnify(z, from)
-      const rad = 128 * spread * Math.sqrt(j + 0.35)
-      const ang = j * GOLDEN + group.phase
+      const col = j % cols
+      const row = Math.floor(j / cols)
+      const inRow = row === rows - 1 ? group.items.length - row * cols : cols
       bodies.push({
         item,
         group,
-        t,
-        s,
+        s: plane.s,
         z,
         f,
-        x: group.cx + Math.cos(ang) * rad * ex,
-        y: group.cy + Math.sin(ang) * rad * ey,
-        hw: (CARD.w * s * f) / 2,
-        hh: (CARD.h * s * f) / 2,
+        x: group.cx + (col - (inRow - 1) / 2) * (CARD.w * 1.06 + gapX),
+        y: group.cy + (row - (rows - 1) / 2) * (CARD.h * 1.06 + gapY),
+        hw: (CARD.w * plane.s * f) / 2,
+        hh: (CARD.h * plane.s * f) / 2,
       })
     })
   }
 
   // Push overlapping cards apart, with a light pull back toward their cluster
   // so the groups stay readable. The last passes skip the pull to finish clean.
-  const margin = 20 * spread
+  const margin = gapX * 0.6
   const passes = 160
   for (let pass = 0; pass < passes; pass++) {
     for (let a = 0; a < bodies.length; a++) {
@@ -199,7 +212,7 @@ export function scatter(items, { seed = 7, spread = 1, depth = 1, kinds = [], or
         const A = bodies[a]
         const B = bodies[b]
         // Cards in different clusters keep a wider gap, so groups read as groups.
-        const gap = A.group === B.group ? margin : margin * 4.5
+        const gap = A.group === B.group ? margin : margin * 3
         const dx = B.x - A.x
         const dy = B.y - A.y
         const ox = A.hw + B.hw + gap - Math.abs(dx)
@@ -234,12 +247,12 @@ export function scatter(items, { seed = 7, spread = 1, depth = 1, kinds = [], or
   for (const body of bodies) {
     body.x -= mx
     body.y -= my
-    const { item, t, s, z, f } = body
+    const { item, s, z, f } = body
     poses.set(item.id, {
       x: origin.x + body.x / f,
       y: origin.y + body.y / f,
       z,
-      r: jitter(seed, item.id, 'r') * (t < 0.15 ? 1.5 : 3.5),
+      r: 0,
       s,
       o: 1,
     })
@@ -258,9 +271,9 @@ export function scatter(items, { seed = 7, spread = 1, depth = 1, kinds = [], or
       dab: kind ? kind.dab : null,
       pose: {
         x: origin.x + (anchor.x - anchor.hw + 2) / anchor.f,
-        y: origin.y + (anchor.y - anchor.hh - 62) / anchor.f,
+        y: origin.y + (anchor.y - anchor.hh - 40) / anchor.f,
         z: anchor.z,
-        r: -2 + jitter(seed, group.kind, 'label') * 1.5,
+        r: 0,
         s: 1,
         o: 1,
       },
@@ -270,9 +283,9 @@ export function scatter(items, { seed = 7, spread = 1, depth = 1, kinds = [], or
   // Bounds are given as seen, on the z = 0 plane, with room for the labels.
   const bounds = {
     x: origin.x + left - mx,
-    y: origin.y + top - my - 70,
+    y: origin.y + top - my - 50,
     w: right - left,
-    h: bottom - top + 70,
+    h: bottom - top + 50,
     z: 0,
   }
   return { poses, labels, bounds }
@@ -340,7 +353,7 @@ export function timeline(items, { seed = 7, spread = 1, origin = ZERO } = {}) {
         x: x + col * stepX + CARD.w / 2,
         y: (row - (inColumn - 1) / 2) * stepY,
         z: 0,
-        r: jitter(seed, item.id, 'time') * 1.2,
+        r: 0,
         s: 1,
         o: 1,
       })
@@ -349,7 +362,7 @@ export function timeline(items, { seed = 7, spread = 1, origin = ZERO } = {}) {
       id: `label:year:${group.text}`,
       text: group.text,
       dab: null,
-      pose: { x: x + 4, y: top - 64, z: 0, r: -1.5, s: 1, o: 1 },
+      pose: { x: x + 4, y: top - 64, z: 0, r: 0, s: 1, o: 1 },
     })
     x += columns * stepX - 34 * spread + groupGap
   }
@@ -414,7 +427,7 @@ export function fan(items, { seed = 7, spread = 1, depth = 1, origin = ZERO, sha
       x: origin.x + u / f,
       y: origin.y + v / f,
       z,
-      r: i === 0 ? 0 : jitter(seed, item.id, 'fr') * 2.2,
+      r: 0,
       s: looks / f,
       o: 1,
     })
