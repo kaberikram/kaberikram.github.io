@@ -4,11 +4,11 @@
 //   node tools/demo.mjs --out my-demo.mp4
 //   node tools/demo.mjs --ref v2-bar          film an older tag instead of the working tree
 //
-// A normal screen recording of headless Chromium is about 25fps. This steps the
-// browser's own clock exactly 1/60s at a time (Chrome DevTools "virtual time")
-// and takes a frame after each step, so every frame is evenly spaced and every
-// animation, spring and CSS transition plays at the right speed. It is slower
-// than real time to render and exact when it plays.
+// A normal screen recording of headless Chromium is about 25fps. This gives the
+// page a clock that only moves when the script moves it, exactly 1/60s per
+// step, and takes a frame after each step. Every frame is evenly spaced and
+// every spring, timer and CSS transition plays at the right speed. It renders
+// slower than real time and plays back exactly.
 //
 // Needs Playwright, Chromium and ffmpeg. Edit the SCRIPT section to change what
 // the demo does.
@@ -72,6 +72,83 @@ const context = await browser.newContext({ viewport: SIZE, deviceScaleFactor: 1 
 const page = await context.newPage()
 const client = await context.newCDPSession(page)
 
+// The page's sense of time is replaced by one this script winds forward:
+//   - performance.now, setTimeout and setInterval run on it;
+//   - requestAnimationFrame callbacks run once per step, at that time;
+//   - CSS transitions and animations are paused and set to exactly the time that
+//     has passed since each began.
+// (A screenshot makes the browser render several frames at once, so left alone
+// all of these would run too fast.)
+await page.addInitScript(() => {
+  let now = 1000
+  let queue = []
+  let nextId = 1
+  const timers = new Map()
+  performance.now = () => now
+  window.requestAnimationFrame = (callback) => { queue.push(callback); return queue.length }
+  window.cancelAnimationFrame = () => {}
+  window.setTimeout = (callback, ms = 0, ...rest) => {
+    const id = nextId++
+    timers.set(id, { at: now + Math.max(0, Number(ms) || 0), callback, rest, every: 0 })
+    return id
+  }
+  window.setInterval = (callback, ms = 0, ...rest) => {
+    const id = nextId++
+    const every = Math.max(1, Number(ms) || 1)
+    timers.set(id, { at: now + every, callback, rest, every })
+    return id
+  }
+  window.clearTimeout = (id) => { timers.delete(id) }
+  window.clearInterval = window.clearTimeout
+
+  window.__step = (dt) => {
+    now += dt
+    for (let guard = 0; guard < 5000; guard++) {
+      let due = null
+      let dueId = 0
+      for (const [id, timer] of timers) {
+        if (timer.at <= now && (!due || timer.at < due.at)) { due = timer; dueId = id }
+      }
+      if (!due) break
+      if (due.every) due.at += due.every
+      else timers.delete(dueId)
+      due.callback(...due.rest)
+    }
+    const run = queue
+    queue = []
+    for (const callback of run) callback(now)
+
+    const seeding = !window.__seeded
+    for (const animation of document.getAnimations()) {
+      if (!animation.__demo) {
+        // Animations already looping before filming keep their place; anything
+        // that starts later begins at zero.
+        const endless = animation.effect && animation.effect.getTiming().iterations === Infinity
+        const keep = seeding || (endless && !(animation instanceof CSSTransition))
+        const at = keep ? animation.currentTime || 0 : 0
+        animation.pause()
+        animation.currentTime = at
+        animation.__demo = { t0: now - at }
+      } else {
+        animation.currentTime = now - animation.__demo.t0
+      }
+    }
+    window.__seeded = true
+
+    // A page that does not change produces no frame, and a screenshot would wait
+    // for one. Moving a 1px speck in the corner guarantees a repaint.
+    let speck = document.getElementById('demo-speck')
+    if (!speck) {
+      speck = document.createElement('div')
+      speck.id = 'demo-speck'
+      speck.style.cssText = 'position:fixed;left:0;bottom:0;width:1px;height:1px;z-index:99990;pointer-events:none;background:rgba(241,231,226,1)'
+      document.body.appendChild(speck)
+    }
+    window.__tick = (window.__tick || 0) + 1
+    speck.style.left = window.__tick % 2 ? '0px' : '1px'
+  }
+})
+
 // A visible cursor and a click pulse, because headless Chromium draws neither.
 await page.addInitScript(() => {
   addEventListener('DOMContentLoaded', () => {
@@ -107,20 +184,27 @@ await page.addInitScript(() => {
 })
 
 await page.goto(base + PAGE, { waitUntil: 'load' })
-await page.waitForFunction(() => window.__progress && window.__progress.ready, null, { timeout: 20000 })
+await page.waitForFunction(() => window.__progress && window.__progress.ready, null, { timeout: 20000, polling: 100 })
 await page.waitForTimeout(1500)
 
 // From here the page's clock only moves when we move it.
-await client.send('Emulation.setVirtualTimePolicy', { policy: 'pause' })
+await page.evaluate(() => window.__step(0))
 
 let frame = 0
+
+// Every browser call can stall if the page is mid-navigation or busy. Name the
+// call that stalled and try again rather than hanging the whole render.
+function within(label, promise, ms = 8000) {
+  let timer
+  const limit = new Promise((_, reject) => { timer = setTimeout(() => reject(new Error(`${label} stalled at frame ${frame}`)), ms) })
+  return Promise.race([promise, limit]).finally(() => clearTimeout(timer))
+}
+
 async function tick() {
-  const expired = new Promise((done) => client.once('Emulation.virtualTimeBudgetExpired', done))
-  await client.send('Emulation.setVirtualTimePolicy', { policy: 'advance', budget: FRAME_MS })
-  await expired
-  const shot = await client.send('Page.captureScreenshot', { format: 'jpeg', quality: 92 })
+  await within('page step', page.evaluate((dt) => window.__step(dt), FRAME_MS))
+  const shot = await within('screenshot', client.send('Page.captureScreenshot', { format: 'jpeg', quality: 92 }))
   writeFileSync(join(frames, `f${String(frame++).padStart(5, '0')}.jpg`), Buffer.from(shot.data, 'base64'))
-  if (frame % 60 === 0) process.stdout.write(`\r  ${(frame / FPS).toFixed(0)}s rendered`)
+  if (frame % 60 === 0) console.log(`  ${(frame / FPS).toFixed(0)}s rendered`)
 }
 
 const hold = async (ms) => { for (let n = Math.round(ms / FRAME_MS); n > 0; n--) await tick() }

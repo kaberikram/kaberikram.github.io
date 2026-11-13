@@ -37,8 +37,10 @@ node tools/demo.mjs --out demo.mp4          the working tree
 node tools/demo.mjs --ref v2-bar --out old.mp4
 ```
 
-Steps the browser's clock exactly 1/60s per frame and captures each one, so
-motion is truly 60fps (a normal headless recording is about 25). Edit the
+Gives the page a clock that only moves 1/60s per step (timers, animation
+frames and CSS transitions all follow it) and captures each step, so motion is
+truly 60fps and plays at the right speed (a normal headless recording is about
+25fps, and naive frame-by-frame capture runs animations several times too fast). Edit the
 SCRIPT section of `tools/demo.mjs` to change what it does. Videos are not
 committed: they are large, and this folder is published with the site.
 

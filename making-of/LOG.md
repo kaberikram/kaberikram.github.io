@@ -54,3 +54,11 @@ read.
 `tools/capture.mjs` films any tag or commit (stills, optional clip);
 `tools/demo.mjs` renders a scripted 60fps demo by stepping the browser's clock.
 First demo: deal-in, ask for proudest work, fly-to, step, edit a blank, timeline.
+
+## 2026-11-13 · demo fix
+First 60fps demo played far too fast: each screenshot makes the browser render
+several frames at once, so springs and CSS transitions ran 3 to 8x ahead.
+Fixed by giving the page its own clock (timers, animation frames and CSS
+animation time all advance exactly 1/60s per step). Rendering it also showed
+a real flaw: the opening deal skipped its stagger, so every card flew out at
+once. It now deals out proudest-first.

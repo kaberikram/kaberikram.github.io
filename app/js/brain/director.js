@@ -138,7 +138,7 @@ export function createDirector({ content, board, camera, ticker }) {
 
   // url: 'push' adds a Back step, 'replace' rewrites the current one, 'none'
   // leaves the address alone (used when the address itself caused the change).
-  function apply(raw, { url = 'push', stagger = true, keepCamera = false, instant = false, panel = null } = {}) {
+  function apply(raw, { url = 'push', stagger = true, forceStagger = false, keepCamera = false, instant = false, panel = null } = {}) {
     const { cmd, view } = resolve(raw)
     const focus = cmd.focus
 
@@ -161,7 +161,7 @@ export function createDirector({ content, board, camera, ticker }) {
     board.setTargets(poses, {
       labels,
       order: view.results,
-      stagger: changed && stagger && !still ? getSettings().stagger : 0,
+      stagger: (changed || forceStagger) && stagger && !still ? getSettings().stagger : 0,
       instant: still,
     })
 
@@ -211,7 +211,9 @@ export function createDirector({ content, board, camera, ticker }) {
       const start = new Map()
       for (const [id, pose] of pile.poses) start.set(id, { ...pose, o: 0 })
       board.jump(start)
-      apply(cmd, { url: 'replace', keepCamera: true })
+      // The pile is not a view, so the first deal is staggered even though the
+      // view itself is unchanged: the proudest cards leave the pile first.
+      apply(cmd, { url: 'replace', keepCamera: true, forceStagger: true })
     },
 
     focus(id) {
