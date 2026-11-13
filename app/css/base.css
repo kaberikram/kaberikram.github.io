@@ -13,7 +13,6 @@
   --bloom-opacity: 0.62;
   --ui-font: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
   --brand-font: Archivo, Inter, Helvetica, sans-serif;
-  --hand-font: "Shadows Into Light", "Bradley Hand", "Segoe Print", cursive;
 }
 
 html, body {
@@ -95,31 +94,6 @@ html.reduced-motion #field { animation: none; }
 #nav a { padding: 6px 0; }
 #nav a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
-/* Stands where the bar will live. For now it only says how to move. */
-#hint {
-  left: 50%;
-  bottom: max(26px, env(safe-area-inset-bottom));
-  transform: translateX(-50%);
-  max-width: calc(100vw - 32px);
-  padding: 11px 18px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  box-shadow: 0 0 0 0.5px rgba(70, 40, 30, 0.1), 0 8px 24px rgba(70, 40, 30, 0.1);
-  color: #5d5650;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  pointer-events: none;
-}
-
-#hint .touch { display: none; }
-html.is-lean #hint .mouse { display: none; }
-html.is-lean #hint .touch { display: inline; }
-
 #fail {
   display: none;
   position: fixed;
@@ -136,7 +110,7 @@ html.is-lean #hint .touch { display: inline; }
 
 #fail a { text-decoration: underline; }
 html.failed #fail { display: grid; }
-html.failed #hint { display: none; }
+html.failed #bar { display: none; }
 
 .sr-only {
   position: absolute;

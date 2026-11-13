@@ -27,14 +27,14 @@ const GROUPS = [
       { key: 'paper', type: 'color', label: 'Paper' },
       { key: 'ink', type: 'color', label: 'Ink' },
       { key: 'cardRadius', type: 'range', label: 'Corner radius', min: 0, max: 36, step: 1, unit: 'px' },
-      { key: 'labelSize', type: 'range', label: 'Label size', min: 20, max: 80, step: 1, unit: 'px' },
+      { key: 'labelSize', type: 'range', label: 'Label size', min: 12, max: 64, step: 1, unit: 'px' },
       { key: 'breathe', type: 'range', label: 'Idle drift', min: 0, max: 1, step: 1 },
     ],
   },
   {
     label: 'Space',
     controls: [
-      { key: 'spread', type: 'range', label: 'Spacing', min: 0.6, max: 2, step: 0.01 },
+      { key: 'spread', type: 'range', label: 'Spacing', min: 0.3, max: 2, step: 0.01 },
       { key: 'depth', type: 'range', label: 'Depth', min: 0, max: 2.5, step: 0.01 },
       { key: 'tilt', type: 'range', label: 'Lean to pointer', min: 0, max: 8, step: 0.1, unit: '°' },
       { key: 'bank', type: 'range', label: 'Lean into moves', min: 0, max: 3, step: 0.01 },

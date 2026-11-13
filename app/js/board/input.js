@@ -16,7 +16,7 @@ export function initInput({ stage, camera, board, director, ticker }) {
 
   function typingTarget(target) {
     if (!target || !target.closest) return false
-    return Boolean(target.closest('input, textarea, select, [contenteditable], #tune-panel'))
+    return Boolean(target.closest('input, textarea, select, [contenteditable], #tune-panel, #bar'))
   }
 
   function beginPinch() {

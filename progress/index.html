@@ -8,9 +8,10 @@
   <meta name="theme-color" content="#F1E7E2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Inter:wght@400..700&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Inter:wght@400..700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../app/css/base.css">
   <link rel="stylesheet" href="../app/css/cards.css">
+  <link rel="stylesheet" href="../app/css/bar.css">
   <link rel="preload" href="../app/content/content.json" as="fetch" crossorigin>
   <link rel="modulepreload" href="../app/js/main.js">
 </head>
@@ -26,10 +27,7 @@
     <a href="mailto:ikramandhakim@gmail.com">ikramandhakim@gmail.com</a>
   </nav>
 
-  <p class="ui" id="hint">
-    <span class="mouse">Drag to wander · click a card · arrows to step · 1–4 to rearrange</span>
-    <span class="touch">Drag to wander · pinch to zoom · tap a card</span>
-  </p>
+  <div id="bar" class="ui" data-mode="idle" role="search" aria-label="Ask about my work"></div>
 
   <div id="fail">
     <p>The board didn't load.<br>You can still reach me at <a href="mailto:ikramandhakim@gmail.com">ikramandhakim@gmail.com</a>.</p>

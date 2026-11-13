@@ -3,145 +3,450 @@
     "name": "Ikram Hakim",
     "email": "ikramandhakim@gmail.com"
   },
+  "about": {
+    "headline": "Hi! I'm a Creative Technologist based in Malaysia."
+  },
+  "contact": {
+    "email": "ikramandhakim@gmail.com",
+    "links": [
+      {
+        "label": "Instagram @kaberikram",
+        "url": "https://instagram.com/kaberikram"
+      },
+      {
+        "label": "Latest work (deck)",
+        "url": "https://docs.google.com/presentation/d/16rH1SScbSXx9nE_vG3BidaglPbljbsR_kiROxSRXZI8/edit?usp=sharing"
+      },
+      {
+        "label": "About Dreampop",
+        "url": "/dreampop.html"
+      },
+      {
+        "label": "Dreampop privacy policy",
+        "url": "/privacy.html"
+      }
+    ]
+  },
   "kinds": [
-    { "id": "ar", "label": "AR / Lenses", "dab": "#E4452E" },
-    { "id": "xr", "label": "XR / Mixed reality", "dab": "#7F92E6" },
-    { "id": "web", "label": "Web / Creative dev", "dab": "#F2A531" },
-    { "id": "product", "label": "Product / UI", "dab": "#2B2D5C" }
+    {
+      "id": "ar",
+      "label": "AR / Lenses",
+      "dab": "#E4452E"
+    },
+    {
+      "id": "xr",
+      "label": "XR / Mixed reality",
+      "dab": "#7F92E6"
+    },
+    {
+      "id": "web",
+      "label": "Web / Creative dev",
+      "dab": "#F2A531"
+    },
+    {
+      "id": "product",
+      "label": "Product / UI",
+      "dab": "#2B2D5C"
+    }
   ],
   "works": [
     {
-      "id": "IH0101", "title": "Geospatial AR", "line": "Google Maps, I/O pilot",
-      "when": null, "year": null, "month": null,
-      "kind": "ar", "tags": ["ar", "geospatial", "google maps"],
-      "proud": 11, "cover": "geo", "muted": false,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0101",
+      "title": "Geospatial AR",
+      "line": "Google Maps, I/O pilot",
+      "when": null,
+      "year": null,
+      "month": null,
+      "kind": "ar",
+      "tags": [
+        "ar",
+        "geospatial",
+        "google maps"
+      ],
+      "proud": 11,
+      "cover": "geo",
+      "muted": false,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0102", "title": "Ghost Catch", "line": "Spectacles, 2nd at Snap AR Day",
-      "when": "2024", "year": 2024, "month": null,
-      "kind": "ar", "tags": ["ar", "spectacles", "snap", "award"],
-      "proud": 14, "cover": "ghost", "muted": false,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0102",
+      "title": "Ghost Catch",
+      "line": "Spectacles, 2nd at Snap AR Day",
+      "when": "2024",
+      "year": 2024,
+      "month": null,
+      "kind": "ar",
+      "tags": [
+        "ar",
+        "spectacles",
+        "snap",
+        "award"
+      ],
+      "proud": 14,
+      "cover": "ghost",
+      "muted": false,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0103", "title": "Spectacles tools", "line": "Teleprompter, Currency, Pomodoro",
-      "when": "2024–25", "year": 2024, "month": null,
-      "kind": "ar", "tags": ["ar", "spectacles", "tools"],
-      "proud": 7, "cover": "pomodoro", "muted": false,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0103",
+      "title": "Spectacles tools",
+      "line": "Teleprompter, Currency, Pomodoro",
+      "when": "2024–25",
+      "year": 2024,
+      "month": null,
+      "kind": "ar",
+      "tags": [
+        "ar",
+        "spectacles",
+        "tools"
+      ],
+      "proud": 7,
+      "cover": "pomodoro",
+      "muted": false,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0201", "title": "Quest MR games", "line": "Dreampop, Take a Leap",
-      "when": null, "year": null, "month": null,
-      "kind": "xr", "tags": ["xr", "mr", "quest", "game"],
-      "proud": 10, "cover": "dreampop", "muted": false,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0201",
+      "title": "Quest MR games",
+      "line": "Dreampop, Take a Leap",
+      "when": null,
+      "year": null,
+      "month": null,
+      "kind": "xr",
+      "tags": [
+        "xr",
+        "mr",
+        "quest",
+        "game"
+      ],
+      "proud": 10,
+      "cover": "dreampop",
+      "muted": false,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0202", "title": "MOMNTS", "line": "Face-AR editor",
-      "when": "Jul 2026", "year": 2026, "month": 7,
-      "kind": "xr", "tags": ["xr", "ar", "face", "editor"],
-      "proud": 6, "cover": "live-momnts", "muted": false,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0202",
+      "title": "MOMNTS",
+      "line": "Face-AR editor",
+      "when": "Jul 2026",
+      "year": 2026,
+      "month": 7,
+      "kind": "xr",
+      "tags": [
+        "xr",
+        "ar",
+        "face",
+        "editor"
+      ],
+      "proud": 6,
+      "cover": "live-momnts",
+      "muted": false,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0203", "title": "Dimensional", "line": "Reel. A scene, scrubbed by hand",
-      "when": "Sep 2026", "year": 2026, "month": 9,
-      "kind": "xr", "tags": ["xr", "reel", "hand"],
-      "proud": 2, "cover": "a14f", "muted": false,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0203",
+      "title": "Dimensional",
+      "line": "Reel. A scene, scrubbed by hand",
+      "when": "Sep 2026",
+      "year": 2026,
+      "month": 9,
+      "kind": "xr",
+      "tags": [
+        "xr",
+        "reel",
+        "hand"
+      ],
+      "proud": 2,
+      "cover": "a14f",
+      "muted": false,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0204", "title": "Reality to bend", "line": "Reel. A room stretches, then shatters",
-      "when": "Oct 2026", "year": 2026, "month": 10,
-      "kind": "xr", "tags": ["xr", "reel"],
-      "proud": 1, "cover": "b26f", "muted": false,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0204",
+      "title": "Reality to bend",
+      "line": "Reel. A room stretches, then shatters",
+      "when": "Oct 2026",
+      "year": 2026,
+      "month": 10,
+      "kind": "xr",
+      "tags": [
+        "xr",
+        "reel"
+      ],
+      "proud": 1,
+      "cover": "b26f",
+      "muted": false,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0301", "title": "Webcam particles", "line": "Three.js",
-      "when": "2019", "year": 2019, "month": null,
-      "kind": "web", "tags": ["web", "three.js", "webcam"],
-      "proud": 4, "cover": null, "muted": false,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0301",
+      "title": "Webcam particles",
+      "line": "Three.js",
+      "when": "2019",
+      "year": 2019,
+      "month": null,
+      "kind": "web",
+      "tags": [
+        "web",
+        "three.js",
+        "webcam"
+      ],
+      "proud": 4,
+      "cover": null,
+      "muted": false,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0302", "title": "World End Tree", "line": "Spotify data, R3F",
-      "when": "May 2025", "year": 2025, "month": 5,
-      "kind": "web", "tags": ["web", "r3f", "spotify", "data"],
-      "proud": 8, "cover": "live-worldendtree", "muted": false,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0302",
+      "title": "World End Tree",
+      "line": "Spotify data, R3F",
+      "when": "May 2025",
+      "year": 2025,
+      "month": 5,
+      "kind": "web",
+      "tags": [
+        "web",
+        "r3f",
+        "spotify",
+        "data"
+      ],
+      "proud": 8,
+      "cover": "live-worldendtree",
+      "muted": false,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0303", "title": "Styling Canvas", "line": "Drag a shirt onto a model",
-      "when": "May 2025", "year": 2025, "month": 5,
-      "kind": "web", "tags": ["web", "canvas"],
-      "proud": 9, "cover": null, "muted": false,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0303",
+      "title": "Styling Canvas",
+      "line": "Drag a shirt onto a model",
+      "when": "May 2025",
+      "year": 2025,
+      "month": 5,
+      "kind": "web",
+      "tags": [
+        "web",
+        "canvas"
+      ],
+      "proud": 9,
+      "cover": null,
+      "muted": false,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0304", "title": "TIC Corp", "line": "Parody label, working shop",
-      "when": "2025", "year": 2025, "month": null,
-      "kind": "web", "tags": ["web", "shop", "parody"],
-      "proud": 16, "cover": "tic", "muted": true,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0304",
+      "title": "TIC Corp",
+      "line": "Parody label, working shop",
+      "when": "2025",
+      "year": 2025,
+      "month": null,
+      "kind": "web",
+      "tags": [
+        "web",
+        "shop",
+        "parody"
+      ],
+      "proud": 16,
+      "cover": "tic",
+      "muted": true,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0305", "title": "depth-vfx", "line": "Light becomes rays",
-      "when": "Mar 2026", "year": 2026, "month": 3,
-      "kind": "web", "tags": ["web", "depth", "vfx"],
-      "proud": 13, "cover": null, "muted": false,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0305",
+      "title": "depth-vfx",
+      "line": "Light becomes rays",
+      "when": "Mar 2026",
+      "year": 2026,
+      "month": 3,
+      "kind": "web",
+      "tags": [
+        "web",
+        "depth",
+        "vfx"
+      ],
+      "proud": 13,
+      "cover": null,
+      "muted": false,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0306", "title": "Speakfall", "line": "Speak. The words fall.",
-      "when": "Apr 2026", "year": 2026, "month": 4,
-      "kind": "web", "tags": ["web", "speech"],
-      "proud": 5, "cover": "live-speakfall", "muted": false,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0306",
+      "title": "Speakfall",
+      "line": "Speak. The words fall.",
+      "when": "Apr 2026",
+      "year": 2026,
+      "month": 4,
+      "kind": "web",
+      "tags": [
+        "web",
+        "speech"
+      ],
+      "proud": 5,
+      "cover": "live-speakfall",
+      "muted": false,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0307", "title": "Astral Angels", "line": "Client site, KL",
-      "when": "2026", "year": 2026, "month": null,
-      "kind": "web", "tags": ["web", "client"],
-      "proud": 19, "cover": "astral", "muted": true,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0307",
+      "title": "Astral Angels",
+      "line": "Client site, KL",
+      "when": "2026",
+      "year": 2026,
+      "month": null,
+      "kind": "web",
+      "tags": [
+        "web",
+        "client"
+      ],
+      "proud": 19,
+      "cover": "astral",
+      "muted": true,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0308", "title": "Aetherial", "line": "Browser game",
-      "when": "Jul 2026", "year": 2026, "month": 7,
-      "kind": "web", "tags": ["web", "game"],
-      "proud": 15, "cover": "live-aetherialgame", "muted": false,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0308",
+      "title": "Aetherial",
+      "line": "Browser game",
+      "when": "Jul 2026",
+      "year": 2026,
+      "month": 7,
+      "kind": "web",
+      "tags": [
+        "web",
+        "game"
+      ],
+      "proud": 15,
+      "cover": "live-aetherialgame",
+      "muted": false,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0309", "title": "Volta", "line": "Music-video editor",
-      "when": "Oct 2026", "year": 2026, "month": 10,
-      "kind": "web", "tags": ["web", "editor", "music", "video"],
-      "proud": 12, "cover": "live-volta", "muted": false,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0309",
+      "title": "Volta",
+      "line": "Music-video editor",
+      "when": "Oct 2026",
+      "year": 2026,
+      "month": 10,
+      "kind": "web",
+      "tags": [
+        "web",
+        "editor",
+        "music",
+        "video"
+      ],
+      "proud": 12,
+      "cover": "live-volta",
+      "muted": false,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0310", "title": "Depth Warp", "line": "A room from one photo",
-      "when": null, "year": null, "month": null,
-      "kind": "web", "tags": ["web", "depth", "photo"],
-      "proud": 3, "cover": "warp-room", "muted": false,
-      "summary": null, "role": null, "tools": [], "links": []
+      "id": "IH0310",
+      "title": "Depth Warp",
+      "line": "A room from one photo",
+      "when": null,
+      "year": null,
+      "month": null,
+      "kind": "web",
+      "tags": [
+        "web",
+        "depth",
+        "photo"
+      ],
+      "proud": 3,
+      "cover": "warp-room",
+      "muted": false,
+      "summary": null,
+      "role": null,
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0401", "title": "EPF i-Akaun", "line": "UI/UX designer, EPF",
-      "when": null, "year": null, "month": null,
-      "kind": "product", "tags": ["product", "ui", "ux"],
-      "proud": 17, "cover": null, "muted": false,
-      "summary": null, "role": "UI/UX designer", "tools": [], "links": []
+      "id": "IH0401",
+      "title": "EPF i-Akaun",
+      "line": "UI/UX designer, EPF",
+      "when": null,
+      "year": null,
+      "month": null,
+      "kind": "product",
+      "tags": [
+        "product",
+        "ui",
+        "ux"
+      ],
+      "proud": 17,
+      "cover": null,
+      "muted": false,
+      "summary": null,
+      "role": "UI/UX designer",
+      "tools": [],
+      "links": []
     },
     {
-      "id": "IH0402", "title": "SHXFT Studio", "line": "Creative developer, contract",
-      "when": null, "year": null, "month": null,
-      "kind": "product", "tags": ["product", "contract"],
-      "proud": 18, "cover": "shxft", "muted": false,
-      "summary": null, "role": "Creative developer (contract)", "tools": [], "links": []
+      "id": "IH0402",
+      "title": "SHXFT Studio",
+      "line": "Creative developer, contract",
+      "when": null,
+      "year": null,
+      "month": null,
+      "kind": "product",
+      "tags": [
+        "product",
+        "contract"
+      ],
+      "proud": 18,
+      "cover": "shxft",
+      "muted": false,
+      "summary": null,
+      "role": "Creative developer (contract)",
+      "tools": [],
+      "links": []
     }
   ]
 }

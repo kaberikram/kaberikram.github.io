@@ -15,7 +15,7 @@ export function createDirector({ content, board, camera, ticker }) {
 
   // Screen space the camera keeps clear: the header above, the bar below.
   let inset = { top: 64, right: 0, bottom: 104, left: 0 }
-  let state = { command: { ...HOME, tags: [] }, results: [], focus: null }
+  let state = { command: { ...HOME, tags: [] }, results: [], focus: null, panel: null }
   // Poses of the current view before any card is focused.
   let base = new Map()
   // Where the visitor dropped cards they picked up. Cleared when the view changes.
@@ -138,7 +138,7 @@ export function createDirector({ content, board, camera, ticker }) {
 
   // url: 'push' adds a Back step, 'replace' rewrites the current one, 'none'
   // leaves the address alone (used when the address itself caused the change).
-  function apply(raw, { url = 'push', stagger = true, keepCamera = false, instant = false } = {}) {
+  function apply(raw, { url = 'push', stagger = true, keepCamera = false, instant = false, panel = null } = {}) {
     const { cmd, view } = resolve(raw)
     const focus = cmd.focus
 
@@ -171,7 +171,7 @@ export function createDirector({ content, board, camera, ticker }) {
       else camera.to(cam)
     }
 
-    state = { command: cmd, results: view.results, focus: focus || null }
+    state = { command: cmd, results: view.results, focus: focus || null, panel }
     writeUrl(cmd, url)
     ticker.wake()
     notify()
@@ -266,10 +266,19 @@ export function createDirector({ content, board, camera, ticker }) {
       apply(HOME)
     },
 
-    // One step out: leave a focused card, then leave a filtered or rearranged
-    // view, then nothing.
+    // A side panel (about, contact) shown by the bar. It is not part of the
+    // view or the URL, so it never changes the board.
+    setPanel(name) {
+      if (name === state.panel) return
+      state = { ...state, panel: name }
+      notify()
+    },
+
+    // One step out: close a panel, leave a focused card, then leave a filtered
+    // or rearranged view, then nothing.
     back() {
-      if (state.focus) director.unfocus()
+      if (state.panel) director.setPanel(null)
+      else if (state.focus) director.unfocus()
       else if (toHash(state.command) !== '') director.home()
     },
 
@@ -287,7 +296,7 @@ export function createDirector({ content, board, camera, ticker }) {
 
     // Same view again after a resize or a settings change.
     reframe({ instant = false } = {}) {
-      apply(state.command, { url: 'none', stagger: false, instant })
+      apply(state.command, { url: 'none', stagger: false, instant, panel: state.panel })
     },
   }
 

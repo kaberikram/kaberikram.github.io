@@ -29,6 +29,8 @@ input ──▶ Command ──▶ director ──▶ a pose for every card ─�
 |---|---|
 | `content/content.json` | All content. The only file to edit to add or change a work. |
 | `js/brain/command.js` | The Command: validate it, pick the works it selects, read and write it as a URL hash. |
+| `js/brain/parse.js` | The on-device brain: text to a Command, which words were understood (for underlining), and a one-line plan. Words live in `LEXICON` at the top. |
+| `js/bar/bar.js` | The bar: pill, plan line while typing, answer sentence with editable blanks, work detail, About and Contact. Only sends Commands. |
 | `js/brain/director.js` | Turns a Command into card poses, a camera move and a URL. The one path for every change. |
 | `js/board/layouts.js` | The arrangements (scatter, grid, timeline, stack, fan). Pure functions. |
 | `js/board/board.js` | One element per card and label, moved by springs. |
@@ -69,9 +71,18 @@ Every view has a URL. Keys: `k` kind, `t` tags, `y` years, `s` sort
 
 Add `?fresh` to ignore settings saved in the browser.
 
+## The bar
+
+Press `/` (or click) and type. Understood words are underlined, a plan line says
+what will happen, and the board previews it live; Esc abandons it, Enter
+commits. Nothing it cannot read is a dead end: it offers a blank to fill.
+
+To teach it a word, add it to `LEXICON` in `js/brain/parse.js` and a case to
+`tests/parse.test.js`. Tags come from `content.json` automatically.
+
 ## Keys
 
-Arrows step between cards. Enter focuses the first. Esc steps out. Home or 0
+`/` asks. Arrows step between cards. Enter focuses the first. Esc steps out. Home or 0
 goes home. 1 to 4 switch arrangement. + and - zoom. D opens the Tune panel.
 
 ## The earlier version

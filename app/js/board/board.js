@@ -77,7 +77,7 @@ export function createBoard({ world, content }) {
     if (node.isCard) {
       // The shadow deepens in a few steps as a card comes forward. Stepping it
       // keeps the per-frame work to a transform and an opacity.
-      const lift = clamp(Math.round((v[Z] + 240) / 110), 0, 5)
+      const lift = clamp(Math.round((v[Z] + 360) / 130), 0, 6)
       if (lift !== node.lift) {
         node.lift = lift
         node.el.dataset.lift = String(lift)

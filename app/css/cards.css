@@ -16,6 +16,7 @@
   --shadow-blur: 16px;
   --shadow-alpha: 0.09;
   --haze: 0;
+  --blur: 0px;
 }
 
 .card.is-moving { will-change: transform, opacity; }
@@ -27,9 +28,9 @@
   border-radius: var(--card-radius);
   background: var(--paper);
   box-shadow:
-    0 0 0 0.5px rgba(70, 40, 30, 0.1),
-    0 1px 2px rgba(70, 40, 30, 0.06),
-    0 var(--shadow-y) var(--shadow-blur) rgba(70, 40, 30, var(--shadow-alpha));
+    0 0 0 1px rgba(40, 30, 25, 0.09),
+    0 var(--shadow-y) var(--shadow-blur) rgba(40, 30, 25, var(--shadow-alpha));
+  filter: blur(var(--blur));
   transition: box-shadow 0.35s ease, scale 0.25s ease, filter 0.4s ease;
   animation: drift var(--drift-time, 8s) ease-in-out var(--drift-delay, 0s) infinite alternate;
 }
@@ -53,12 +54,17 @@
 
 html.no-breathe .card-in { animation: none; }
 
-.card[data-lift="0"] { --shadow-y: 2px; --shadow-blur: 6px; --shadow-alpha: 0.06; --haze: 0.2; }
-.card[data-lift="1"] { --shadow-y: 4px; --shadow-blur: 10px; --shadow-alpha: 0.07; --haze: 0.1; }
-.card[data-lift="2"] { --shadow-y: 7px; --shadow-blur: 18px; --shadow-alpha: 0.09; }
-.card[data-lift="3"] { --shadow-y: 12px; --shadow-blur: 28px; --shadow-alpha: 0.12; }
-.card[data-lift="4"] { --shadow-y: 20px; --shadow-blur: 44px; --shadow-alpha: 0.15; }
-.card[data-lift="5"] { --shadow-y: 30px; --shadow-blur: 64px; --shadow-alpha: 0.19; }
+/* Seven depth steps (data-lift, set in board.js). Far cards take on haze, a
+   little blur and a tight shadow; near cards lift off the page with a long one. */
+.card[data-lift="0"] { --shadow-y: 1px; --shadow-blur: 4px; --shadow-alpha: 0.05; --haze: 0.34; --blur: 1.6px; }
+.card[data-lift="1"] { --shadow-y: 2px; --shadow-blur: 8px; --shadow-alpha: 0.06; --haze: 0.22; --blur: 0.9px; }
+.card[data-lift="2"] { --shadow-y: 4px; --shadow-blur: 14px; --shadow-alpha: 0.08; --haze: 0.1; --blur: 0.3px; }
+.card[data-lift="3"] { --shadow-y: 8px; --shadow-blur: 22px; --shadow-alpha: 0.1; }
+.card[data-lift="4"] { --shadow-y: 14px; --shadow-blur: 36px; --shadow-alpha: 0.13; }
+.card[data-lift="5"] { --shadow-y: 22px; --shadow-blur: 54px; --shadow-alpha: 0.16; }
+.card[data-lift="6"] { --shadow-y: 32px; --shadow-blur: 72px; --shadow-alpha: 0.2; }
+
+html.is-lean .card-in { --blur: 0px; filter: none; }
 
 @media (hover: hover) {
   .card:hover .card-in { scale: 1.025; }
@@ -80,14 +86,14 @@ html.no-breathe .card-in { animation: none; }
 /* Cards that are not part of the current answer sink back and soften.
    Cards beside a focused one soften a little, like a shallow depth of field.
    Phones skip the blur: it is the costly part. */
-.card.is-soft .card-in { filter: blur(1.5px); }
-.card.is-dim .card-in { filter: blur(2.5px) saturate(0.7); }
+.card.is-soft .card-in { filter: blur(calc(var(--blur) + 1px)); }
+.card.is-dim .card-in { filter: blur(calc(var(--blur) + 2px)) saturate(0.7); }
 html.is-lean .card.is-soft .card-in { filter: none; }
 html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
 
 .card-pic {
   height: 162px;
-  border-radius: max(2px, calc(var(--card-radius) - 6px));
+  border-radius: calc(var(--card-radius) * 0.6);
   overflow: hidden;
   background: #EEE8E3;
 }
@@ -166,23 +172,16 @@ html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
   top: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 4px 0 2px;
-  border-bottom: 2px solid var(--ink);
-  transform-origin: 0 0;
+  gap: 9px;
   color: var(--ink);
-  font-family: var(--hand-font);
+  font-family: var(--ui-font);
   font-size: var(--label-size);
-  line-height: 1.15;
-  letter-spacing: 0.05em;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
   pointer-events: none;
 }
 
-.label .dab {
-  width: 0.62em;
-  height: 0.46em;
-  border-radius: 50%;
-  rotate: -14deg;
-}
+.label .dab { width: 0.5em; height: 0.5em; }
