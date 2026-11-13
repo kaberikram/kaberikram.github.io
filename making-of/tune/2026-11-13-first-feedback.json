@@ -1,0 +1,21 @@
+{
+  "canvas": "#F1E7E2",
+  "bloom1": "#ffffff",
+  "bloom2": "#ffffff",
+  "bloom3": "#ffffff",
+  "bloomOpacity": 0.8,
+  "paper": "#FFFFFF",
+  "ink": "#1C1B1A",
+  "cardRadius": 0,
+  "labelSize": 31,
+  "spread": 0.6,
+  "depth": 2.07,
+  "tilt": 2,
+  "bank": 1,
+  "camStiffness": 90,
+  "camDamping": 20,
+  "cardStiffness": 130,
+  "cardDamping": 19,
+  "stagger": 26,
+  "breathe": 1
+}

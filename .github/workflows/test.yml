@@ -1,0 +1,18 @@
+name: tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Node only, no installs: the unit tests cover the content file, the
+      # arrangements, the camera maths, the Commands and the parser.
+      - run: npm test
