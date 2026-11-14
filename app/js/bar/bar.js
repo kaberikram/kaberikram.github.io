@@ -13,6 +13,7 @@
 import { SUGGESTIONS, LAYOUT_TEXT, describe, parse, sortText } from '../brain/parse.js'
 import { hasFilter, toHash } from '../brain/command.js'
 import { escapeHtml } from '../util.js'
+import { cue } from '../cue.js'
 
 const SORTS = [['proud', 'proudest'], ['recent', 'newest'], ['oldest', 'earliest']]
 const LAYOUTS = [['scatter', 'a board'], ['grid', 'a grid'], ['timeline', 'a timeline'], ['stack', 'a stack']]
@@ -52,6 +53,9 @@ export function createBar({ content, director, mount }) {
   let blank = null // text we did not understand
   let note = null // { text, at } explanation shown with the answer
   let openSlot = null
+  let lastLength = 0
+  let lastFound = 0
+  let lastMode = null
 
   const typing = () => input.value.trim().length > 0
 
@@ -89,6 +93,8 @@ export function createBar({ content, director, mount }) {
   }
 
   function onInput() {
+    if (input.value.length > lastLength) cue('type')
+    lastLength = input.value.length
     blank = null
     note = null
     openSlot = null
@@ -103,6 +109,8 @@ export function createBar({ content, director, mount }) {
     }
     if (!committed) committed = director.getState().command
     const result = parse(input.value, content)
+    if (result.found.length > lastFound) cue('understood')
+    lastFound = result.found.length
     paintMirror(result.found)
     plan.textContent = result.understood ? describe(result, content) : 'Keep going, or pick something below'
     plan.classList.toggle('quiet', !result.understood)
@@ -121,7 +129,10 @@ export function createBar({ content, director, mount }) {
   function commit(text) {
     const result = parse(text, content)
     clearTimeout(previewTimer)
+    lastLength = 0
+    lastFound = 0
     if (!result.understood) {
+      cue('unsure')
       if (previewing && committed) director.apply(committed, { url: 'none', stagger: false })
       finishTyping()
       blank = text.trim()
@@ -130,6 +141,7 @@ export function createBar({ content, director, mount }) {
       return
     }
     finishTyping()
+    cue('confirm')
     blank = null
     if (result.boardChange) {
       const asked = hasFilter(result.command)
@@ -320,6 +332,8 @@ export function createBar({ content, director, mount }) {
     show('answer', hasAnswer)
     show('plan', isTyping)
     show('chips', mode === 'idle' || Boolean(blank))
+    if (lastMode && mode !== lastMode && mode !== 'typing' && lastMode !== 'typing') cue('shape')
+    lastMode = mode
     mount.dataset.mode = mode
     input.placeholder = mode === 'idle' ? 'Ask me anything' : mode === 'detail' ? 'Ask for something else' : 'Ask me anything'
   }

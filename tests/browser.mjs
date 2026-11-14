@@ -338,6 +338,73 @@ const browser = await chromium.launch()
   await context.close()
 }
 
+// ---- sound -------------------------------------------------------------------------
+{
+  console.log('\nSound')
+  const { context, page, errors } = await open(browser)
+  await settled(page)
+  const sound = () => page.evaluate(() => ({ state: window.__progress.sound.state, on: window.__progress.sound.on, played: [...window.__progress.sound.played] }))
+  let s = await sound()
+  check(s.state === 'locked' && s.played.length === 0, 'nothing plays, and no audio starts, before the first tap or key')
+  check(await page.getAttribute('#sound', 'aria-pressed') === 'true', 'the speaker button is there from the start, on')
+
+  const target = await centreOf(page, 'IH0306')
+  await page.mouse.click(target.x, target.y)
+  await page.waitForTimeout(400)
+  s = await sound()
+  check(s.state !== 'locked', 'the first click wakes the sound')
+  check(s.played.filter((n) => n === 'focus').length === 1, 'focusing a card plays one focus sound')
+  check(s.played.includes('flight'), 'the flight to it plays the whoosh')
+  await settled(page)
+  await page.waitForTimeout(600)
+  check(await page.evaluate(() => window.__progress.sound.played.length) >= 2, 'sounds are logged as they play')
+
+  await page.keyboard.press('Escape')
+  await page.waitForTimeout(300)
+  check((await sound()).played.includes('close'), 'stepping out plays the close sound')
+
+  await page.keyboard.press('/')
+  await page.keyboard.type('proudest', { delay: 30 })
+  await page.waitForTimeout(300)
+  s = await sound()
+  check(s.played.filter((n) => n === 'type').length >= 6, 'typing ticks')
+  check(s.played.includes('understood'), 'an understood word glints')
+  await page.keyboard.press('Enter')
+  await page.waitForTimeout(300)
+  check((await sound()).played.includes('confirm'), 'Enter confirms')
+  await settled(page)
+  await page.keyboard.press('Escape')
+  await page.keyboard.press('Home')
+  await settled(page)
+
+  const before = (await sound()).played.filter((n) => n === 'deal').length
+  await page.keyboard.press('2')
+  await settled(page)
+  const dealt = (await sound()).played.filter((n) => n === 'deal').length - before
+  check(dealt === 19, `rearranging flicks each card once as it sets off (${dealt})`)
+
+  await page.click('#sound')
+  s = await sound()
+  check(!s.on && await page.getAttribute('#sound', 'aria-pressed') === 'false', 'the speaker button turns sound off')
+  const count = s.played.length
+  await page.keyboard.press('1')
+  await settled(page)
+  await page.mouse.click(target.x, target.y)
+  await settled(page)
+  check((await sound()).played.length === count, 'nothing plays while sound is off')
+  await page.reload({ waitUntil: 'load' })
+  await page.waitForFunction(() => window.__progress && window.__progress.ready, null, { polling: 100 })
+  check(!(await sound()).on, 'off is remembered after a reload')
+  await page.click('#sound')
+  await settled(page)
+
+  const idle = await page.evaluate(() => window.__progress.ticker.frames)
+  await page.waitForTimeout(1200)
+  check(await page.evaluate(() => window.__progress.ticker.frames) - idle <= 1, 'sound adds no animation frames while idle')
+  check(errors.length === 0, `no page errors (${errors.slice(0, 2).join(' | ') || 'none'})`)
+  await context.close()
+}
+
 // ---- deep link on first load ---------------------------------------------------
 {
   console.log('\nOpening straight on a card')

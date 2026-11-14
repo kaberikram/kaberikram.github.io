@@ -5,6 +5,7 @@
 
 import { clamp } from '../util.js'
 import { getSettings, isLean } from '../settings.js'
+import { cue } from '../cue.js'
 
 // Movement under this many pixels is a click, not a drag.
 const CLICK_SLOP = 6
@@ -16,7 +17,7 @@ export function initInput({ stage, camera, board, director, ticker }) {
 
   function typingTarget(target) {
     if (!target || !target.closest) return false
-    return Boolean(target.closest('input, textarea, select, [contenteditable], #tune-panel, #bar'))
+    return Boolean(target.closest('input, textarea, select, [contenteditable], #tune-panel, #bar, #sound'))
   }
 
   function beginPinch() {
@@ -39,6 +40,7 @@ export function initInput({ stage, camera, board, director, ticker }) {
     drag.gy = under.y - pose.y
     drag.mode = 'card'
     board.lift(drag.id, { z: rest.z + 150, s: rest.s * 1.06 })
+    cue('lift', { px: drag.px })
     stage.classList.add('is-carrying')
     return true
   }
@@ -58,6 +60,7 @@ export function initInput({ stage, camera, board, director, ticker }) {
     const spot = camera.screenToWorld(onScreen.x, onScreen.y, rest ? rest.z : pose.z)
     director.moveCard(held.id, spot.x, spot.y)
     board.drop(held.id, director.restPose(held.id))
+    cue('drop', { px: onScreen.x })
     stage.classList.remove('is-carrying')
     ticker.wake()
   }

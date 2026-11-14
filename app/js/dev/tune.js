@@ -12,6 +12,16 @@ import {
 
 const GROUPS = [
   {
+    label: 'Sound',
+    controls: [
+      { key: 'soundLevel', type: 'range', label: 'Volume', min: 0, max: 1, step: 0.01 },
+      { key: 'soundFlight', type: 'range', label: 'Flight whoosh', min: 0, max: 1.5, step: 0.01 },
+      { key: 'soundTicks', type: 'range', label: 'Ticks and taps', min: 0, max: 1.5, step: 0.01 },
+      { key: 'soundBrightness', type: 'range', label: 'Brightness', min: 0, max: 1, step: 0.01 },
+      { key: 'soundRoom', type: 'range', label: 'Room', min: 0, max: 1, step: 0.01 },
+    ],
+  },
+  {
     label: 'Canvas',
     controls: [
       { key: 'canvas', type: 'color', label: 'Background' },

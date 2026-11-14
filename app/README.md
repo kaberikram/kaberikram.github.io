@@ -38,6 +38,8 @@ input ──▶ Command ──▶ director ──▶ a pose for every card ─�
 | `js/core/camera.js` | Camera position and all projection maths. |
 | `js/core/spring.js` | Springs, and the single animation loop that stops when nothing moves. |
 | `js/settings.js` | Look-and-feel values, saved in the browser, pushed to CSS. |
+| `js/sound/` | Generated sound: `voices.js` (each sound), `mix.js` (pan, distance, whoosh maths), `sound.js` (unlock, mute button, listens for cues). |
+| `js/cue.js` | `cue(name)`: how the bar, board and input announce moments worth hearing. |
 | `js/dev/tune.js` | The Tune panel: press **D**, or add `?debug`. |
 
 ## Adding a work

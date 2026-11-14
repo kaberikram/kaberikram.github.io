@@ -26,6 +26,11 @@ export const DEFAULTS = {
   cardDamping: 19,
   stagger: 26,
   breathe: 1,
+  soundLevel: 0.7,
+  soundFlight: 0.6,
+  soundTicks: 0.6,
+  soundBrightness: 0.55,
+  soundRoom: 0.25,
 }
 
 const BOUNDS = {
@@ -42,6 +47,11 @@ const BOUNDS = {
   cardDamping: [4, 60],
   stagger: [0, 120],
   breathe: [0, 1],
+  soundLevel: [0, 1],
+  soundFlight: [0, 1.5],
+  soundTicks: [0, 1.5],
+  soundBrightness: [0, 1],
+  soundRoom: [0, 1],
 }
 
 const COLOR_KEYS = ['canvas', 'bloom1', 'bloom2', 'bloom3', 'paper', 'ink']

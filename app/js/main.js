@@ -9,6 +9,7 @@ import { initInput } from './board/input.js'
 import { createDirector } from './brain/director.js'
 import { createBar } from './bar/bar.js'
 import { initTune } from './dev/tune.js'
+import { createSound } from './sound/sound.js'
 
 bootSettings()
 
@@ -70,6 +71,9 @@ try {
 
   createBar({ content, director, mount: document.getElementById('bar') })
 
+  const sound = createSound({ camera, director, button: document.getElementById('sound') })
+  ticker.add(() => sound.update())
+
   initTune({
     views: [
       ['Messy', () => director.setLayout('scatter')],
@@ -89,6 +93,7 @@ try {
     director,
     camera,
     ticker,
+    sound,
     get ready() {
       return ready
     },
