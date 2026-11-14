@@ -118,3 +118,16 @@ Couldn't listen here, so rendered every sound offline to WAV and measured:
 nothing clips, but the first pass had ticks near -40 dBFS under a -17 dBFS
 whoosh. Rebalanced so notes peak about -18, ticks about -26, whoosh -21.
 Renders and levels in `sounds/`.
+
+## 2026-11-14 · the flight, rebuilt
+"The only sound that needs to be better is flight. Now it's sharp and harsh;
+needs to sound effortless, lush, clean and impactful." (Flight had been turned
+down to 0.1 in Tune.)
+
+Measured the old one: centre 5.1 kHz, half its energy above 4 kHz. First
+rebuild overcorrected to a 69 Hz rumble that laptop speakers can't play; the
+soft noise also hid low drift and isolated spikes. Fixed both at the source.
+Final: warm air in stereo with a body, an impact on long flights and a landing,
+centred near 250 Hz, clean above 4 kHz. Short hops whisper, drifts are silent.
+Tune values from this round are the new defaults; saved settings reset (v3) so
+the flight starts at its new level, 0.5.
