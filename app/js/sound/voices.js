@@ -137,6 +137,203 @@ export const VOICES = {
   },
 }
 
+// Soft noise for the flight: pink, then gently darkened toward brown, so its
+// energy falls with pitch (white noise is what made the old one hiss). Seeded,
+// four seconds long so the loop is never heard, one buffer per seed.
+const softCache = new WeakMap()
+
+export function softNoise(c, seed = 1) {
+  let bySeed = softCache.get(c)
+  if (!bySeed) softCache.set(c, (bySeed = new Map()))
+  if (bySeed.has(seed)) return bySeed.get(seed)
+  const length = Math.round(c.sampleRate * 4)
+  const buffer = c.createBuffer(1, length, c.sampleRate)
+  const data = buffer.getChannelData(0)
+  let r = 1 + seed * 7919
+  let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0, brown = 0
+  for (let i = 0; i < length; i++) {
+    r = (r * 16807) % 2147483647
+    const white = (r / 2147483647) * 2 - 1
+    // Paul Kellet's pink filter.
+    b0 = 0.99886 * b0 + white * 0.0555179
+    b1 = 0.99332 * b1 + white * 0.0750759
+    b2 = 0.969 * b2 + white * 0.153852
+    b3 = 0.8665 * b3 + white * 0.3104856
+    b4 = 0.55 * b4 + white * 0.5329522
+    b5 = -0.7616 * b5 - white * 0.016898
+    const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362
+    b6 = white * 0.115926
+    brown = 0.985 * brown + pink * 0.06
+    data[i] = pink * 0.35 + brown * 0.65
+  }
+  // Crossfade the ends so the loop point is seamless.
+  const fade = Math.round(c.sampleRate * 0.05)
+  for (let i = 0; i < fade; i++) {
+    const k = i / fade
+    data[i] = data[i] * k + data[length - fade + i] * (1 - k)
+  }
+  // Remove the slow drift (brown noise wanders), then set a steady level by
+  // average loudness and gently round off the rare spikes, so the noise has
+  // no sudden peaks.
+  let prevIn = 0
+  let prevOut = 0
+  let sum = 0
+  for (let i = 0; i < length; i++) {
+    const y = 0.995 * (prevOut + data[i] - prevIn)
+    prevIn = data[i]
+    prevOut = y
+    data[i] = y
+    sum += y * y
+  }
+  const rms = Math.sqrt(sum / length) || 1
+  for (let i = 0; i < length; i++) data[i] = Math.tanh((data[i] / rms) * 0.28) / 0.9
+  bySeed.set(seed, buffer)
+  return buffer
+}
+
+// The flight: a lasting voice, not a one-shot. Two soft noise layers spread left
+// and right through a gentle low-pass (the air), and a low detuned fifth
+// underneath (the body). `dry` takes it straight to the master, past the
+// brightness filter; `send` feeds the room. Returns controls the engine calls
+// each frame, plus the impact at the start of a long flight and the landing.
+export function createFlight(c, dry, send) {
+  // A gentle compressor holds the peaks and glues air, body and impact into one
+  // sound. `out` is the level control in front of it.
+  const out = c.createGain()
+  const glue = c.createDynamicsCompressor()
+  glue.threshold.value = -26
+  glue.knee.value = 12
+  glue.ratio.value = 3.5
+  glue.attack.value = 0.012
+  glue.release.value = 0.3
+  const trim = c.createGain()
+  trim.gain.value = 0.45
+  out.connect(glue).connect(trim)
+  trim.connect(dry)
+  trim.connect(send)
+
+  const air = c.createGain()
+  air.gain.value = 0
+  air.connect(out)
+  const filters = []
+  for (const [seed, side] of [[3, -0.65], [8, 0.65]]) {
+    const src = c.createBufferSource()
+    src.buffer = softNoise(c, seed)
+    src.loop = true
+    const low = c.createBiquadFilter()
+    low.type = 'lowpass'
+    low.Q.value = 0.7
+    low.frequency.value = 250
+    // Soft noise carries a lot of rumble near zero hertz; trim it so the air
+    // reads as air, not as a boom.
+    const high = c.createBiquadFilter()
+    high.type = 'highpass'
+    high.Q.value = 0.6
+    high.frequency.value = 140
+    const pan = c.createStereoPanner()
+    pan.pan.value = side
+    src.connect(high).connect(low).connect(pan).connect(air)
+    src.start(0, seed * 0.37)
+    filters.push(low)
+  }
+
+  const body = c.createGain()
+  body.gain.value = 0
+  body.connect(out)
+  // An octave above sub-bass, so laptop and phone speakers can still play it.
+  const tones = [[110, 0], [165, 4]].map(([freq, cents]) => {
+    const osc = c.createOscillator()
+    osc.type = 'sine'
+    osc.frequency.value = freq
+    osc.detune.value = cents
+    osc.connect(body)
+    osc.start()
+    return { osc, freq }
+  })
+
+  return {
+    out,
+    // level 0 to 1, filter in Hz, lift 0 to 1 (one semitone up at full).
+    set(level, freq, lift, t) {
+      air.gain.setTargetAtTime(level * 1.6, t, 0.05)
+      body.gain.setTargetAtTime(level ** 1.5 * 0.05, t, 0.08)
+      for (const low of filters) low.frequency.setTargetAtTime(freq, t, 0.08)
+      for (const { osc, freq: base } of tones) osc.frequency.setTargetAtTime(base * 2 ** (lift / 12), t, 0.12)
+    },
+    // A long flight sets off: one soft, deep push with a long tail.
+    impact(t, size = 1) {
+      const osc = c.createOscillator()
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(160, t)
+      osc.frequency.exponentialRampToValueAtTime(80, t + 0.7)
+      const g = c.createGain()
+      g.gain.setValueAtTime(0.0001, t)
+      g.gain.linearRampToValueAtTime(0.13 * size, t + 0.03)
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 1.1)
+      osc.connect(g).connect(out)
+      osc.start(t)
+      osc.stop(t + 1.2)
+      // Its octave, quieter, so the push is felt even on small speakers.
+      const over = c.createOscillator()
+      over.type = 'sine'
+      over.frequency.setValueAtTime(320, t)
+      over.frequency.exponentialRampToValueAtTime(160, t + 0.6)
+      const og = c.createGain()
+      og.gain.setValueAtTime(0.0001, t)
+      og.gain.linearRampToValueAtTime(0.035 * size, t + 0.03)
+      og.gain.exponentialRampToValueAtTime(0.0001, t + 0.8)
+      over.connect(og).connect(out)
+      over.start(t)
+      over.stop(t + 0.9)
+      const src = c.createBufferSource()
+      src.buffer = softNoise(c, 5)
+      const low = c.createBiquadFilter()
+      low.type = 'lowpass'
+      low.frequency.setValueAtTime(1400, t)
+      low.frequency.exponentialRampToValueAtTime(300, t + 0.6)
+      const n = c.createGain()
+      n.gain.setValueAtTime(0.0001, t)
+      n.gain.linearRampToValueAtTime(0.16 * size, t + 0.04)
+      n.gain.exponentialRampToValueAtTime(0.0001, t + 0.7)
+      const trim = c.createBiquadFilter()
+      trim.type = 'highpass'
+      trim.frequency.value = 90
+      src.connect(trim).connect(low).connect(n).connect(out)
+      src.start(t, 1.3)
+      src.stop(t + 0.8)
+    },
+    // The flight settles: a quiet low breath.
+    land(t) {
+      const src = c.createBufferSource()
+      src.buffer = softNoise(c, 11)
+      const low = c.createBiquadFilter()
+      low.type = 'lowpass'
+      low.frequency.setValueAtTime(650, t)
+      low.frequency.exponentialRampToValueAtTime(200, t + 0.45)
+      const n = c.createGain()
+      n.gain.setValueAtTime(0.0001, t)
+      n.gain.linearRampToValueAtTime(0.09, t + 0.05)
+      n.gain.exponentialRampToValueAtTime(0.0001, t + 0.5)
+      const trim = c.createBiquadFilter()
+      trim.type = 'highpass'
+      trim.frequency.value = 90
+      src.connect(trim).connect(low).connect(n).connect(out)
+      src.start(t, 0.6)
+      src.stop(t + 0.6)
+      const osc = c.createOscillator()
+      osc.frequency.setValueAtTime(130, t)
+      osc.frequency.exponentialRampToValueAtTime(100, t + 0.35)
+      const g = c.createGain()
+      g.gain.setValueAtTime(0.0001, t)
+      g.gain.linearRampToValueAtTime(0.04, t + 0.02)
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.4)
+      osc.connect(g).connect(out)
+      osc.start(t)
+      osc.stop(t + 0.5)
+    },
+  }
+}
+
 // A room: a short, soft, generated reverb tail. `size` 0 to 1.
 export function roomImpulse(c, size = 0.3) {
   const seconds = 0.4 + size * 1.6

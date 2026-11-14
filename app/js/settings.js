@@ -3,7 +3,7 @@
 // The Tune panel (D key, or ?debug) edits it.
 
 // Bumped when defaults change meaning, so stale saved values are dropped.
-const STORAGE_KEY = 'ikram-board-v2'
+const STORAGE_KEY = 'ikram-board-v3'
 const LEAN_QUERY = '(max-width: 768px), (pointer: coarse)'
 
 export const DEFAULTS = {
@@ -27,10 +27,11 @@ export const DEFAULTS = {
   stagger: 26,
   breathe: 1,
   soundLevel: 0.7,
-  soundFlight: 0.6,
-  soundTicks: 0.6,
-  soundBrightness: 0.55,
-  soundRoom: 0.25,
+  soundFlight: 0.5,
+  soundFlightSpace: 0.5,
+  soundTicks: 0.35,
+  soundBrightness: 0.91,
+  soundRoom: 0.5,
 }
 
 const BOUNDS = {
@@ -49,6 +50,7 @@ const BOUNDS = {
   breathe: [0, 1],
   soundLevel: [0, 1],
   soundFlight: [0, 1.5],
+  soundFlightSpace: [0, 1],
   soundTicks: [0, 1.5],
   soundBrightness: [0, 1],
   soundRoom: [0, 1],

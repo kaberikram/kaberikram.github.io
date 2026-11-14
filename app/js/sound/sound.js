@@ -8,8 +8,8 @@
 // so an idle page costs nothing.
 
 import { getSettings, subscribe } from '../settings.js'
-import { VOICES, noiseBuffer, roomImpulse } from './voices.js'
-import { distanceGain, flightShape, panFor } from './mix.js'
+import { VOICES, createFlight, roomImpulse } from './voices.js'
+import { createFlightTracker, distanceGain, flightShape, panFor } from './mix.js'
 
 const STORE = 'ikram-sound'
 const MAX_VOICES = 14
@@ -32,6 +32,11 @@ export function createSound({ camera, director, button }) {
   let wet = null
   let room = null
   let flight = null
+  let flightSend = null
+  const track = createFlightTracker()
+  let flightLevel = 0
+  let lastStep = 0
+  let flying = false
   let roomSize = -1
   let voices = 0
   let sleepTimer = 0
@@ -58,18 +63,11 @@ export function createSound({ camera, director, button }) {
     wet.connect(master)
     master.connect(ctx.destination)
 
-    // The flight: a looping hiss through a moving band filter, silent at rest.
-    const src = ctx.createBufferSource()
-    src.buffer = noiseBuffer(ctx)
-    src.loop = true
-    const band = ctx.createBiquadFilter()
-    band.type = 'bandpass'
-    band.Q.value = 0.9
-    const gain = ctx.createGain()
-    gain.gain.value = 0
-    src.connect(band).connect(gain).connect(bus)
-    src.start()
-    flight = { band, gain, level: 0 }
+    // The flight has its own path: straight to the master, past the brightness
+    // filter, and its own send into the room.
+    flightSend = ctx.createGain()
+    flightSend.connect(room)
+    flight = createFlight(ctx, master, flightSend)
     applySettings()
     return true
   }
@@ -81,6 +79,8 @@ export function createSound({ camera, director, button }) {
     master.gain.setTargetAtTime(on ? s.soundLevel : 0, t, 0.05)
     tone.frequency.setTargetAtTime(2500 + 12000 * s.soundBrightness, t, 0.05)
     wet.gain.setTargetAtTime(s.soundRoom * 0.6, t, 0.05)
+    flight.out.gain.setTargetAtTime(s.soundFlight, t, 0.05)
+    flightSend.gain.setTargetAtTime(s.soundFlightSpace * 0.9, t, 0.05)
     // Rebuilding the room is the one costly step, so only when its size changes.
     if (Math.abs(s.soundRoom - roomSize) > 0.02) {
       roomSize = s.soundRoom
@@ -95,7 +95,7 @@ export function createSound({ camera, director, button }) {
     if (ctx.state === 'suspended') ctx.resume()
     clearTimeout(sleepTimer)
     sleepTimer = setTimeout(() => {
-      if (ctx && ctx.state === 'running' && flight.level < 0.01 && voices === 0) ctx.suspend()
+      if (ctx && ctx.state === 'running' && flightLevel < 0.01 && voices === 0) ctx.suspend()
     }, SLEEP_AFTER)
     return true
   }
@@ -175,35 +175,51 @@ export function createSound({ camera, director, button }) {
 
   // ---- the flight, once a frame while the camera moves --------------------------
 
+  // Feed the tracker a target and let it breathe; then hand the smoothed level
+  // to the voice. Impact and landing come from the tracker, once each per flight.
+  function advance(target, dt) {
+    const result = track(target.level, dt)
+    flightLevel = result.level
+    const t = ctx.currentTime
+    flight.set(result.level, target.freq, target.lift, t)
+    for (const event of result.events) {
+      if (event === 'impact') {
+        flight.impact(t)
+        played.push('impact')
+      } else {
+        flight.land(t)
+        played.push('land')
+      }
+    }
+    if (!flying && flightLevel > 0.02) {
+      flying = true
+      played.push('flight')
+    } else if (flying && flightLevel < 0.005) {
+      flying = false
+    }
+    if (flightLevel > 0.005) awake()
+  }
+
   function update() {
     if (!ctx || !on || ctx.state !== 'running') return false
+    const now = performance.now()
+    const dt = Math.min(0.1, (now - (lastStep || now)) / 1000) || 1 / 60
+    lastStep = now
     const v = camera.velocity
     const scale = camera.scaleAt(camera.pivot)
-    const shape = flightShape(Math.hypot(v.x, v.y) * scale, v.z)
-    const level = shape.level * getSettings().soundFlight * 0.2
-    const t = ctx.currentTime
-    flight.gain.gain.setTargetAtTime(level, t, 0.07)
-    flight.band.frequency.setTargetAtTime(shape.freq, t, 0.07)
-    flight.level = level
-    if (level > 0.005) {
-      awake()
-      if (!flight.on) played.push('flight')
-      flight.on = true
-    } else {
-      flight.on = false
-    }
+    advance(flightShape(Math.hypot(v.x, v.y) * scale, v.z), dt)
     return false
   }
 
-  // When the camera stops, the ticker stops calling us: make sure the hiss
-  // fades even then.
+  // When the camera stops, the ticker stops calling update: keep easing the
+  // flight out here, so its tail and landing still happen.
   setInterval(() => {
-    if (ctx && flight.level > 0 && Math.hypot(camera.velocity.x, camera.velocity.y, camera.velocity.z) < 1) {
-      flight.gain.gain.setTargetAtTime(0, ctx.currentTime, 0.08)
-      flight.level = 0
-      flight.on = false
-    }
-  }, 250)
+    if (!ctx || !on || ctx.state !== 'running' || flightLevel < 0.002) return
+    const v = camera.velocity
+    if (Math.hypot(v.x, v.y, v.z) > 1) return
+    lastStep = performance.now()
+    advance({ level: 0, freq: 250, lift: 0 }, 0.05)
+  }, 50)
 
   // ---- the speaker button ------------------------------------------------------
 
@@ -225,8 +241,8 @@ export function createSound({ camera, director, button }) {
     if (on) unlock()
     applySettings()
     if (!on && ctx) {
-      flight.gain.gain.setTargetAtTime(0, ctx.currentTime, 0.03)
-      flight.level = 0
+      flight.set(0, 250, 0, ctx.currentTime)
+      flightLevel = 0
     }
     paint()
   }
