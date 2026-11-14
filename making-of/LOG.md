@@ -103,3 +103,18 @@ in depth along the ray under the pointer.
 Also read a teardown of tsubi.club and diana.lu. Taken: one signature done
 fully (this camera), one motion language. Later, maybe: a small recorded sound
 kit with mute, cued by flights. Left: their palettes, fonts, cursors, wording.
+
+## 2026-11-14 · sound
+"No sfx yet?" Chose: every sound generated in the browser, no files; cues for
+flights, focus and close, typing and the bar, deal and card handling.
+
+One engine listens for named cues and never starts on its own (first tap or
+key wakes it, a speaker button turns it off and is remembered). The flight is
+a continuous whoosh driven by camera speed, brighter flying in than back. Card
+sounds are panned by screen position and quieter with distance. It sleeps
+after four quiet seconds.
+
+Couldn't listen here, so rendered every sound offline to WAV and measured:
+nothing clips, but the first pass had ticks near -40 dBFS under a -17 dBFS
+whoosh. Rebalanced so notes peak about -18, ticks about -26, whoosh -21.
+Renders and levels in `sounds/`.

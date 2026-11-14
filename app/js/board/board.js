@@ -6,6 +6,7 @@ import { Springs } from '../core/spring.js'
 import { clamp, escapeHtml, hashString } from '../util.js'
 import { imgUrl } from '../content.js'
 import { getSettings } from '../settings.js'
+import { cue } from '../cue.js'
 
 // Spring channels of a node.
 const X = 0
@@ -159,9 +160,12 @@ export function createBoard({ world, content }) {
         if (delay > 0) {
           node.pending = pose
           node.delay = delay
+          node.order = index
         } else {
           node.pending = null
           aim(node, pose)
+          // The first card of a staggered deal leaves at once; it still flicks.
+          if (stagger > 0) cue('deal', { x: pose.x, y: pose.y, z: pose.z, index })
         }
       }
 
@@ -283,8 +287,10 @@ export function createBoard({ world, content }) {
         if (node.pending) {
           node.delay -= dt
           if (node.delay <= 0) {
-            aim(node, node.pending)
+            const pose = node.pending
+            aim(node, pose)
             node.pending = null
+            if (node.isCard) cue('deal', { x: pose.x, y: pose.y, z: pose.z, index: node.order || 0 })
           }
           any = true
         }

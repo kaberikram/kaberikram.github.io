@@ -85,13 +85,34 @@ html.reduced-motion #field { animation: none; }
 }
 
 #nav {
-  right: 24px;
+  right: 66px;
   top: 27px;
   font-size: 14px;
   font-weight: 500;
 }
 
 #nav a { padding: 6px 0; }
+
+#sound {
+  right: 18px;
+  top: 21px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#sound:hover { background: rgba(40, 30, 25, 0.07); }
+#sound:focus-visible { outline: 2px solid color-mix(in srgb, var(--ink) 55%, transparent); outline-offset: 2px; }
+#sound .off, #sound.is-off .on { display: none; }
+#sound.is-off .off { display: block; }
+#sound.is-off { color: #8f8780; }
 #nav a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 #fail {
@@ -123,7 +144,8 @@ html.failed #bar { display: none; }
 
 @media (max-width: 700px) {
   .brand { left: 18px; top: 20px; }
-  #nav { right: 18px; top: 21px; font-size: 13px; }
+  #nav { right: 56px; top: 21px; font-size: 13px; }
+  #sound { right: 12px; top: 14px; }
 }
 
 /* Tune panel */
