@@ -76,11 +76,11 @@ function cardElement(work) {
 
   // A picture is a window you look into: the work sits on the back wall of a
   // shallow box (pic-back), four inner walls run back to it (pic-side), and
-  // the walls take their colour from the work itself (pic-glow), the way a lit
+  // the walls are painted with the work's own edge pulled out long, the way a lit
   // room spills onto its own walls.
-  const sides = '<i class="pic-side t"></i><i class="pic-side r"></i><i class="pic-side b"></i><i class="pic-side l"></i>'
+  const sides = ['t', 'r', 'b', 'l'].map((side) => `<i class="pic-side ${side}">${work.cover ? '<u></u>' : ''}</i>`).join('')
   const picture = work.cover
-    ? `<div class="card-pic"><div class="pic-glow"><img src="${imgUrl(work.cover)}" alt="" draggable="false" decoding="async"></div>${sides}<div class="pic-back"><img src="${imgUrl(work.cover)}" alt="" draggable="false" decoding="async"></div></div>`
+    ? `<div class="card-pic" style="--cover: url('${imgUrl(work.cover)}')">${sides}<div class="pic-back"><img src="${imgUrl(work.cover)}" alt="" draggable="false" decoding="async"></div></div>`
     : `<div class="card-pic">${sides}<div class="pic-back"><p>${escapeHtml(work.line)}</p></div></div>`
   const when = work.when ? `<span>${escapeHtml(work.when)}</span>` : ''
   el.innerHTML = `<div class="card-in">${picture}<div class="card-cap"><b>${escapeHtml(work.title)}</b>${when}</div></div>`
@@ -335,8 +335,11 @@ export function createBoard({ world, content }) {
           if (ox !== node.ox || oy !== node.oy) {
             node.ox = ox
             node.oy = oy
-            node.el.style.setProperty('--ox', `${ox}px`)
-            node.el.style.setProperty('--oy', `${oy}px`)
+            // Only the window's vanishing point moves: one property on one
+            // element, so the browser shifts the planes and restyles nothing.
+            const lens = Math.max(portal, 0.01)
+            node.pic ??= node.el.querySelector('.card-pic')
+            node.pic.style.perspectiveOrigin = `calc(50% + ${ox / lens}px) calc(50% + ${oy / lens}px)`
           }
         }
         // Octaves beyond (+) or in front of (-) the focal distance.

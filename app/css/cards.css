@@ -87,11 +87,13 @@ html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
   border-radius: var(--card-radius);
   overflow: hidden;
   background: color-mix(in srgb, var(--ink) 12%, var(--canvas));
+  /* The window is a real little room: the walls and the back are planes in
+     3D, seen through this box's own lens. The board moves the lens's
+     vanishing point (perspective-origin) as the room moves, and nothing else
+     in here changes. */
   --k: calc(1 - var(--portal, 0));
-  --L: calc(50% - var(--k) * 50% + var(--ox, 0px));
-  --R: calc(50% + var(--k) * 50% + var(--ox, 0px));
-  --T: calc(50% - var(--k) * 50% + var(--oy, 0px));
-  --B: calc(50% + var(--k) * 50% + var(--oy, 0px));
+  --d: calc(600px * var(--portal, 0) / var(--k));
+  perspective: 600px;
 }
 
 .card-pic img {
@@ -103,49 +105,51 @@ html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
   pointer-events: none;
 }
 
-/* The walls' colour: the work itself, spilling onto them. No blur filter
-   anywhere (it is the costly part, and the same on every device). The softness
-   is faked: the picture is drawn more than three times too large, so the
-   browser's own stretching smooths it into broad soft colour, for free. A dark
-   wash over it keeps the walls quieter than the work. */
-.pic-glow { position: absolute; inset: -120%; }
-.pic-glow::after {
-  content: "";
+/* Four inner walls, each a plane hinged on one edge of the opening and running
+   straight back to the work. Each wall is painted with the edge of the work
+   itself, pulled out long: the last few rows of the picture stretched forty
+   times over, so every colour on the picture's edge runs toward you as a
+   streak (the stretching room in Spike Jonze's "Welcome Home"). No blur, no
+   redrawing: the browser only moves the planes. */
+.pic-side {
   position: absolute;
-  inset: 0;
-  background: rgba(10, 8, 6, 0.3);
+  overflow: hidden;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--ink) 16%, var(--canvas));
 }
+.pic-side.t { left: 0; top: 0; width: 100%; height: var(--d); transform-origin: 50% 0; transform: rotateX(-90deg); }
+.pic-side.b { left: 0; bottom: 0; width: 100%; height: var(--d); transform-origin: 50% 100%; transform: rotateX(90deg); }
+.pic-side.l { left: 0; top: 0; width: var(--d); height: 100%; transform-origin: 0 50%; transform: rotateY(90deg); }
+.pic-side.r { right: 0; top: 0; width: var(--d); height: 100%; transform-origin: 100% 50%; transform: rotateY(-90deg); }
 
-/* Four inner walls, each a trapezoid from the opening to the back wall. Each
-   darkens as it goes back, deepest in the corners where it meets the work; the
-   ceiling is the darkest and the floor catches a little light at its lip. */
-.pic-side { position: absolute; inset: 0; pointer-events: none; }
-.pic-side.t {
-  clip-path: polygon(0 0, 100% 0, var(--R) var(--T), var(--L) var(--T));
-  background: linear-gradient(to bottom, rgba(10, 8, 6, 0.3) 0, rgba(10, 8, 6, 0.66) var(--T));
+/* The streaks: a full copy of the picture, flipped and stretched from the edge
+   that touches the work, so only that edge's sliver is ever in view. */
+.pic-side u {
+  position: absolute;
+  width: 260px;
+  height: 170px;
+  background: var(--cover) 50% 40% / cover no-repeat;
 }
-.pic-side.b {
-  clip-path: polygon(0 100%, 100% 100%, var(--R) var(--B), var(--L) var(--B));
-  background: linear-gradient(to top, rgba(255, 255, 255, 0.16) 0, rgba(10, 8, 6, 0.38) calc(100% - var(--B)));
-}
-.pic-side.l {
-  clip-path: polygon(0 0, var(--L) var(--T), var(--L) var(--B), 0 100%);
-  background: linear-gradient(to right, rgba(10, 8, 6, 0.16) 0, rgba(10, 8, 6, 0.54) var(--L));
-}
-.pic-side.r {
-  clip-path: polygon(100% 0, var(--R) var(--T), var(--R) var(--B), 100% 100%);
-  background: linear-gradient(to left, rgba(10, 8, 6, 0.16) 0, rgba(10, 8, 6, 0.54) calc(100% - var(--R)));
-}
+.pic-side.t u { left: 0; top: 100%; transform-origin: 0 0; transform: scaleY(-40); }
+.pic-side.b u { left: 0; bottom: 100%; transform-origin: 0 100%; transform: scaleY(-40); }
+.pic-side.l u { top: 0; left: 100%; transform-origin: 0 0; transform: scaleX(-40); }
+.pic-side.r u { top: 0; right: 100%; transform-origin: 100% 0; transform: scaleX(-40); }
+
+/* Shade over the streaks: each wall darkens as it goes back, the ceiling the
+   darkest and the floor catching a little light at its lip. */
+.pic-side::after { content: ""; position: absolute; inset: 0; }
+.pic-side.t::after { background: linear-gradient(to bottom, rgba(10, 8, 6, 0.3), rgba(10, 8, 6, 0.62)); }
+.pic-side.b::after { background: linear-gradient(to top, rgba(255, 255, 255, 0.14), rgba(10, 8, 6, 0.36)); }
+.pic-side.l::after { background: linear-gradient(to right, rgba(10, 8, 6, 0.16), rgba(10, 8, 6, 0.5)); }
+.pic-side.r::after { background: linear-gradient(to left, rgba(10, 8, 6, 0.16), rgba(10, 8, 6, 0.5)); }
 
 /* The back wall: the work, a little smaller for being further away, with the
    corners of the box falling into soft shade. */
 .pic-back {
   position: absolute;
-  left: var(--L);
-  top: var(--T);
-  width: calc(var(--k) * 100%);
-  height: calc(var(--k) * 100%);
+  inset: 0;
   overflow: hidden;
+  transform: translateZ(calc(-1 * var(--d)));
 }
 
 .pic-back::after {
@@ -156,7 +160,8 @@ html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
   pointer-events: none;
 }
 
-.card.is-muted img { filter: grayscale(1); }
+.card.is-muted img,
+.card.is-muted .pic-side u { filter: grayscale(1); }
 
 /* No picture yet: the back wall says the work's one line, large. */
 .card.is-words .card-pic { background: color-mix(in srgb, var(--ink) 9%, var(--canvas)); }
@@ -267,3 +272,7 @@ html[data-card="paper"] .card-cap { padding: 0 6px 2px; }
   pointer-events: none;
 }
 
+
+/* Behind a picture's walls: dark, so the hairline where two walls meet reads
+   as a shadowed corner and never as a bright crack. */
+.card:not(.is-words) .card-pic { background: #2b2824; }
