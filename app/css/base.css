@@ -4,7 +4,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --canvas: #FBF3EE;
+  --canvas: #FEFAF7;
   --paper: #FFFFFF;
   --ink: #1C1B1A;
   --muted: #8A827C;
@@ -33,12 +33,15 @@ a { color: inherit; text-decoration: none; }
 /* The sunset behind everything. Drifts on the compositor, so it costs no script. */
 #field {
   position: fixed;
-  inset: -8%;
+  inset: -150px;
   z-index: 0;
   pointer-events: none;
   background: var(--bloom);
   background-repeat: no-repeat;
   opacity: var(--bloom-opacity);
+  /* Slid by the camera's lean (main.js): the horizon is far away, so it moves
+     only when the view turns, never when the camera travels. */
+  translate: var(--room-x, 0px) var(--room-y, 0px);
   animation: bloom 28s ease-in-out infinite alternate;
 }
 

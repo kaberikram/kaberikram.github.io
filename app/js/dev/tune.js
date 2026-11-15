@@ -37,6 +37,7 @@ const GROUPS = [
     label: 'Cards',
     controls: [
       { key: 'cardStyle', type: 'range', label: 'Style', min: 0, max: CARD_STYLES.length - 1, step: 1, names: CARD_STYLES },
+      { key: 'edge', type: 'range', label: 'Hand-drawn edge', min: 0, max: 6, step: 0.1, unit: 'px' },
       { key: 'paper', type: 'color', label: 'Paper' },
       { key: 'ink', type: 'color', label: 'Ink' },
       { key: 'cardRadius', type: 'range', label: 'Corner radius', min: 0, max: 36, step: 1, unit: 'px' },
@@ -49,6 +50,7 @@ const GROUPS = [
     controls: [
       { key: 'spread', type: 'range', label: 'Spacing', min: 0.3, max: 2, step: 0.01 },
       { key: 'depth', type: 'range', label: 'Depth', min: 0, max: 2.5, step: 0.01 },
+      { key: 'roomTilt', type: 'range', label: 'Room angle', min: 0, max: 20, step: 0.5, unit: '°' },
       { key: 'tilt', type: 'range', label: 'Lean to pointer', min: 0, max: 10, step: 0.1, unit: '°' },
       { key: 'bank', type: 'range', label: 'Lean into moves', min: 0, max: 3, step: 0.01 },
     ],

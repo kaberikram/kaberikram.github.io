@@ -25,8 +25,10 @@
 .card-in {
   position: absolute;
   inset: 0;
-  opacity: calc(var(--fore) * (1 - var(--haze)));
-  filter: blur(var(--blur));
+  /* Distance washes a work out toward the light; it only thins a little, so
+     one work behind another does not show through it. */
+  opacity: calc(var(--fore) * (1 - var(--haze) * 0.3));
+  filter: blur(var(--blur)) contrast(calc(1 - var(--haze) * 0.9)) brightness(calc(1 + var(--haze) * 0.3));
   transition: scale 0.25s ease, filter 0.4s ease, opacity 0.4s ease;
   animation: drift var(--drift-time, 8s) ease-in-out var(--drift-delay, 0s) infinite alternate;
 }
@@ -48,7 +50,7 @@ html.no-breathe .card-in { animation: none; }
    a lens, so it never hides what you came to look at. */
 .card.is-fore .card-in { --blur: 3px; --fore: 0.45; }
 
-html.is-lean .card-in { --blur: 0px; filter: none; }
+html.is-lean .card-in { --blur: 0px; filter: none; opacity: calc(var(--fore) * (1 - var(--haze) * 0.8)); }
 
 @media (hover: hover) {
   .card:hover .card-in { scale: 1.025; }
@@ -70,7 +72,7 @@ html.is-lean .card-in { --blur: 0px; filter: none; }
 /* Cards that are not part of the current answer sink back and soften.
    Cards beside a focused one soften a little, like a shallow depth of field.
    Phones skip the blur: it is the costly part. */
-.card.is-soft .card-in { filter: blur(calc(var(--blur) + 1px)); }
+.card.is-soft .card-in { filter: blur(calc(var(--blur) + 1px)) contrast(calc(1 - var(--haze) * 0.9)) brightness(calc(1 + var(--haze) * 0.3)); }
 .card.is-dim .card-in { filter: blur(calc(var(--blur) + 2px)) saturate(0.7); }
 html.is-lean .card.is-soft .card-in { filter: none; }
 html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
@@ -98,7 +100,7 @@ html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
   display: flex;
   align-items: flex-end;
   padding: 14px 14px 13px;
-  background: rgba(255, 255, 255, 0.55);
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
 }
 
 .card.is-words .card-pic p {
@@ -146,6 +148,10 @@ html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
    file   the picture with soft corners and one small line under it, set like
           a file name.
    paper  the picture on a sheet of white with a hairline edge. */
+
+/* bare: the edge is cut by hand. Each work gets its own outline (--rough, from
+   board.js), so no two are the same and none is a clean box. */
+html[data-card="bare"] .card-pic { clip-path: var(--rough, none); border-radius: 0; }
 
 html[data-card="file"] .card-pic { border-radius: max(var(--card-radius), 10px); }
 

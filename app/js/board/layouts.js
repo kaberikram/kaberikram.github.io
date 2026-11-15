@@ -127,14 +127,16 @@ function result(poses, labels) {
 
 // The home view: loose clusters by kind of work, proudest pieces nearest and
 // largest, everything slightly off-square.
-export function scatter(items, { seed = 7, spread = 1, depth = 1, kinds = [], origin = ZERO, shape = 'wide' } = {}) {
+// `from` is the camera depth the board will be looked at from. Works are
+// spaced as they will be seen from there, so the director passes the depth it
+// is really going to use.
+export function scatter(items, { seed = 7, spread = 1, depth = 1, kinds = [], origin = ZERO, shape = 'wide', from = SEEN_FROM.scatter } = {}) {
   const poses = new Map()
   const labels = []
   const n = items.length
   if (!n) return result(poses, labels)
 
   const { ex, ey, sideways } = SHAPES[shape] || SHAPES.wide
-  const from = SEEN_FROM.scatter
   const ranked = [...items].sort(byProud)
   const rankOf = new Map(ranked.map((item, i) => [item.id, i]))
   const kindOrder = kinds.length ? kinds.map((k) => k.id) : [...new Set(ranked.map((item) => item.kind))]
@@ -169,8 +171,9 @@ export function scatter(items, { seed = 7, spread = 1, depth = 1, kinds = [], or
   })
 
   const ratio = shape === 'wide' ? 1.9 : shape === 'square' ? 1.2 : 0.55
-  const gapX = 16 + 18 * spread
-  const gapY = 16 + 18 * spread
+  // Air between works: the board is a space to look into, not a packed sheet.
+  const gapX = 28 + 120 * spread
+  const gapY = 24 + 90 * spread
 
   // Everything below is in "as seen" space until the last step.
   const bodies = []
@@ -192,8 +195,9 @@ export function scatter(items, { seed = 7, spread = 1, depth = 1, kinds = [], or
         s: 1,
         z,
         f,
-        x: group.cx + (col - (inRow - 1) / 2) * (CARD.w * 0.9 + gapX),
-        y: group.cy + (row - (rows - 1) / 2) * (CARD.h * 0.9 + gapY),
+        // Off the grid by a stable amount, so rows never line up like shelves.
+        x: group.cx + (col - (inRow - 1) / 2) * (CARD.w * 0.9 + gapX) + jitter(seed, item.id, 'x') * gapX * 0.45,
+        y: group.cy + (row - (rows - 1) / 2) * (CARD.h * 0.9 + gapY) + jitter(seed, item.id, 'y') * gapY * 0.5,
         hw: (CARD.w * f) / 2,
         hh: (CARD.h * f) / 2,
       })
@@ -202,7 +206,7 @@ export function scatter(items, { seed = 7, spread = 1, depth = 1, kinds = [], or
 
   // Push overlapping cards apart, with a light pull back toward their cluster
   // so the groups stay readable. The last passes skip the pull to finish clean.
-  const margin = gapX * 0.6
+  const margin = (16 + 18 * spread) * 0.6
   const passes = 160
   for (let pass = 0; pass < passes; pass++) {
     for (let a = 0; a < bodies.length; a++) {

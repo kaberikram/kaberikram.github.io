@@ -3,7 +3,7 @@
 // for every card and it moves them there.
 
 import { Springs } from '../core/spring.js'
-import { clamp, escapeHtml, hashString } from '../util.js'
+import { clamp, escapeHtml, hashString, rng } from '../util.js'
 import { imgUrl } from '../content.js'
 import { getSettings } from '../settings.js'
 import { cue } from '../cue.js'
@@ -23,6 +23,44 @@ const NEAR_HIDE = 110
 const NEAR_FADE = 240
 
 const EPS = [0.05, 0.05, 0.05, 0.01, 0.0008, 0.003, 0.02, 0.02]
+
+// A hand-cut outline for a picture, as a CSS polygon in percentages. Walks the
+// four sides in small steps and pulls each point inward by a wandering amount:
+// a slow drift (the hand) plus a little grit (the pen). `amount` is in pixels
+// on a card at scale 1; the same seed always gives the same outline.
+const PIC = { w: 260, h: 170 }
+
+export function roughEdge(seed, amount) {
+  if (amount <= 0) return 'none'
+  const rand = rng(seed)
+  const points = []
+  const side = (length, place) => {
+    const steps = Math.max(6, Math.round(length / 13))
+    let from = rand()
+    let to = rand()
+    for (let i = 0; i < steps; i++) {
+      // A new target for the slow drift every few points.
+      if (i % 4 === 0 && i) {
+        from = to
+        to = rand()
+      }
+      const k = (i % 4) / 4
+      const drift = from + (to - from) * (k * k * (3 - 2 * k))
+      const grit = (rand() - 0.5) * 0.5
+      // Ease into the corners so they come out soft, never square.
+      const t = (i + 0.5) / steps
+      const corner = Math.max(0, 1 - Math.min(t, 1 - t) * steps / 1.5)
+      const inset = amount * (0.35 + drift * 1.3 + grit + corner * 1.1)
+      points.push(place(t * length, Math.max(0, inset)))
+    }
+  }
+  side(PIC.w, (d, inset) => [d, inset])
+  side(PIC.h, (d, inset) => [PIC.w - inset, d])
+  side(PIC.w, (d, inset) => [PIC.w - d, PIC.h - inset])
+  side(PIC.h, (d, inset) => [inset, PIC.h - d])
+  const text = points.map(([x, y]) => `${(x / PIC.w * 100).toFixed(2)}% ${(y / PIC.h * 100).toFixed(2)}%`)
+  return `polygon(${text.join(',')})`
+}
 
 function cardElement(work) {
   const el = document.createElement('article')
@@ -126,12 +164,24 @@ export function createBoard({ world, content }) {
       node.sp.damping = s.cardDamping
     }
   }
+  // Recut every outline when the edge setting changes.
+  let edge = -1
+  function syncEdges() {
+    const amount = getSettings().edge
+    if (amount === edge) return
+    edge = amount
+    for (const [id, node] of cards) node.el.style.setProperty('--rough', roughEdge(hashString(id), amount))
+  }
+
   syncSprings()
+  syncEdges()
 
   const board = {
     cards,
 
     syncSprings,
+
+    syncEdges,
 
     // Put every card somewhere at once, with no motion.
     jump(poses) {
@@ -265,7 +315,7 @@ export function createBoard({ world, content }) {
         if (!node.isCard) return
         // Octaves beyond (+) or in front of (-) the focal distance.
         const beyond = Math.log2(Math.max(1, distance) / Math.max(1, focal))
-        const lift = clamp(Math.round(4 - beyond * 5), 0, 6)
+        const lift = clamp(Math.round(4 - beyond * 3.4), 0, 6)
         if (lift !== node.lift) {
           node.lift = lift
           node.el.dataset.lift = String(lift)
