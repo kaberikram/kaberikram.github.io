@@ -216,3 +216,25 @@ Five directions, switchable live (Tune, Canvas, Palette) or by link
 
 Stills in `captures/2026-11-15-palettes/`. Not decided yet.
 
+## 2026-11-15 · windows you look into
+"How do we make each tile feel like there's depth? Like looking into a portal.
+Some shader trick, like the Apple ads Spike Jonze did, pushed-in walls."
+
+No shader needed. Each picture is now a shallow box: the work is on the back
+wall, a little smaller for being further away, and four inner walls run back
+to it. The back wall slides toward wherever the eye is pointed and swings with
+the lean, so moving the pointer or flying the camera changes what you see
+inside every window at once. The walls take their colour from the work itself,
+out of focus, like a lit room spilling onto its own walls; the ceiling is in
+shade and the floor catches light. The opening keeps its hand-cut edge.
+
+It is plain geometry in CSS (`cards.css`, "The picture is a window"), driven
+by two numbers per card from `board.js`. Tune, Cards, Window depth; 0 turns it
+off. Stills in `captures/2026-11-15-windows/`. Saved settings reset (v7).
+
+Also from Ikram, "some feeling of how I feel when I look at my website": a
+huge pale gridded sheet with a few tiny figures, umbrellas and pencil marks
+scattered on it, joined by thin arrows and dotted lines. Small things, vast
+emptiness, a little colour, the hand visible. Kept as the measure for scale
+and emptiness (not stored here; it is someone else's work).
+

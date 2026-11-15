@@ -3,7 +3,7 @@
 // The Tune panel (D key, or ?debug) edits it.
 
 // Bumped when defaults change meaning, so stale saved values are dropped.
-const STORAGE_KEY = 'ikram-board-v6'
+const STORAGE_KEY = 'ikram-board-v7'
 const LEAN_QUERY = '(max-width: 768px), (pointer: coarse)'
 
 export const DEFAULTS = {
@@ -15,6 +15,7 @@ export const DEFAULTS = {
   cardStyle: 0,
   palette: 1,
   edge: 2.2,
+  portal: 0.16,
   roomTilt: 9,
   paper: '#FFFFFF',
   ink: '#1C1B1A',
@@ -66,6 +67,7 @@ const BOUNDS = {
   bloomOpacity: [0, 1],
   cardRadius: [0, 40],
   edge: [0, 6],
+  portal: [0, 0.35],
   roomTilt: [0, 20],
   labelSize: [12, 64],
   spread: [0.3, 2],
@@ -182,6 +184,7 @@ export function applyCss() {
   root.style.setProperty('--ink', s.ink)
   root.style.setProperty('--card-radius', `${s.cardRadius}px`)
   root.style.setProperty('--label-size', `${s.labelSize}px`)
+  root.style.setProperty('--portal', String(s.portal))
   root.style.setProperty('--bloom', bloomGradient(s))
   root.style.setProperty('--bloom-opacity', String(s.bloomOpacity))
   root.dataset.card = cardStyleName(s)
