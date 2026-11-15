@@ -245,3 +245,13 @@ Now phones keep the walls' colour: the same picture held a little larger and
 faded, with no blur (the blur was the expensive part). Still in
 `captures/2026-11-15-windows/phone-walls.png`.
 
+## 2026-11-15 · no blur at all, darker walls
+"I think without blur is the way to go! Darken the depth area a bit, and we
+can make a fake light blur that's optimised and subtle."
+
+The blur filter is gone on every device. The softness is faked for free: the
+wall picture is drawn more than three times too large, so the browser's own
+stretching smooths it into broad colour. A dark wash sits over it and the wall
+shading is deeper, darkest where the walls meet the work, so the recess reads
+as shadowed depth and the work as the lit thing at the back.
+

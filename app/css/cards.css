@@ -103,34 +103,38 @@ html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
   pointer-events: none;
 }
 
-/* The walls' colour: the work itself, out of focus, spilling onto them. */
-.pic-glow { position: absolute; inset: -14%; }
-.pic-glow img { filter: blur(16px) saturate(1.25) brightness(1.08); }
-/* Phones: no blur. The blur is the costly part, so the wall colour is the
-   same picture held a little larger and faded, which is cheap to draw. */
-html.is-lean .pic-glow { inset: -6%; opacity: 0.5; }
-html.is-lean .pic-glow img { filter: none; }
-html.is-lean .card.is-muted .pic-glow img { filter: grayscale(1); }
+/* The walls' colour: the work itself, spilling onto them. No blur filter
+   anywhere (it is the costly part, and the same on every device). The softness
+   is faked: the picture is drawn more than three times too large, so the
+   browser's own stretching smooths it into broad soft colour, for free. A dark
+   wash over it keeps the walls quieter than the work. */
+.pic-glow { position: absolute; inset: -120%; }
+.pic-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 8, 6, 0.3);
+}
 
 /* Four inner walls, each a trapezoid from the opening to the back wall. Each
-   darkens as it goes back; the ceiling is the darkest and the floor catches
-   the light. */
+   darkens as it goes back, deepest in the corners where it meets the work; the
+   ceiling is the darkest and the floor catches a little light at its lip. */
 .pic-side { position: absolute; inset: 0; pointer-events: none; }
 .pic-side.t {
   clip-path: polygon(0 0, 100% 0, var(--R) var(--T), var(--L) var(--T));
-  background: linear-gradient(to bottom, rgba(10, 8, 6, 0.16) 0, rgba(10, 8, 6, 0.5) var(--T));
+  background: linear-gradient(to bottom, rgba(10, 8, 6, 0.3) 0, rgba(10, 8, 6, 0.66) var(--T));
 }
 .pic-side.b {
   clip-path: polygon(0 100%, 100% 100%, var(--R) var(--B), var(--L) var(--B));
-  background: linear-gradient(to top, rgba(255, 255, 255, 0.3) 0, rgba(10, 8, 6, 0.2) calc(100% - var(--B)));
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.16) 0, rgba(10, 8, 6, 0.38) calc(100% - var(--B)));
 }
 .pic-side.l {
   clip-path: polygon(0 0, var(--L) var(--T), var(--L) var(--B), 0 100%);
-  background: linear-gradient(to right, rgba(10, 8, 6, 0.06) 0, rgba(10, 8, 6, 0.36) var(--L));
+  background: linear-gradient(to right, rgba(10, 8, 6, 0.16) 0, rgba(10, 8, 6, 0.54) var(--L));
 }
 .pic-side.r {
   clip-path: polygon(100% 0, var(--R) var(--T), var(--R) var(--B), 100% 100%);
-  background: linear-gradient(to left, rgba(10, 8, 6, 0.06) 0, rgba(10, 8, 6, 0.36) calc(100% - var(--R)));
+  background: linear-gradient(to left, rgba(10, 8, 6, 0.16) 0, rgba(10, 8, 6, 0.54) calc(100% - var(--R)));
 }
 
 /* The back wall: the work, a little smaller for being further away, with the
@@ -153,7 +157,6 @@ html.is-lean .card.is-muted .pic-glow img { filter: grayscale(1); }
 }
 
 .card.is-muted img { filter: grayscale(1); }
-.card.is-muted .pic-glow img { filter: grayscale(1) blur(16px) brightness(1.08); }
 
 /* No picture yet: the back wall says the work's one line, large. */
 .card.is-words .card-pic { background: color-mix(in srgb, var(--ink) 9%, var(--canvas)); }
