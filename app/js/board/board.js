@@ -74,9 +74,14 @@ function cardElement(work) {
   el.style.setProperty('--drift-time', `${7 + (seed % 50) / 10}s`)
   el.style.setProperty('--drift-delay', `${-((seed >> 8) % 90) / 10}s`)
 
+  // A picture is a window you look into: the work sits on the back wall of a
+  // shallow box (pic-back), four inner walls run back to it (pic-side), and
+  // the walls take their colour from the work itself (pic-glow), the way a lit
+  // room spills onto its own walls.
+  const sides = '<i class="pic-side t"></i><i class="pic-side r"></i><i class="pic-side b"></i><i class="pic-side l"></i>'
   const picture = work.cover
-    ? `<div class="card-pic"><img src="${imgUrl(work.cover)}" alt="" draggable="false" decoding="async"></div>`
-    : `<div class="card-pic"><p>${escapeHtml(work.line)}</p></div>`
+    ? `<div class="card-pic"><div class="pic-glow"><img src="${imgUrl(work.cover)}" alt="" draggable="false" decoding="async"></div>${sides}<div class="pic-back"><img src="${imgUrl(work.cover)}" alt="" draggable="false" decoding="async"></div></div>`
+    : `<div class="card-pic">${sides}<div class="pic-back"><p>${escapeHtml(work.line)}</p></div></div>`
   const when = work.when ? `<span>${escapeHtml(work.when)}</span>` : ''
   el.innerHTML = `<div class="card-in">${picture}<div class="card-cap"><b>${escapeHtml(work.title)}</b>${when}</div></div>`
   return el
@@ -93,7 +98,7 @@ function labelElement(label) {
 function makeNode(el, isCard) {
   const sp = new Springs(8, { eps: EPS })
   sp.set(S, 1)
-  return { el, isCard, sp, active: false, pending: null, delay: 0, lift: -1, shown: true, near: 1, blocked: false }
+  return { el, isCard, sp, active: false, pending: null, delay: 0, lift: -1, shown: true, near: 1, blocked: false, ox: 0, oy: 0 }
 }
 
 export function createBoard({ world, content }) {
@@ -299,7 +304,8 @@ export function createBoard({ world, content }) {
     // Cards near the focal distance are sharp with a full shadow; farther ones
     // take on haze and blur in steps; anything about to hit the eye fades out
     // and stops taking clicks, so it never blocks the view.
-    look(distanceTo, focal) {
+    look(distanceTo, focal, view) {
+      const portal = getSettings().portal
       const update = (node) => {
         const distance = distanceTo(node.sp.value[Z])
         const near = Math.round(clamp((distance - NEAR_HIDE) / NEAR_FADE, 0, 1) * 20) / 20
@@ -313,6 +319,26 @@ export function createBoard({ world, content }) {
           node.el.style.pointerEvents = blocked ? 'none' : ''
         }
         if (!node.isCard) return
+        // Looking into the window. The back wall is further away than the
+        // opening, so it sits closer to where the eye is pointed (the middle
+        // of the screen) than the opening does, and it swings with the lean.
+        // Held inside the opening so the work is never hidden by a wall.
+        if (view && node.shown) {
+          const v = node.sp.value
+          const at = view.project(v[X], v[Y], v[Z])
+          const size = Math.max(0.05, at.scale * v[S])
+          const reachX = portal * PIC.w * 0.46
+          const reachY = portal * PIC.h * 0.46
+          const swing = portal * 9
+          const ox = Math.round(clamp(((view.cx - at.x) / size) * portal - view.ry * swing, -reachX, reachX) * 2) / 2
+          const oy = Math.round(clamp(((view.cy - at.y) / size) * portal + view.rx * swing, -reachY, reachY) * 2) / 2
+          if (ox !== node.ox || oy !== node.oy) {
+            node.ox = ox
+            node.oy = oy
+            node.el.style.setProperty('--ox', `${ox}px`)
+            node.el.style.setProperty('--oy', `${oy}px`)
+          }
+        }
         // Octaves beyond (+) or in front of (-) the focal distance.
         const beyond = Math.log2(Math.max(1, distance) / Math.max(1, focal))
         const lift = clamp(Math.round(4 - beyond * 3.4), 0, 6)

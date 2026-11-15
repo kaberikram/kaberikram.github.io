@@ -39,6 +39,7 @@ const GROUPS = [
     label: 'Cards',
     controls: [
       { key: 'cardStyle', type: 'range', label: 'Style', min: 0, max: CARD_STYLES.length - 1, step: 1, names: CARD_STYLES },
+      { key: 'portal', type: 'range', label: 'Window depth', min: 0, max: 0.35, step: 0.01 },
       { key: 'edge', type: 'range', label: 'Hand-drawn edge', min: 0, max: 6, step: 0.1, unit: 'px' },
       { key: 'paper', type: 'color', label: 'Paper' },
       { key: 'ink', type: 'color', label: 'Ink' },

@@ -76,7 +76,14 @@ try {
       }
       if (nearest < Infinity) focal = Math.min(focal, nearest * 1.2)
     }
-    board.look((z) => camera.distanceTo(z), focal)
+    const { rx, ry } = camera.lean
+    board.look((z) => camera.distanceTo(z), focal, {
+      project: (x, y, z) => camera.worldToScreen(x, y, z),
+      cx: camera.view.w / 2,
+      cy: camera.view.h / 2,
+      rx,
+      ry,
+    })
     return moving
   })
 
