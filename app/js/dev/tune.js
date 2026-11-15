@@ -5,6 +5,7 @@
 import {
   getSettings,
   replaceSettings,
+  CARD_STYLES,
   resetSettings,
   updateSettings,
   wantsDebug,
@@ -35,6 +36,7 @@ const GROUPS = [
   {
     label: 'Cards',
     controls: [
+      { key: 'cardStyle', type: 'range', label: 'Style', min: 0, max: CARD_STYLES.length - 1, step: 1, names: CARD_STYLES },
       { key: 'paper', type: 'color', label: 'Paper' },
       { key: 'ink', type: 'color', label: 'Ink' },
       { key: 'cardRadius', type: 'range', label: 'Corner radius', min: 0, max: 36, step: 1, unit: 'px' },
@@ -66,6 +68,7 @@ const GROUPS = [
 function formatValue(control, value) {
   if (control.type !== 'range') return ''
   const n = Number(value)
+  if (control.names) return control.names[Math.round(n)] || ''
   const text = control.step < 1 ? n.toFixed(2) : String(Math.round(n))
   return control.unit ? `${text}${control.unit}` : text
 }

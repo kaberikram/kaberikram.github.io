@@ -131,3 +131,26 @@ Final: warm air in stereo with a body, an impact on long flights and a landing,
 centred near 250 Hz, clean above 4 kHz. Short hops whisper, drifts are silent.
 Tune values from this round are the new defaults; saved settings reset (v3) so
 the flight starts at its new level, 0.5.
+
+## 2026-11-15 · open air, and three card styles to compare
+"It's supposed to be a spatial mindmap moodboard, but a shadow on the card
+makes it seem like I'm placing everything on a wall. I want it to feel like an
+infinite white space." Then: "Pastel sunset. As Spike Jonze as possible. I
+really like no card, just image with text below. Do A/B testing."
+
+Why it read as a wall: a shadow needs a surface to land on, the flat warm
+canvas looked like that surface, and the white frame looked like a print
+pinned to it. Removed all three. No card casts a shadow now; far works thin
+out into the air (they turn see-through instead of being tinted) and lose a
+little focus. The canvas is a pastel sunset with no edge anywhere: warm light
+from far below the frame, a cool sky in the top corner.
+
+Three card styles, switchable live (Tune panel, Cards, Style) or by link:
+`/progress/?card=bare`, `?card=file`, `?card=paper`.
+- **bare** (default): just the picture, title and date under it.
+- **file**: soft corners, one small line under it set like a file name.
+- **paper**: the old white sheet with a hairline, minus the shadow.
+
+Stills of each in `captures/2026-11-15-card-ab/`. Saved settings reset (v4) so
+the new canvas shows. Not yet restyled to match: the bar, labels and header.
+

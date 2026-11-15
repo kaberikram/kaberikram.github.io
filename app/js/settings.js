@@ -3,15 +3,16 @@
 // The Tune panel (D key, or ?debug) edits it.
 
 // Bumped when defaults change meaning, so stale saved values are dropped.
-const STORAGE_KEY = 'ikram-board-v3'
+const STORAGE_KEY = 'ikram-board-v4'
 const LEAN_QUERY = '(max-width: 768px), (pointer: coarse)'
 
 export const DEFAULTS = {
-  canvas: '#F1E7E2',
-  bloom1: '#FFFFFF',
-  bloom2: '#FFFFFF',
-  bloom3: '#FFFFFF',
-  bloomOpacity: 0.8,
+  canvas: '#FBF3EE',
+  bloom1: '#F9CDB9',
+  bloom2: '#F6AE9C',
+  bloom3: '#CDD6F6',
+  bloomOpacity: 0.85,
+  cardStyle: 0,
   paper: '#FFFFFF',
   ink: '#1C1B1A',
   cardRadius: 0,
@@ -34,7 +35,11 @@ export const DEFAULTS = {
   soundRoom: 0.5,
 }
 
+// How a work is drawn. A/B test: switch in the Tune panel or with ?card=name.
+export const CARD_STYLES = ['bare', 'file', 'paper']
+
 const BOUNDS = {
+  cardStyle: [0, CARD_STYLES.length - 1],
   bloomOpacity: [0, 1],
   cardRadius: [0, 40],
   labelSize: [12, 64],
@@ -106,6 +111,7 @@ export function sanitize(partial, base) {
     if (!Number.isFinite(n)) continue
     const bounds = BOUNDS[key]
     next[key] = bounds ? clamp(n, bounds[0], bounds[1]) : n
+    if (key === 'cardStyle') next[key] = Math.round(next[key])
   }
   return next
 }
@@ -115,14 +121,22 @@ function rgba(hex, alpha) {
   return `rgba(${r},${g},${b},${alpha})`
 }
 
-// The warm field behind the board: a sunset low in the frame, a cool sky
-// corner above it. Three soft blooms, same idea as the old Rothko field.
+// The air behind the board: a pastel sunset with no edge to it. Warm light
+// rises from far below the frame and thins out upward, a cool sky sits in the
+// top corner. Nothing here has a line or a corner, so it reads as open space
+// with a far horizon, never as a surface the cards hang on.
 function bloomGradient(s) {
   return [
-    `radial-gradient(46% 42% at 50% 104%, ${rgba(s.bloom2, 0.85)} 0%, ${rgba(s.bloom2, 0)} 100%)`,
-    `radial-gradient(78% 58% at 46% 100%, ${rgba(s.bloom1, 0.9)} 0%, ${rgba(s.bloom1, 0)} 100%)`,
-    `radial-gradient(60% 55% at 92% 2%, ${rgba(s.bloom3, 0.6)} 0%, ${rgba(s.bloom3, 0)} 100%)`,
+    `radial-gradient(70% 46% at 50% 112%, ${rgba(s.bloom2, 0.8)} 0%, ${rgba(s.bloom2, 0)} 100%)`,
+    `linear-gradient(to top, ${rgba(s.bloom1, 0.95)} 0%, ${rgba(s.bloom1, 0.45)} 30%, ${rgba(s.bloom1, 0)} 72%)`,
+    `radial-gradient(75% 70% at 96% -6%, ${rgba(s.bloom3, 0.75)} 0%, ${rgba(s.bloom3, 0)} 100%)`,
   ].join(',')
+}
+
+// ?card=bare|file|paper shows one style without saving it, for comparing and filming.
+function cardStyleName(s) {
+  const asked = new URLSearchParams(location.search).get('card')
+  return CARD_STYLES.includes(asked) ? asked : CARD_STYLES[s.cardStyle] || CARD_STYLES[0]
 }
 
 export function applyCss() {
@@ -135,6 +149,7 @@ export function applyCss() {
   root.style.setProperty('--label-size', `${s.labelSize}px`)
   root.style.setProperty('--bloom', bloomGradient(s))
   root.style.setProperty('--bloom-opacity', String(s.bloomOpacity))
+  root.dataset.card = cardStyleName(s)
   root.classList.toggle('is-lean', isLean())
   root.classList.toggle('no-breathe', s.breathe < 0.5 || isLean() || reducedMotion())
   root.classList.toggle('reduced-motion', reducedMotion())
