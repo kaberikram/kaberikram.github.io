@@ -238,3 +238,10 @@ scattered on it, joined by thin arrows and dotted lines. Small things, vast
 emptiness, a little colour, the hand visible. Kept as the measure for scale
 and emptiness (not stored here; it is someone else's work).
 
+## 2026-11-15 · the walls on a phone
+"On mobile you don't have the depth or the texture on the walls." True: phones
+turned the wall colour off to save power, so the windows were only a frame.
+Now phones keep the walls' colour: the same picture held a little larger and
+faded, with no blur (the blur was the expensive part). Still in
+`captures/2026-11-15-windows/phone-walls.png`.
+

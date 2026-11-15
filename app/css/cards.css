@@ -106,7 +106,11 @@ html.is-lean .card.is-dim .card-in { filter: saturate(0.7); }
 /* The walls' colour: the work itself, out of focus, spilling onto them. */
 .pic-glow { position: absolute; inset: -14%; }
 .pic-glow img { filter: blur(16px) saturate(1.25) brightness(1.08); }
-html.is-lean .pic-glow { display: none; }
+/* Phones: no blur. The blur is the costly part, so the wall colour is the
+   same picture held a little larger and faded, which is cheap to draw. */
+html.is-lean .pic-glow { inset: -6%; opacity: 0.5; }
+html.is-lean .pic-glow img { filter: none; }
+html.is-lean .card.is-muted .pic-glow img { filter: grayscale(1); }
 
 /* Four inner walls, each a trapezoid from the opening to the back wall. Each
    darkens as it goes back; the ceiling is the darkest and the floor catches
