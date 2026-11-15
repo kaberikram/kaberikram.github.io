@@ -192,3 +192,11 @@ leaving their paintings on the world, like an artist displaying their art."
 Two things to hold every later choice against: the bar is a conversation, not
 a search box; the works are marks left by a hand, not products on a shelf.
 
+## 2026-11-15 · too much colour
+"The background colour is too much. I think this is why it feels flat, not an
+endless room." Agreed: a strong colour across the whole frame reads as a
+surface. The canvas is now pure white; the sunset is only a faint warm glow at
+the horizon and a hint of sky in one corner (bloom strength 0.55, was 0.9).
+Space is shown by the works' size, focus and the room angle, not by paint.
+Saved settings reset (v6).
+

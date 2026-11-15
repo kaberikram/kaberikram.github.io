@@ -3,15 +3,15 @@
 // The Tune panel (D key, or ?debug) edits it.
 
 // Bumped when defaults change meaning, so stale saved values are dropped.
-const STORAGE_KEY = 'ikram-board-v5'
+const STORAGE_KEY = 'ikram-board-v6'
 const LEAN_QUERY = '(max-width: 768px), (pointer: coarse)'
 
 export const DEFAULTS = {
-  canvas: '#FEFAF7',
-  bloom1: '#FAD3C2',
-  bloom2: '#F5A994',
-  bloom3: '#CFD9F8',
-  bloomOpacity: 0.9,
+  canvas: '#FFFFFF',
+  bloom1: '#FBE3D8',
+  bloom2: '#F7C4B4',
+  bloom3: '#DCE4F8',
+  bloomOpacity: 0.55,
   cardStyle: 0,
   edge: 2.2,
   roomTilt: 9,
@@ -132,9 +132,9 @@ function rgba(hex, alpha) {
 // lean, so the horizon behaves like something very far away.
 function bloomGradient(s) {
   return [
-    `radial-gradient(60% 9% at 50% 74%, ${rgba(s.bloom2, 0.75)} 0%, ${rgba(s.bloom2, 0)} 100%)`,
-    `linear-gradient(to bottom, ${rgba(s.bloom1, 0)} 22%, ${rgba(s.bloom1, 0.55)} 58%, ${rgba(s.bloom1, 1)} 74%, ${rgba(s.bloom1, 0.5)} 86%, ${rgba(s.bloom1, 0.18)} 100%)`,
-    `radial-gradient(70% 60% at 94% -4%, ${rgba(s.bloom3, 0.8)} 0%, ${rgba(s.bloom3, 0)} 100%)`,
+    `radial-gradient(70% 7% at 50% 78%, ${rgba(s.bloom2, 0.6)} 0%, ${rgba(s.bloom2, 0)} 100%)`,
+    `linear-gradient(to bottom, ${rgba(s.bloom1, 0)} 55%, ${rgba(s.bloom1, 0.5)} 78%, ${rgba(s.bloom1, 0.25)} 100%)`,
+    `radial-gradient(60% 40% at 96% -6%, ${rgba(s.bloom3, 0.55)} 0%, ${rgba(s.bloom3, 0)} 100%)`,
   ].join(',')
 }
 
