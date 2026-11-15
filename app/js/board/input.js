@@ -4,7 +4,7 @@
 // director call. It never positions cards itself, apart from the one being held.
 
 import { clamp } from '../util.js'
-import { getSettings, isLean } from '../settings.js'
+import { getSettings, isLean, reducedMotion } from '../settings.js'
 import { cue } from '../cue.js'
 
 // Movement under this many pixels is a click, not a drag.
@@ -91,8 +91,9 @@ export function initInput({ stage, camera, board, director, ticker }) {
   })
 
   stage.addEventListener('pointermove', (e) => {
-    if (e.pointerType === 'mouse' && !isLean()) {
-      // The whole board leans a little toward the pointer.
+    if (e.pointerType === 'mouse' && !isLean() && !reducedMotion()) {
+      // The whole board leans a little toward the pointer (not for anyone
+      // who asked for less motion).
       const tilt = getSettings().tilt
       // -1 to 1 across the screen, so the edges give the full lean.
       const nx = (e.clientX / camera.view.w - 0.5) * 2

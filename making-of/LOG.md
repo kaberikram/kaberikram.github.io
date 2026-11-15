@@ -255,3 +255,25 @@ stretching smooths it into broad colour. A dark wash sits over it and the wall
 shading is deeper, darkest where the walls meet the work, so the recess reads
 as shadowed depth and the work as the lit thing at the back.
 
+
+## 2026-11-15 · streaks
+"Wait, the stretch doesn't have line streaks like the Apple ad, Spike Jonze?"
+
+It did not: the walls were the whole picture scaled up into soft colour. Ikram
+had asked for the stretching room in "Welcome Home" earlier ("is texture
+stretching like Spike Jonze expensive? let's do that instead") and it was
+misread as a question about speed.
+
+Now each wall is painted with the edge of the work itself, pulled out long:
+the last few rows of pixels stretched forty times, so every colour on the
+picture's edge runs toward you as a streak, and the streaks meet the work
+exactly where they came from. To make them converge properly, the window
+became a real little room: four walls and a back as planes in 3D inside each
+picture, instead of flat shapes redrawn every frame. While the room moves the
+browser only shifts one vanishing point per picture. Still no blur. Measured
+the same way as before (emulated phone), it runs about as fast as the last
+version, 33 against 32.5 frames a second.
+
+Also: the board no longer leans toward the pointer for people who ask their
+device for less motion. Stills in `captures/2026-11-15-windows/`
+(`streaks-closeup.jpg`, `streaks-phone.jpg`).
