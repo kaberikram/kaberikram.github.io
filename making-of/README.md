@@ -2,6 +2,23 @@
 
 Everything for a "how this was made" video, kept next to the code.
 
+## Why this exists
+
+This folder records how the site evolves, from the first glass version to
+whatever it becomes, so the process can be shown in a documentary.
+
+- **What is kept:** every round of significant changes, in `LOG.md`, with the
+  reason for it (usually your feedback) and the commit or tag to film it from.
+  Milestones are also captured as stills, sounds are rendered to files, and
+  the tuning values behind each round are saved in `tune/`.
+- **How often:** added as the work happens, not reconstructed afterwards. A
+  round can be two or three lines.
+- **What is left out:** private details, unreleased work you have not chosen
+  to show, and third-party material. Reference sources are listed, not copied
+  (see below).
+- **Who decides:** you do. Anything here can be edited or removed before it is
+  used publicly.
+
 ```
 LOG.md          dated story: what changed, why, which tag to film
 captures/       stills (and clips) of each milestone, made by tools/capture.mjs
