@@ -200,3 +200,19 @@ the horizon and a hint of sky in one corner (bloom strength 0.55, was 0.9).
 Space is shown by the works' size, focus and the room angle, not by paint.
 Saved settings reset (v6).
 
+## 2026-11-15 · colour A/B, away from the Claude look
+"Need to do some A/B testing for the colours. I feel like I'm a child of
+Claude now." Fair: cream, peach and terracotta are the house colours of
+everything Claude makes, and the board had drifted into them.
+
+Five directions, switchable live (Tune, Canvas, Palette) or by link
+(`/progress/?palette=daylight`, `gallery`, `dusk`, `lagoon`, `peach`):
+- **daylight** (default for now): white air with a cool blue lifting off the
+  floor, from the meme-board reference.
+- **gallery**: pure white and grey; all colour comes from the works.
+- **dusk**: lilac air, pink-gold horizon (the colour reference's pastels).
+- **lagoon**: soft blue-green with an edge of sand (the same reference's sea).
+- **peach**: the old warm one, kept only to judge the others against.
+
+Stills in `captures/2026-11-15-palettes/`. Not decided yet.
+

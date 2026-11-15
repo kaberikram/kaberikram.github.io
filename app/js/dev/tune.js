@@ -6,6 +6,7 @@ import {
   getSettings,
   replaceSettings,
   CARD_STYLES,
+  PALETTES,
   resetSettings,
   updateSettings,
   wantsDebug,
@@ -26,7 +27,8 @@ const GROUPS = [
   {
     label: 'Canvas',
     controls: [
-      { key: 'canvas', type: 'color', label: 'Background' },
+      { key: 'palette', type: 'range', label: 'Palette', min: 0, max: PALETTES.length - 1, step: 1, names: PALETTES.map((p) => p.name) },
+      { key: 'canvas', type: 'color', label: 'Background (custom)' },
       { key: 'bloom1', type: 'color', label: 'Sunset, wide' },
       { key: 'bloom2', type: 'color', label: 'Sunset, core' },
       { key: 'bloom3', type: 'color', label: 'Sky corner' },

@@ -13,6 +13,7 @@ export const DEFAULTS = {
   bloom3: '#DCE4F8',
   bloomOpacity: 0.55,
   cardStyle: 0,
+  palette: 1,
   edge: 2.2,
   roomTilt: 9,
   paper: '#FFFFFF',
@@ -40,7 +41,27 @@ export const DEFAULTS = {
 // How a work is drawn. A/B test: switch in the Tune panel or with ?card=name.
 export const CARD_STYLES = ['bare', 'file', 'paper']
 
+// Colour directions to compare. 'custom' uses the four colour pickers in Tune;
+// the rest replace them. Switch in Tune (Canvas, Palette) or with ?palette=name.
+// None is warm cream or peach, which is the colour of everything Claude makes.
+// bloom1 is the wide haze, bloom2 the core of the horizon glow, bloom3 the sky
+// in the top corner. `ink` is the text and bar colour.
+export const PALETTES = [
+  { name: 'custom' },
+  // The reference: white air, a cool blue lifting off the floor.
+  { name: 'daylight', canvas: '#FFFFFF', bloom1: '#DDE8FA', bloom2: '#BFD3F5', bloom3: '#EEF3FC', opacity: 0.75, ink: '#16181C' },
+  // Pure white and nothing else. Colour comes only from the works.
+  { name: 'gallery', canvas: '#FFFFFF', bloom1: '#F2F2F2', bloom2: '#E6E6E6', bloom3: '#FAFAFA', opacity: 0.6, ink: '#111111' },
+  // Pastel dusk from your colour reference: lilac air, a pink-gold horizon.
+  { name: 'dusk', canvas: '#FFFFFF', bloom1: '#E6DDF7', bloom2: '#F6C9DA', bloom3: '#D5E3FA', opacity: 0.8, ink: '#1B1727' },
+  // Sea and sky from the same reference: soft blue-green, a warm edge of sand.
+  { name: 'lagoon', canvas: '#FFFFFF', bloom1: '#D6ECEE', bloom2: '#F3E2B8', bloom3: '#DCEAF8', opacity: 0.75, ink: '#12201F' },
+  // The warm peach we had. Kept as the baseline to judge the others against.
+  { name: 'peach', canvas: '#FFFFFF', bloom1: '#FBE3D8', bloom2: '#F7C4B4', bloom3: '#DCE4F8', opacity: 0.55, ink: '#1C1B1A' },
+]
+
 const BOUNDS = {
+  palette: [0, PALETTES.length - 1],
   cardStyle: [0, CARD_STYLES.length - 1],
   bloomOpacity: [0, 1],
   cardRadius: [0, 40],
@@ -115,7 +136,7 @@ export function sanitize(partial, base) {
     if (!Number.isFinite(n)) continue
     const bounds = BOUNDS[key]
     next[key] = bounds ? clamp(n, bounds[0], bounds[1]) : n
-    if (key === 'cardStyle') next[key] = Math.round(next[key])
+    if (key === 'cardStyle' || key === 'palette') next[key] = Math.round(next[key])
   }
   return next
 }
@@ -144,9 +165,18 @@ function cardStyleName(s) {
   return CARD_STYLES.includes(asked) ? asked : CARD_STYLES[s.cardStyle] || CARD_STYLES[0]
 }
 
+// ?palette=name shows one direction without saving it, for comparing and filming.
+function activePalette(s) {
+  const asked = new URLSearchParams(location.search).get('palette')
+  const named = PALETTES.find((p) => p.name === asked)
+  const chosen = named || PALETTES[s.palette] || PALETTES[0]
+  if (!chosen.canvas) return s
+  return { ...s, canvas: chosen.canvas, bloom1: chosen.bloom1, bloom2: chosen.bloom2, bloom3: chosen.bloom3, bloomOpacity: chosen.opacity, ink: chosen.ink }
+}
+
 export function applyCss() {
   const root = document.documentElement
-  const s = state
+  const s = activePalette(state)
   root.style.setProperty('--canvas', s.canvas)
   root.style.setProperty('--paper', s.paper)
   root.style.setProperty('--ink', s.ink)
