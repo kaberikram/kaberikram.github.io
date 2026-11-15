@@ -131,3 +131,88 @@ Final: warm air in stereo with a body, an impact on long flights and a landing,
 centred near 250 Hz, clean above 4 kHz. Short hops whisper, drifts are silent.
 Tune values from this round are the new defaults; saved settings reset (v3) so
 the flight starts at its new level, 0.5.
+
+## 2026-11-15 · open air, and three card styles to compare
+"It's supposed to be a spatial mindmap moodboard, but a shadow on the card
+makes it seem like I'm placing everything on a wall. I want it to feel like an
+infinite white space." Then: "Pastel sunset. As Spike Jonze as possible. I
+really like no card, just image with text below. Do A/B testing."
+
+Why it read as a wall: a shadow needs a surface to land on, the flat warm
+canvas looked like that surface, and the white frame looked like a print
+pinned to it. Removed all three. No card casts a shadow now; far works thin
+out into the air (they turn see-through instead of being tinted) and lose a
+little focus. The canvas is a pastel sunset with no edge anywhere: warm light
+from far below the frame, a cool sky in the top corner.
+
+Three card styles, switchable live (Tune panel, Cards, Style) or by link:
+`/progress/?card=bare`, `?card=file`, `?card=paper`.
+- **bare** (default): just the picture, title and date under it.
+- **file**: soft corners, one small line under it set like a file name.
+- **paper**: the old white sheet with a hairline, minus the shadow.
+
+Stills of each in `captures/2026-11-15-card-ab/`. Saved settings reset (v4) so
+the new canvas shows. Not yet restyled to match: the bar, labels and header.
+
+## 2026-11-15 · hand-cut edges, and a room instead of a backdrop
+"Let's go with style A, but with not so clean edges, like the boxes are hand
+drawn. No frames please! Raw. Also why does the layout and background still
+feel flat? I want the spatial endless white room effect."
+
+**Edges.** Every picture is now cut by hand: its outline is a wandering polygon
+made from the work's id, so each is different and none is a clean box
+(`roughEdge` in `board.js`; Tune, Cards, Hand-drawn edge). No frame, no line.
+
+**Why it was flat, and what changed.**
+- The works were packed edge to edge in tidy rows, with only a 2x difference
+  in size from front to back. Now there is air between them, they sit off the
+  grid, and the space runs almost twice as deep (depth 1.8).
+- The camera looked at everything square-on, so nothing shared a vanishing
+  direction. The room is now seen from 9 degrees to one side; a focused work
+  squares up to be read (Tune, Space, Room angle).
+- The background was a wash of colour. It is now a place: pale overhead, a
+  glowing horizon low in the frame, a paler floor coming back toward you. It
+  slides when the view turns and holds still when the camera travels, the way
+  something very far away does.
+- The nearest, proudest works used to go soft. Now they are the sharp ones and
+  the room fades only with distance. Far works wash out toward the light
+  instead of turning see-through.
+- The board is laid out for where the camera will really stand, and framed
+  with the room's angle counted, so every work still lands on screen.
+
+Stills in `captures/2026-11-15-open-room/`. Saved settings reset (v5).
+
+## 2026-11-15 · what the site is for
+Ikram, on the philosophy of the whole site: "I want it to feel like meeting the
+love of your life for the first time, having a conversation. That's why the
+main interaction is a chat, so you can talk to me, get to know me. The first
+social interaction of humans is talking to another. And also like cavemen
+leaving their paintings on the world, like an artist displaying their art."
+
+Two things to hold every later choice against: the bar is a conversation, not
+a search box; the works are marks left by a hand, not products on a shelf.
+
+## 2026-11-15 · too much colour
+"The background colour is too much. I think this is why it feels flat, not an
+endless room." Agreed: a strong colour across the whole frame reads as a
+surface. The canvas is now pure white; the sunset is only a faint warm glow at
+the horizon and a hint of sky in one corner (bloom strength 0.55, was 0.9).
+Space is shown by the works' size, focus and the room angle, not by paint.
+Saved settings reset (v6).
+
+## 2026-11-15 · colour A/B, away from the Claude look
+"Need to do some A/B testing for the colours. I feel like I'm a child of
+Claude now." Fair: cream, peach and terracotta are the house colours of
+everything Claude makes, and the board had drifted into them.
+
+Five directions, switchable live (Tune, Canvas, Palette) or by link
+(`/progress/?palette=daylight`, `gallery`, `dusk`, `lagoon`, `peach`):
+- **daylight** (default for now): white air with a cool blue lifting off the
+  floor, from the meme-board reference.
+- **gallery**: pure white and grey; all colour comes from the works.
+- **dusk**: lilac air, pink-gold horizon (the colour reference's pastels).
+- **lagoon**: soft blue-green with an edge of sand (the same reference's sea).
+- **peach**: the old warm one, kept only to judge the others against.
+
+Stills in `captures/2026-11-15-palettes/`. Not decided yet.
+

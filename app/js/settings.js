@@ -3,21 +3,25 @@
 // The Tune panel (D key, or ?debug) edits it.
 
 // Bumped when defaults change meaning, so stale saved values are dropped.
-const STORAGE_KEY = 'ikram-board-v3'
+const STORAGE_KEY = 'ikram-board-v6'
 const LEAN_QUERY = '(max-width: 768px), (pointer: coarse)'
 
 export const DEFAULTS = {
-  canvas: '#F1E7E2',
-  bloom1: '#FFFFFF',
-  bloom2: '#FFFFFF',
-  bloom3: '#FFFFFF',
-  bloomOpacity: 0.8,
+  canvas: '#FFFFFF',
+  bloom1: '#FBE3D8',
+  bloom2: '#F7C4B4',
+  bloom3: '#DCE4F8',
+  bloomOpacity: 0.55,
+  cardStyle: 0,
+  palette: 1,
+  edge: 2.2,
+  roomTilt: 9,
   paper: '#FFFFFF',
   ink: '#1C1B1A',
   cardRadius: 0,
   labelSize: 20,
   spread: 0.6,
-  depth: 1,
+  depth: 1.8,
   tilt: 5,
   bank: 1,
   camStiffness: 58,
@@ -34,9 +38,35 @@ export const DEFAULTS = {
   soundRoom: 0.5,
 }
 
+// How a work is drawn. A/B test: switch in the Tune panel or with ?card=name.
+export const CARD_STYLES = ['bare', 'file', 'paper']
+
+// Colour directions to compare. 'custom' uses the four colour pickers in Tune;
+// the rest replace them. Switch in Tune (Canvas, Palette) or with ?palette=name.
+// None is warm cream or peach, which is the colour of everything Claude makes.
+// bloom1 is the wide haze, bloom2 the core of the horizon glow, bloom3 the sky
+// in the top corner. `ink` is the text and bar colour.
+export const PALETTES = [
+  { name: 'custom' },
+  // The reference: white air, a cool blue lifting off the floor.
+  { name: 'daylight', canvas: '#FFFFFF', bloom1: '#DDE8FA', bloom2: '#BFD3F5', bloom3: '#EEF3FC', opacity: 0.75, ink: '#16181C' },
+  // Pure white and nothing else. Colour comes only from the works.
+  { name: 'gallery', canvas: '#FFFFFF', bloom1: '#F2F2F2', bloom2: '#E6E6E6', bloom3: '#FAFAFA', opacity: 0.6, ink: '#111111' },
+  // Pastel dusk from your colour reference: lilac air, a pink-gold horizon.
+  { name: 'dusk', canvas: '#FFFFFF', bloom1: '#E6DDF7', bloom2: '#F6C9DA', bloom3: '#D5E3FA', opacity: 0.8, ink: '#1B1727' },
+  // Sea and sky from the same reference: soft blue-green, a warm edge of sand.
+  { name: 'lagoon', canvas: '#FFFFFF', bloom1: '#D6ECEE', bloom2: '#F3E2B8', bloom3: '#DCEAF8', opacity: 0.75, ink: '#12201F' },
+  // The warm peach we had. Kept as the baseline to judge the others against.
+  { name: 'peach', canvas: '#FFFFFF', bloom1: '#FBE3D8', bloom2: '#F7C4B4', bloom3: '#DCE4F8', opacity: 0.55, ink: '#1C1B1A' },
+]
+
 const BOUNDS = {
+  palette: [0, PALETTES.length - 1],
+  cardStyle: [0, CARD_STYLES.length - 1],
   bloomOpacity: [0, 1],
   cardRadius: [0, 40],
+  edge: [0, 6],
+  roomTilt: [0, 20],
   labelSize: [12, 64],
   spread: [0.3, 2],
   depth: [0, 2.5],
@@ -59,7 +89,7 @@ const BOUNDS = {
 const COLOR_KEYS = ['canvas', 'bloom1', 'bloom2', 'bloom3', 'paper', 'ink']
 
 // Keys that change where cards sit, so the board must be laid out again.
-export const LAYOUT_KEYS = ['spread', 'depth']
+export const LAYOUT_KEYS = ['spread', 'depth', 'roomTilt']
 
 let state = { ...DEFAULTS }
 let saveTimer = 0
@@ -106,6 +136,7 @@ export function sanitize(partial, base) {
     if (!Number.isFinite(n)) continue
     const bounds = BOUNDS[key]
     next[key] = bounds ? clamp(n, bounds[0], bounds[1]) : n
+    if (key === 'cardStyle' || key === 'palette') next[key] = Math.round(next[key])
   }
   return next
 }
@@ -115,19 +146,37 @@ function rgba(hex, alpha) {
   return `rgba(${r},${g},${b},${alpha})`
 }
 
-// The warm field behind the board: a sunset low in the frame, a cool sky
-// corner above it. Three soft blooms, same idea as the old Rothko field.
+// The room behind the board: an endless white studio at sunset. Pale overhead,
+// warming toward a soft glowing horizon low in the frame, then a paler floor
+// running back toward you. There is no line anywhere, only light, so the eye
+// reads distance and never a surface. main.js slides this with the camera's
+// lean, so the horizon behaves like something very far away.
 function bloomGradient(s) {
   return [
-    `radial-gradient(46% 42% at 50% 104%, ${rgba(s.bloom2, 0.85)} 0%, ${rgba(s.bloom2, 0)} 100%)`,
-    `radial-gradient(78% 58% at 46% 100%, ${rgba(s.bloom1, 0.9)} 0%, ${rgba(s.bloom1, 0)} 100%)`,
-    `radial-gradient(60% 55% at 92% 2%, ${rgba(s.bloom3, 0.6)} 0%, ${rgba(s.bloom3, 0)} 100%)`,
+    `radial-gradient(70% 7% at 50% 78%, ${rgba(s.bloom2, 0.6)} 0%, ${rgba(s.bloom2, 0)} 100%)`,
+    `linear-gradient(to bottom, ${rgba(s.bloom1, 0)} 55%, ${rgba(s.bloom1, 0.5)} 78%, ${rgba(s.bloom1, 0.25)} 100%)`,
+    `radial-gradient(60% 40% at 96% -6%, ${rgba(s.bloom3, 0.55)} 0%, ${rgba(s.bloom3, 0)} 100%)`,
   ].join(',')
+}
+
+// ?card=bare|file|paper shows one style without saving it, for comparing and filming.
+function cardStyleName(s) {
+  const asked = new URLSearchParams(location.search).get('card')
+  return CARD_STYLES.includes(asked) ? asked : CARD_STYLES[s.cardStyle] || CARD_STYLES[0]
+}
+
+// ?palette=name shows one direction without saving it, for comparing and filming.
+function activePalette(s) {
+  const asked = new URLSearchParams(location.search).get('palette')
+  const named = PALETTES.find((p) => p.name === asked)
+  const chosen = named || PALETTES[s.palette] || PALETTES[0]
+  if (!chosen.canvas) return s
+  return { ...s, canvas: chosen.canvas, bloom1: chosen.bloom1, bloom2: chosen.bloom2, bloom3: chosen.bloom3, bloomOpacity: chosen.opacity, ink: chosen.ink }
 }
 
 export function applyCss() {
   const root = document.documentElement
-  const s = state
+  const s = activePalette(state)
   root.style.setProperty('--canvas', s.canvas)
   root.style.setProperty('--paper', s.paper)
   root.style.setProperty('--ink', s.ink)
@@ -135,6 +184,7 @@ export function applyCss() {
   root.style.setProperty('--label-size', `${s.labelSize}px`)
   root.style.setProperty('--bloom', bloomGradient(s))
   root.style.setProperty('--bloom-opacity', String(s.bloomOpacity))
+  root.dataset.card = cardStyleName(s)
   root.classList.toggle('is-lean', isLean())
   root.classList.toggle('no-breathe', s.breathe < 0.5 || isLean() || reducedMotion())
   root.classList.toggle('reduced-motion', reducedMotion())

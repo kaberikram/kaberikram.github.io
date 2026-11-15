@@ -31,19 +31,37 @@ export function createDirector({ content, board, camera, ticker }) {
     return { seed: SEED, spread: s.spread, depth: s.depth, kinds: content.kinds, shape: shapeFor(freeW, freeH) }
   }
 
+  // The home board is spaced as it will be seen, and how it is seen depends on
+  // where the camera has to stand to fit it. Settle the two against each other:
+  // lay out, see where the camera lands, lay out again from there.
+  function homeBoard(opts) {
+    let out = LAYOUTS.scatter(works, opts)
+    for (let i = 0; i < 4; i++) {
+      const cam = camera.fit(out.bounds, { inset, pad: 0.92, minScale: homeMinScale(), maxScale: 1.12, zRef: out.bounds.z })
+      if (Math.abs(cam.z - (opts.from ?? -800)) < 4) break
+      opts = { ...opts, from: cam.z }
+      out = LAYOUTS.scatter(works, opts)
+    }
+    return out
+  }
+
+  function homeMinScale() {
+    return (narrow() ? 112 : 96) / CARD.w
+  }
+
   function buildView(cmd) {
     const opts = layoutOptions()
     const selected = select(works, cmd)
     const results = selected.map((work) => work.id)
 
     if (!hasFilter(cmd)) {
-      const out = LAYOUTS[cmd.layout](cmd.layout === 'scatter' ? works : selected, opts)
+      const out = cmd.layout === 'scatter' ? homeBoard(opts) : LAYOUTS[cmd.layout](selected, opts)
       return { poses: out.poses, labels: out.labels, bounds: out.bounds, results }
     }
 
     // A filtered view: the matches step forward together, near where they
     // already were, and everything else sinks back into the board.
-    const home = LAYOUTS.scatter(works, opts)
+    const home = homeBoard(opts)
     let ox = 0
     let oy = 0
     for (const id of results) {
@@ -88,6 +106,10 @@ export function createDirector({ content, board, camera, ticker }) {
     }
     const middle = view.results.length ? sum / view.results.length : 0
     camera.setPivot(focus ? poses.get(focus).z : middle, { immediate: still })
+    // The room is seen a little from one side. Looking at one work, it squares
+    // up so the work is read straight on.
+    const tilt = focus ? 0 : getSettings().roomTilt
+    camera.setRoom(tilt * 0.3, -tilt, { immediate: still })
     // Back far enough to see everything; in until the farthest card is close.
     const P = camera.perspective
     camera.setRange(P - P / MIN_SCALE - near, P - P / MAX_SCALE - far)
@@ -110,22 +132,72 @@ export function createDirector({ content, board, camera, ticker }) {
     )
   }
 
+  // The room's angle swings near works one way and far ones the other, so a
+  // view framed square-on can spill off the screen. Look at where every card
+  // will really land and step back or sideways until they all fit.
+  function settle(cam, view, poses) {
+    const freeW = camera.view.w - inset.left - inset.right
+    const freeH = camera.view.h - inset.top - inset.bottom
+    const midX = inset.left + freeW / 2
+    const midY = inset.top + freeH / 2
+    const P = camera.perspective
+    let next = { ...cam }
+    for (let i = 0; i < 5; i++) {
+      let minX = Infinity
+      let minY = Infinity
+      let maxX = -Infinity
+      let maxY = -Infinity
+      for (const id of view.results) {
+        const pose = poses.get(id)
+        const hw = (CARD.w * pose.s) / 2
+        const hh = (CARD.h * pose.s) / 2
+        for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+          const at = camera.projectFrom(next, pose.x + sx * hw, pose.y + sy * hh, pose.z)
+          minX = Math.min(minX, at.x)
+          maxX = Math.max(maxX, at.x)
+          minY = Math.min(minY, at.y)
+          maxY = Math.max(maxY, at.y)
+        }
+      }
+      if (!Number.isFinite(minX)) break
+      const distance = Math.max(200, P - camera.pivot - next.z)
+      const fits = Math.min(1, (freeW * 0.95) / (maxX - minX), (freeH * 0.95) / (maxY - minY))
+      const scale = P / distance
+      next = {
+        ...next,
+        x: next.x + ((minX + maxX) / 2 - midX) / scale,
+        y: next.y + ((minY + maxY) / 2 - midY) / scale,
+        z: next.z - (distance / fits - distance),
+      }
+    }
+    return next
+  }
+
   // Frame the cards in front. If that would make them too small to read (a
   // phone showing the whole board), open on the first card with its
   // neighbours around it instead, and let the visitor wander from there.
   function frameView(view, poses) {
-    const minScale = (narrow() ? 112 : 96) / CARD.w
+    const minScale = homeMinScale()
     const cam = camera.fit(view.bounds, { inset, pad: 0.92, minScale, maxScale: 1.12, zRef: view.bounds.z })
     const first = poses.get(view.results[0])
-    if (!cam.clamped || !first) return cam
+    if (!cam.clamped || !first) return settle(cam, view, poses)
     const cameraZ = camera.zForScale(minScale * 1.28, 0)
     const scale = camera.scaleAt(first.z, cameraZ)
     const w = CARD.w * first.s
     const h = CARD.h * first.s
-    return camera.fit(
+    const near = camera.fit(
       { x: first.x - w / 2, y: first.y - h / 2, w, h },
       { inset, pad: 1, minScale: scale, maxScale: scale, zRef: first.z },
     )
+    // The room's angle moves that card off centre; slide until it is back.
+    const midX = inset.left + (camera.view.w - inset.left - inset.right) / 2
+    const midY = inset.top + (camera.view.h - inset.top - inset.bottom) / 2
+    for (let i = 0; i < 4; i++) {
+      const at = camera.projectFrom(near, first.x, first.y, first.z)
+      near.x += (at.x - midX) / scale
+      near.y += (at.y - midY) / scale
+    }
+    return near
   }
 
   function writeUrl(cmd, mode) {

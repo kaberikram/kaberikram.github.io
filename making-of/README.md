@@ -81,3 +81,5 @@ with the site). Keep your own copies alongside your edit.
 - The Embercrest card (adaptive card with nested corners).
 - "John's Break Spot", a sketchbook page (paint dabs as colour code).
 - A still from *Her* (pale screen, flat elements at clear depths).
+- A meme-archive site: bare images hanging in endless white, no shadows.
+- An illustration library: images with a file name beneath, far ones out of focus.

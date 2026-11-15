@@ -37,7 +37,7 @@ input ──▶ Command ──▶ director ──▶ a pose for every card ─�
 | `js/board/input.js` | Drag, zoom, click, carry a card, keys. Ends in camera moves and director calls. |
 | `js/core/camera.js` | Camera position and all projection maths. |
 | `js/core/spring.js` | Springs, and the single animation loop that stops when nothing moves. |
-| `js/settings.js` | Look-and-feel values, saved in the browser, pushed to CSS. |
+| `js/settings.js` | Look-and-feel values, saved in the browser, pushed to CSS. Also the card style (`bare`, `file`, `paper`): pick it in Tune or with `?card=name`; the styles live at the end of `css/cards.css`. |
 | `js/sound/` | Generated sound: `voices.js` (each sound), `mix.js` (pan, distance, whoosh maths), `sound.js` (unlock, mute button, listens for cues). |
 | `js/cue.js` | `cue(name)`: how the bar, board and input announce moments worth hearing. |
 | `js/dev/tune.js` | The Tune panel: press **D**, or add `?debug`. |

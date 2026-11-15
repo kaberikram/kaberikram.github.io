@@ -5,6 +5,8 @@
 import {
   getSettings,
   replaceSettings,
+  CARD_STYLES,
+  PALETTES,
   resetSettings,
   updateSettings,
   wantsDebug,
@@ -25,7 +27,8 @@ const GROUPS = [
   {
     label: 'Canvas',
     controls: [
-      { key: 'canvas', type: 'color', label: 'Background' },
+      { key: 'palette', type: 'range', label: 'Palette', min: 0, max: PALETTES.length - 1, step: 1, names: PALETTES.map((p) => p.name) },
+      { key: 'canvas', type: 'color', label: 'Background (custom)' },
       { key: 'bloom1', type: 'color', label: 'Sunset, wide' },
       { key: 'bloom2', type: 'color', label: 'Sunset, core' },
       { key: 'bloom3', type: 'color', label: 'Sky corner' },
@@ -35,6 +38,8 @@ const GROUPS = [
   {
     label: 'Cards',
     controls: [
+      { key: 'cardStyle', type: 'range', label: 'Style', min: 0, max: CARD_STYLES.length - 1, step: 1, names: CARD_STYLES },
+      { key: 'edge', type: 'range', label: 'Hand-drawn edge', min: 0, max: 6, step: 0.1, unit: 'px' },
       { key: 'paper', type: 'color', label: 'Paper' },
       { key: 'ink', type: 'color', label: 'Ink' },
       { key: 'cardRadius', type: 'range', label: 'Corner radius', min: 0, max: 36, step: 1, unit: 'px' },
@@ -47,6 +52,7 @@ const GROUPS = [
     controls: [
       { key: 'spread', type: 'range', label: 'Spacing', min: 0.3, max: 2, step: 0.01 },
       { key: 'depth', type: 'range', label: 'Depth', min: 0, max: 2.5, step: 0.01 },
+      { key: 'roomTilt', type: 'range', label: 'Room angle', min: 0, max: 20, step: 0.5, unit: '°' },
       { key: 'tilt', type: 'range', label: 'Lean to pointer', min: 0, max: 10, step: 0.1, unit: '°' },
       { key: 'bank', type: 'range', label: 'Lean into moves', min: 0, max: 3, step: 0.01 },
     ],
@@ -66,6 +72,7 @@ const GROUPS = [
 function formatValue(control, value) {
   if (control.type !== 'range') return ''
   const n = Number(value)
+  if (control.names) return control.names[Math.round(n)] || ''
   const text = control.step < 1 ? n.toFixed(2) : String(Math.round(n))
   return control.unit ? `${text}${control.unit}` : text
 }

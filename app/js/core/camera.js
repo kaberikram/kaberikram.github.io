@@ -58,6 +58,9 @@ export function createCamera({ perspective = 800, stiffness = 90, damping = 20 }
   const P = perspective
   const pointerTilt = { x: 0, y: 0 }
   let bankAmount = 1
+  // A standing lean, so the whole space is seen slightly from one side and
+  // everything in it shares a vanishing direction, like a room does.
+  const room = { x: 0, y: 0 }
   let range = { min: P - P / MIN_SCALE, max: P - P / MAX_SCALE }
   // A long flight in progress: where depth should end up once most of the
   // sideways travel is done.
@@ -105,6 +108,20 @@ export function createCamera({ perspective = 800, stiffness = 90, damping = 20 }
 
     setBank(amount) {
       bankAmount = amount
+    },
+
+    setRoom(rx, ry, { immediate = false } = {}) {
+      room.x = rx
+      room.y = ry
+      if (immediate) {
+        sp.set(RX, rx + pointerTilt.x)
+        sp.set(RY, ry + pointerTilt.y)
+      }
+    },
+
+    // The lean right now, in degrees. The backdrop reads it to move its horizon.
+    get lean() {
+      return { rx: sp.value[RX], ry: sp.value[RY] }
     },
 
     setPivot(zw, { immediate = false } = {}) {
@@ -155,6 +172,16 @@ export function createCamera({ perspective = 800, stiffness = 90, damping = 20 }
       const p = lean(x - v[X], y - v[Y], zw + v[Z], v[RX], v[RY], pivotView())
       const s = P / Math.max(1, P - p.z)
       return { x: view.w / 2 + p.x * s, y: view.h / 2 + p.y * s, scale: s }
+    },
+
+    // Where a world point would appear if the camera stood at `cam` with the
+    // room's standing lean and nothing else. Used to frame a view before
+    // flying to it.
+    projectFrom(cam, x, y, zw = 0) {
+      const pz = Math.min(sp.target[PIVOT] + cam.z, P - EYE_MARGIN)
+      const p = lean(x - cam.x, y - cam.y, zw + cam.z, room.x, room.y, pz)
+      const s = P / Math.max(1, P - p.z)
+      return { x: view.w / 2 + p.x * s, y: view.h / 2 + p.y * s }
     },
 
     // Go somewhere at once, with no motion.
@@ -243,8 +270,8 @@ export function createCamera({ perspective = 800, stiffness = 90, damping = 20 }
       // Lean into fast moves, then level out.
       const bankY = clamp(sp.velocity[X] * 0.002, -7, 7) * bankAmount
       const bankX = clamp(-sp.velocity[Y] * 0.002, -7, 7) * bankAmount
-      sp.to(RX, pointerTilt.x + bankX)
-      sp.to(RY, pointerTilt.y + bankY)
+      sp.to(RX, room.x + pointerTilt.x + bankX)
+      sp.to(RY, room.y + pointerTilt.y + bankY)
       return sp.step(dt) || Boolean(arc)
     },
 

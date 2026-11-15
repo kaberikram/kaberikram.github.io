@@ -39,15 +39,44 @@ try {
 
   // Order matters: the camera moves, the held card is re-seated under the
   // pointer, then every card advances.
+  // The backdrop's horizon is far away: it slides when the view turns (about
+  // 14px a degree at this lens) and stays put when the camera travels.
+  const root = document.documentElement
+  let roomX = null
+  let roomY = null
+  const turnRoom = () => {
+    const { rx, ry } = camera.lean
+    const x = Math.round(Math.max(-130, Math.min(130, -ry * 14)))
+    const y = Math.round(Math.max(-130, Math.min(130, rx * 14)))
+    if (x === roomX && y === roomY) return
+    roomX = x
+    roomY = y
+    root.style.setProperty('--room-x', `${x}px`)
+    root.style.setProperty('--room-y', `${y}px`)
+  }
+
   ticker.add((dt) => {
     const moving = camera.step(dt)
     world.style.transform = camera.transform()
+    turnRoom()
     return moving
   })
   ticker.add(() => input.step())
   ticker.add((dt) => {
     const moving = board.step(dt)
-    board.look((z) => camera.distanceTo(z), camera.distanceTo(camera.pivot))
+    // What is in focus: the work being looked at, or with none chosen, the
+    // nearest works. So the proudest pieces up front are always sharp and the
+    // room softens only with distance.
+    let focal = camera.distanceTo(camera.pivot)
+    if (!director.getState().focus) {
+      let nearest = Infinity
+      for (const node of board.cards.values()) {
+        const d = camera.distanceTo(node.sp.value[2])
+        if (d > 200 && d < nearest) nearest = d
+      }
+      if (nearest < Infinity) focal = Math.min(focal, nearest * 1.2)
+    }
+    board.look((z) => camera.distanceTo(z), focal)
     return moving
   })
 
@@ -55,6 +84,7 @@ try {
     camera.setSpring(next.camStiffness, next.camDamping)
     camera.setBank(next.bank)
     board.syncSprings()
+    board.syncEdges()
     if (changed.some((key) => LAYOUT_KEYS.includes(key))) director.reframe()
     ticker.wake()
   })
