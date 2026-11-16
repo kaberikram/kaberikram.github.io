@@ -4,15 +4,24 @@
 #bar {
   --bar-w: 460px;
   --bar-r: 28px;
+  /* One rhythm for everything inside: a 4px grid, one side margin, one
+     hairline, two greys. */
+  --px: 22px;
+  --line: rgba(28, 27, 26, 0.09);
+  --soft: rgba(28, 27, 26, 0.045);
+  --muted: #8a837c;
+  --quiet: #6e6761;
   left: 50%;
   bottom: max(22px, env(safe-area-inset-bottom));
   width: min(var(--bar-w), calc(100vw - 24px));
   transform: translateX(-50%);
   border-radius: var(--bar-r);
-  background: rgba(255, 255, 255, 0.9);
-  -webkit-backdrop-filter: blur(18px);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 0 0 1px rgba(40, 30, 25, 0.08), 0 14px 40px rgba(40, 30, 25, 0.14);
+  background: rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  backdrop-filter: blur(24px) saturate(1.4);
+  /* A hairline and a faint cool haze, not a cast shadow: the bar floats in
+     the same white room as the work. */
+  box-shadow: 0 0 0 1px var(--line), 0 24px 60px -28px rgba(70, 80, 120, 0.22);
   overflow: hidden;
   color: var(--ink);
   font-size: 14px;
@@ -23,9 +32,9 @@
 }
 
 #bar[data-mode="typing"],
-#bar[data-mode="answer"] { --bar-w: 620px; --bar-r: 24px; }
-#bar[data-mode="detail"] { --bar-w: 660px; --bar-r: 22px; }
-#bar.is-open[data-mode="idle"] { --bar-w: 560px; }
+#bar[data-mode="answer"] { --bar-w: 600px; --bar-r: 26px; }
+#bar[data-mode="detail"] { --bar-w: 600px; --bar-r: 26px; }
+#bar.is-open[data-mode="idle"] { --bar-w: 540px; }
 
 /* A section opens by growing from zero height, so the surface stretches
    smoothly instead of jumping. */
@@ -39,14 +48,16 @@
 .sec.on { grid-template-rows: 1fr; opacity: 1; }
 .sec > div { min-height: 0; overflow: hidden; }
 
+/* The input row */
+
 .row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 7px 7px 20px;
+  gap: 10px;
+  padding: 6px 6px 6px var(--px);
 }
 
-.field { position: relative; flex: 1; min-width: 0; height: 36px; }
+.field { position: relative; flex: 1; min-width: 0; height: 40px; }
 
 #b-input,
 .mirror {
@@ -55,8 +66,8 @@
   width: 100%;
   height: 100%;
   padding: 0;
-  font: 500 15px/36px var(--ui-font);
-  letter-spacing: 0;
+  font: 450 15.5px/40px var(--ui-font);
+  letter-spacing: -0.005em;
   white-space: pre;
 }
 
@@ -68,7 +79,7 @@
   caret-color: var(--ink);
 }
 
-#b-input::placeholder { color: #8f8780; }
+#b-input::placeholder { color: var(--muted); }
 
 /* Sits under the input and repeats its text invisibly; only the underline of
    each understood word shows. */
@@ -77,14 +88,14 @@
 .mirror u {
   text-decoration: underline dotted;
   text-decoration-thickness: 1.5px;
-  text-decoration-color: rgba(28, 27, 26, 0.6);
-  text-underline-offset: 6px;
+  text-decoration-color: rgba(28, 27, 26, 0.5);
+  text-underline-offset: 7px;
 }
 
 .send {
   flex: none;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
   border: 0;
@@ -92,16 +103,37 @@
   background: var(--ink);
   color: #fff;
   cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease;
 }
+
+.send:hover { transform: scale(1.04); }
+.send:active { transform: scale(0.96); }
+
+/* Nothing typed yet: the arrow waits quietly instead of shouting. */
+.row:has(#b-input:placeholder-shown) .send { background: var(--soft); color: var(--muted); }
 
 .plan {
-  padding: 14px 20px 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 18px var(--px) 0;
   font-size: 13px;
   font-weight: 500;
-  color: #5d5650;
+  line-height: 1.45;
+  color: var(--quiet);
 }
 
-.plan.quiet { color: #8f8780; }
+.plan::before {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translateY(-1px);
+}
+
+.plan.quiet { color: var(--muted); }
 
 /* Suggestions wrap instead of scrolling, so nothing runs past the rounded
    edge. Two show in the idle pill, a third once the bar is open. */
@@ -109,30 +141,32 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 2px 16px 16px;
+  padding: 0 16px 16px;
 }
 
 .chip:nth-child(n+3) { display: none; }
 #bar.is-open .chip:nth-child(3) { display: block; }
 
+/* Every small choice is a thin outlined pill, filled only when chosen. */
 .chip, .pill, .opt {
   flex: none;
-  padding: 7px 13px;
+  padding: 8px 14px;
   border: 0;
   border-radius: 999px;
-  background: rgba(40, 30, 25, 0.06);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--line);
   color: var(--ink);
-  font: 500 12.5px/1.2 var(--ui-font);
+  font: 500 13px/1.2 var(--ui-font);
   white-space: nowrap;
   cursor: pointer;
   text-decoration: none;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
-.chip:hover, .pill:hover, .opt:hover { background: rgba(40, 30, 25, 0.12); }
-.pill.dark { background: var(--ink); color: #fff; }
-.pill.dark:hover { background: #3a3835; }
-.opt.on { background: var(--ink); color: #fff; }
+.chip:hover, .pill:hover, .opt:hover { background: var(--soft); box-shadow: inset 0 0 0 1px rgba(28, 27, 26, 0.14); }
+.pill.dark, .opt.on { background: var(--ink); color: #fff; box-shadow: none; }
+.pill.dark { padding: 9px 16px; }
+.pill.dark:hover { background: #3a3835; box-shadow: none; }
 
 .pill .dab { display: inline-block; margin-right: 7px; vertical-align: 0; }
 
@@ -143,91 +177,129 @@ button:focus-visible, .pill:focus-visible, #b-input:focus-visible {
 
 #b-input:focus-visible { outline: 0; }
 
-/* Answer sentence */
+/* Answer sentence: plain words, with the parts you can change marked by a
+   dotted underline and a small caret, not boxed. */
 
-.sentence { padding: 16px 20px 0; font-size: 15px; line-height: 1.9; font-weight: 500; }
-.sentence .count { color: #8f8780; font-size: 12.5px; font-weight: 500; white-space: nowrap; }
-.note { padding: 2px 20px 0; font-size: 12.5px; color: #8f8780; }
+.sentence { padding: 18px var(--px) 2px; font-size: 15.5px; line-height: 1.75; font-weight: 450; letter-spacing: -0.005em; text-wrap: pretty; }
+.sentence .count { margin-left: 4px; color: var(--muted); font-size: 13px; font-weight: 450; white-space: nowrap; }
+.note { padding: 4px var(--px) 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
 
 .slot {
-  padding: 2px 9px 3px;
-  margin: 0 1px;
+  display: inline;
+  padding: 2px 4px;
+  margin: 0 -1px;
   border: 0;
-  border-radius: 8px;
-  background: rgba(40, 30, 25, 0.07);
+  border-radius: 7px;
+  background: transparent;
   color: var(--ink);
   font: inherit;
-  text-decoration: underline;
-  text-decoration-color: rgba(28, 27, 26, 0.35);
-  text-underline-offset: 4px;
+  font-weight: 600;
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: rgba(28, 27, 26, 0.4);
+  text-underline-offset: 5px;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-.slot:hover, .slot.is-open { background: rgba(40, 30, 25, 0.14); }
+.slot::after {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin: 0 0 0 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  opacity: 0.45;
+  transform: translateY(-3px) rotate(45deg);
+  transition: transform 0.2s ease;
+}
 
-.options { display: flex; flex-wrap: wrap; gap: 7px; padding: 8px 20px 2px; }
+.slot:hover { background: var(--soft); }
+.slot.is-open { background: rgba(28, 27, 26, 0.07); }
+.slot.is-open::after { transform: translateY(0) rotate(-135deg); }
+
+.sentence .keep { white-space: nowrap; }
+
+.options { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px var(--px) 4px; }
 
 /* Detail */
 
-.d-top { display: flex; align-items: center; justify-content: space-between; padding: 16px 14px 0 20px; }
+.d-top { display: flex; align-items: center; justify-content: space-between; min-height: 32px; padding: 14px 10px 0 var(--px); }
 
 .d-kind {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #6b635d;
+  color: var(--muted);
 }
 
-.d-nav { display: inline-flex; align-items: center; gap: 4px; }
+.d-nav { display: inline-flex; align-items: center; gap: 2px; }
 .d-nav button {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
   border: 0;
   border-radius: 50%;
   background: transparent;
-  color: var(--ink);
+  color: var(--quiet);
   font: 400 20px/1 var(--ui-font);
   cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
-.d-nav button:hover { background: rgba(40, 30, 25, 0.08); }
-.d-count { font-size: 12px; color: #8f8780; font-variant-numeric: tabular-nums; padding: 0 2px; }
+.d-nav button:hover { background: var(--soft); color: var(--ink); }
+.d-nav button[data-act="close"] { margin-left: 4px; }
+.d-count { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; padding: 0 4px; }
 
 .d-title {
-  padding: 8px 20px 0;
+  padding: 8px var(--px) 0;
   font-family: var(--brand-font);
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
   font-variation-settings: "wdth" 108;
+  text-wrap: balance;
 }
 
-.d-line { padding: 4px 20px 0; color: #6b635d; font-size: 14px; line-height: 1.5; }
-.d-summary { padding: 10px 20px 0; font-size: 14px; line-height: 1.6; }
+.d-line { padding: 4px var(--px) 0; color: var(--quiet); font-size: 15px; line-height: 1.5; text-wrap: pretty; }
+.d-summary { max-width: 62ch; padding: 12px var(--px) 0; font-size: 14.5px; line-height: 1.65; text-wrap: pretty; }
 
-.d-facts { display: flex; flex-wrap: wrap; gap: 6px 28px; padding: 14px 20px 0; }
-.d-facts div { display: grid; gap: 2px; }
-.d-facts dt { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #8f8780; }
-.d-facts dd { font-size: 13.5px; font-weight: 500; }
+.d-facts { display: flex; flex-wrap: wrap; gap: 12px 36px; padding: 16px var(--px) 0; }
+.d-facts div { display: grid; gap: 4px; }
+.d-facts div { gap: 2px; }
+.d-facts dt { font-size: 12px; color: var(--muted); }
+.d-facts dd { font-size: 14px; font-weight: 500; }
 .d-facts:empty { display: none; }
 
-.d-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 20px 16px; }
+.d-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 18px var(--px) 18px; }
 
-#bar[data-mode="detail"] .row { border-top: 1px solid rgba(40, 30, 25, 0.07); }
-#bar[data-mode="answer"] .row { border-top: 1px solid rgba(40, 30, 25, 0.07); margin-top: 8px; }
+/* Under a work, the sentence is only context: what you are browsing. It
+   steps back in size and colour, below a hairline. */
+#bar[data-mode="detail"] .sec-answer > div { border-top: 1px solid var(--line); }
+#bar[data-mode="detail"] .sentence { padding-top: 10px; padding-bottom: 0; font-size: 13.5px; line-height: 1.7; color: var(--quiet); }
+#bar[data-mode="detail"] .slot { color: var(--ink); font-weight: 550; }
+#bar[data-mode="detail"] .sentence .count { font-size: 12.5px; }
+
+#bar[data-mode="detail"] .row { border-top: 1px solid var(--line); margin-top: 8px; }
+#bar[data-mode="answer"] .row { border-top: 1px solid var(--line); margin-top: 14px; }
 
 @media (max-width: 700px) {
   #bar.is-open .chip:nth-child(3) { display: none; }
-  #bar { bottom: max(12px, env(safe-area-inset-bottom)); --bar-w: calc(100vw - 24px); }
-  #bar[data-mode="idle"] { --bar-w: calc(100vw - 48px); }
-  .d-title { font-size: 22px; }
+  #bar { --px: 18px; bottom: max(12px, env(safe-area-inset-bottom)); --bar-w: calc(100vw - 24px); }
+  .chips { gap: 6px; padding: 0 12px 14px; }
+  .chip { padding: 8px 11px; font-size: 12px; }
+  .d-title { font-size: 23px; }
+  .d-facts { gap: 10px 28px; padding-top: 16px; }
+  .d-actions { padding: 18px var(--px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #bar, .sec { transition: none; }
+  #bar, .sec, .send, .slot::after { transition: none; }
 }

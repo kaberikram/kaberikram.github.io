@@ -277,3 +277,24 @@ version, 33 against 32.5 frames a second.
 Also: the board no longer leans toward the pointer for people who ask their
 device for less motion. Stills in `captures/2026-11-15-windows/`
 (`streaks-closeup.jpg`, `streaks-phone.jpg`).
+
+## 2026-11-16 · the helper, cleaner
+"This is a stretch, but let's improve the helper UI! Make it cleaner and
+modern, nice spacing."
+
+The bar at the bottom (where you talk to the board) kept its first look while
+the board around it became an open white room. Now it belongs to that room:
+
+- A hairline edge and a faint cool haze instead of a heavy drop shadow, and a
+  frostier glass.
+- One rhythm: the same side margin everywhere, a 4px grid, one hairline, two
+  greys.
+- Suggestions and choices are thin outlined pills, filled only when chosen.
+- The answer sentence reads as words, not boxes: the parts you can change are
+  bold with a dotted underline and a small caret that flips when open.
+- Under a work, that sentence steps back to a quiet line of context below a
+  hairline, so the work's title leads.
+- The send arrow waits greyed until there is something to send.
+- On a phone both suggestions fit on one line.
+
+Before and after in `captures/2026-11-16-helper/`.
