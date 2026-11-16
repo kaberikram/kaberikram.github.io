@@ -277,3 +277,20 @@ version, 33 against 32.5 frames a second.
 Also: the board no longer leans toward the pointer for people who ask their
 device for less motion. Stills in `captures/2026-11-15-windows/`
 (`streaks-closeup.jpg`, `streaks-phone.jpg`).
+
+## 2026-11-16 · the Tune helper, cleaner
+"Wait, I meant the helper UI, not the other UI." The helper is the Tune panel,
+the corner button with all the sliders used to try things on the board.
+
+It was a dark slab of default browser sliders and colour boxes. Now it is the
+same white glass as the bar:
+
+- Light frosted panel with a hairline edge, one side margin, groups split by a
+  single hairline.
+- Thin sliders filled in ink up to a small white handle.
+- Named settings (palette, card style) are pills to tap instead of sliders.
+- Colours are one line each: name, hex code, round swatch.
+- Reset, Copy and Paste stay pinned at the bottom while the settings scroll.
+- The corner button has a small slider icon and fills in ink when open.
+
+Before and after in `captures/2026-11-16-tune/`.

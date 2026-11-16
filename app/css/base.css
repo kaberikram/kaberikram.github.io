@@ -151,45 +151,56 @@ html.failed #bar { display: none; }
   #sound { right: 12px; top: 14px; }
 }
 
-/* Tune panel */
+/* Tune panel: the same white glass as the bar, so the tools sit in the room
+   instead of on top of it. Labels left, values right, one hairline between
+   groups, and choices as pills rather than sliders. */
 
 #tune-toggle {
   position: fixed;
   right: 16px;
   bottom: 16px;
   z-index: 40;
-  height: 28px;
-  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 13px 0 11px;
+  border: 0;
   border-radius: 999px;
-  border: 1px solid rgba(21, 22, 21, 0.18);
-  background: rgba(255, 255, 255, 0.92);
-  color: #151615;
-  font: 600 11px/1 var(--ui-font);
-  letter-spacing: 0.04em;
+  background: rgba(255, 255, 255, 0.82);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 0 0 1px rgba(28, 27, 26, 0.1);
+  color: var(--ink);
+  font: 500 12.5px/1 var(--ui-font);
   cursor: pointer;
   touch-action: manipulation;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
-#tune-toggle.on { background: #151615; color: #fff; }
+#tune-toggle:hover { background: #fff; }
+#tune-toggle.on { background: var(--ink); color: #fff; box-shadow: none; }
 
 #tune-panel {
+  --line: rgba(28, 27, 26, 0.08);
+  --soft: rgba(28, 27, 26, 0.05);
+  --muted: #8a837c;
   position: fixed;
   top: 16px;
   right: 16px;
+  bottom: 60px;
   z-index: 70;
   width: min(320px, calc(100vw - 32px));
-  max-height: calc(100vh - 32px);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  border-radius: 16px;
-  background: rgba(22, 20, 18, 0.9);
-  color: #f6f1ea;
-  font: 12px/1.35 var(--ui-font);
-  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.28);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.86);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  backdrop-filter: blur(24px) saturate(1.4);
+  box-shadow: 0 0 0 1px rgba(28, 27, 26, 0.09), 0 24px 60px -28px rgba(70, 80, 120, 0.25);
+  color: var(--ink);
+  font: 13px/1.35 var(--ui-font);
+  overflow: hidden;
   touch-action: pan-y;
   user-select: text;
   -webkit-user-select: text;
@@ -197,60 +208,180 @@ html.failed #bar { display: none; }
 
 #tune-panel[hidden] { display: none !important; }
 
-.tune-head, .tune-views, .tune-actions {
+.tune-head {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 10px 0 20px;
 }
 
-.tune-head { justify-content: space-between; }
-.tune-head span { color: #b7b1a8; }
+.tune-head strong { font: 700 17px/1 var(--brand-font); letter-spacing: -0.01em; font-variation-settings: "wdth" 108; }
+.tune-head span { flex: 1; color: var(--muted); font-size: 12px; }
+.tune-head kbd {
+  display: inline-block;
+  min-width: 18px;
+  padding: 2px 5px;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  font: 500 11px/1.2 var(--ui-font);
+  text-align: center;
+  color: var(--ink);
+}
 
-.tune-body { overflow: auto; padding-right: 4px; }
+#tune-panel .tune-close {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  color: var(--muted);
+  font: 400 20px/1 var(--ui-font);
+}
+
+#tune-panel .tune-close:hover { background: var(--soft); color: var(--ink); }
+
+/* Shortcuts to each arrangement. */
+.tune-views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 14px 20px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* Every button in the panel is a thin outlined pill. */
+#tune-panel button {
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink);
+  font: 500 12px/1.2 var(--ui-font);
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+#tune-panel button:hover { background: var(--soft); box-shadow: inset 0 0 0 1px rgba(28, 27, 26, 0.14); }
+#tune-panel button[aria-pressed="true"] { background: var(--ink); color: #fff; box-shadow: none; }
+#tune-panel button:focus-visible { outline: 2px solid color-mix(in srgb, var(--ink) 55%, transparent); outline-offset: 2px; }
+
+.tune-body { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 0 20px 8px; }
+
+.tune-body section { padding: 16px 0 8px; }
+.tune-body section + section { border-top: 1px solid var(--line); }
 
 .tune-body h2 {
-  margin: 12px 0 6px;
+  margin: 0 0 10px;
   font-size: 11px;
-  font-weight: 650;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #d7c3ae;
+  color: var(--muted);
 }
 
 .tune-row {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 4px;
-  margin: 6px 0;
+  gap: 6px;
+  margin: 0 0 12px;
 }
 
-.tune-row span { display: flex; justify-content: space-between; gap: 8px; }
-.tune-row output { color: #b7b1a8; font-variant-numeric: tabular-nums; }
-.tune-row input { width: 100%; }
-.tune-row input[type="color"] { height: 28px; padding: 0; border: 0; background: transparent; }
+.tune-row span { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-weight: 500; }
+.tune-row output { color: var(--muted); font-size: 12px; font-weight: 450; font-variant-numeric: tabular-nums; }
 
-#tune-panel button, .tune-json {
-  padding: 6px 8px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: #2a2724;
-  color: inherit;
-  font: inherit;
+/* Choices sit under their label as a wrap of pills. */
+.tune-row .tune-choices { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; font-weight: 450; }
+.tune-row.is-choice > span:first-child { justify-content: flex-start; }
+
+/* A colour is one row: label, hex, and a round swatch. */
+.tune-row.is-color { grid-template-columns: 1fr auto; align-items: center; gap: 12px; }
+.tune-row.is-color output { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
+.tune-row input[type="color"] {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 0 0 0 1px var(--line);
+  overflow: hidden;
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
 }
+.tune-row input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.tune-row input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 50%; }
+.tune-row input[type="color"]::-moz-color-swatch { border: 0; border-radius: 50%; }
+
+/* Sliders: a thin line, filled in ink up to the handle (--at), with a small
+   white handle on a hairline. */
+.tune-row input[type="range"] {
+  width: 100%;
+  height: 18px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.tune-row input[type="range"]::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--ink) var(--at, 50%), rgba(28, 27, 26, 0.12) var(--at, 50%));
+}
+.tune-row input[type="range"]::-moz-range-track { height: 3px; border-radius: 3px; background: rgba(28, 27, 26, 0.12); }
+.tune-row input[type="range"]::-moz-range-progress { height: 3px; border-radius: 3px; background: var(--ink); }
+.tune-row input[type="range"]::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  margin-top: -6.5px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(28, 27, 26, 0.18), 0 2px 6px rgba(28, 27, 26, 0.16);
+  -webkit-appearance: none;
+  appearance: none;
+  transition: transform 0.15s ease;
+}
+.tune-row input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(28, 27, 26, 0.18), 0 2px 6px rgba(28, 27, 26, 0.16);
+}
+.tune-row input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.15); }
+.tune-row input[type="range"]:focus-visible { outline: 0; }
+.tune-row input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px color-mix(in srgb, var(--ink) 30%, transparent); }
+
+/* Reset, copy and paste stay at the bottom while the settings scroll. */
+.tune-foot {
+  display: grid;
+  gap: 10px;
+  padding: 14px 20px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.tune-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 
 .tune-json {
   width: 100%;
-  min-height: 88px;
+  min-height: 96px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--soft);
+  color: var(--ink);
+  font: 11.5px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
   resize: vertical;
-  cursor: text;
 }
 
-.tune-status { color: #b7b1a8; min-height: 1.2em; }
+.tune-status { margin: 0; color: var(--muted); font-size: 12px; min-height: 1.2em; }
 
 #tune-panel button[hidden], .tune-json[hidden] { display: none !important; }
 
 @media (max-width: 700px) {
   #tune-toggle { top: 56px; right: 18px; bottom: auto; }
+  #tune-panel { top: 12px; right: 12px; bottom: 12px; width: calc(100vw - 24px); }
 }
