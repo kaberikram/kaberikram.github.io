@@ -83,7 +83,7 @@ export function initTune({ views = [] } = {}) {
   const button = document.createElement('button')
   button.id = 'tune-toggle'
   button.type = 'button'
-  button.textContent = 'Tune'
+  button.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Tune'
   button.title = 'Tune the board (D)'
   button.setAttribute('aria-expanded', 'false')
   button.setAttribute('aria-controls', 'tune-panel')
@@ -100,10 +100,12 @@ export function initTune({ views = [] } = {}) {
   const title = document.createElement('strong')
   title.textContent = 'Tune'
   const hint = document.createElement('span')
-  hint.textContent = 'D to close'
+  hint.innerHTML = 'Press <kbd>D</kbd> to close'
   const close = document.createElement('button')
   close.type = 'button'
-  close.textContent = 'Close'
+  close.className = 'tune-close'
+  close.setAttribute('aria-label', 'Close')
+  close.textContent = '×'
   head.append(title, hint, close)
 
   const status = document.createElement('p')
@@ -139,24 +141,59 @@ export function initTune({ views = [] } = {}) {
       span.append(output)
       row.append(span)
       const input = document.createElement('input')
+      let paint = () => {}
       if (control.type === 'color') {
         input.type = 'color'
+        row.classList.add('is-color')
+        paint = () => { output.textContent = input.value.toUpperCase() }
       } else {
         input.type = 'range'
         input.min = String(control.min)
         input.max = String(control.max)
         input.step = String(control.step)
       }
+      // A slider shows how far along it is; a named setting (palette, card
+      // style) is a row of choices instead of a slider.
+      let choices = null
+      if (control.type === 'range' && !control.names) {
+        paint = () => {
+          const at = (Number(input.value) - control.min) / (control.max - control.min)
+          input.style.setProperty('--at', `${Math.round(at * 1000) / 10}%`)
+        }
+      }
       const publish = () => {
         const value = control.type === 'range' ? Number(input.value) : input.value
         updateSettings({ [control.key]: value })
         output.textContent = formatValue(control, input.value)
+        paint()
       }
       input.addEventListener('input', publish)
       input.addEventListener('change', publish)
+      if (control.names) {
+        row.classList.add('is-choice')
+        input.hidden = true
+        choices = document.createElement('span')
+        choices.className = 'tune-choices'
+        control.names.forEach((name, index) => {
+          const choice = document.createElement('button')
+          choice.type = 'button'
+          choice.textContent = name
+          choice.addEventListener('click', () => {
+            input.value = String(index)
+            publish()
+          })
+          choices.append(choice)
+        })
+        paint = () => {
+          const at = Math.round(Number(input.value))
+          ;[...choices.children].forEach((choice, index) => choice.setAttribute('aria-pressed', String(index === at)))
+        }
+        output.hidden = true
+      }
       row.append(input)
+      if (choices) row.append(choices)
       section.append(row)
-      inputs.set(control.key, { input, output, control })
+      inputs.set(control.key, { input, output, control, paint })
     }
     body.append(section)
   }
@@ -189,6 +226,7 @@ export function initTune({ views = [] } = {}) {
     for (const [key, entry] of inputs) {
       entry.input.value = String(s[key])
       entry.output.textContent = formatValue(entry.control, entry.input.value)
+      entry.paint()
     }
   }
 
@@ -263,7 +301,10 @@ export function initTune({ views = [] } = {}) {
     setOpen(panel.hidden)
   })
 
-  panel.append(head, shortcuts, body, actions, box, load, status)
+  const foot = document.createElement('div')
+  foot.className = 'tune-foot'
+  foot.append(actions, box, load, status)
+  panel.append(head, shortcuts, body, foot)
   document.body.append(button, panel)
   fill()
   if (wantsDebug()) setOpen(true)
