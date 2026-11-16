@@ -78,7 +78,7 @@ Q: introduce yourself
 Q: what's your name
 Q: what is your story
 Q: a little about you
-A: I'm Ikram Hakim, a creative technologist in Malaysia. I make things you can step inside: AR for Snap Spectacles, mixed reality games for Quest, and small worlds in the browser.
+A: I'm Ikram Hakim, a creative technologist in Kuala Lumpur. I do design and dev, and I'm trying to make the future of interactions: AR, mixed reality, and small worlds in the browser.
 Next: What do you make?
 Next: What are you proudest of?
 Next: Where are you based?
@@ -91,11 +91,10 @@ Q: what do you do for work
 Q: what is a creative technologist
 Q: what kind of work do you do
 Q: what are you good at
-A: I live somewhere between design and code. Mostly AR on Snap Spectacles, mixed reality on Quest, and creative web things. I like it when technology feels like a small surprise.
+A: Design and dev, both. Mostly I'm trying to make the future of interactions: AR on Snap Spectacles, mixed reality on Quest, and creative things on the web.
 Next: Show me your proudest work
 Next: Tell me about your AR work
 Next: What tools do you use?
-Guess
 
 ## where
 Q: where are you based
@@ -104,9 +103,11 @@ Q: where are you from
 Q: which country are you in
 Q: are you in malaysia
 Q: what timezone are you in
-A: I'm in Malaysia. I work with people anywhere, though. Time zones are just a small puzzle.
+Q: are you in kl
+Q: do you work with people overseas
+Q: do you work remotely
+A: I'm based in KL, Kuala Lumpur. I work with people overseas too, so wherever you are is fine.
 Next: Can I hire you?
-Guess
 
 ## proudest
 Q: what are you proudest of
@@ -115,10 +116,10 @@ Q: what is your favourite project
 Q: which project do you love most
 Q: show me your highlights
 Q: show me your proudest work
-A: Reality to bend, probably: a room that stretches and then shatters. Here are the ones I love most.
+A: Reality to bend. I'd been wanting to recreate this effect from Spike Jonze for so long, and when I could finally make it, the whole thing felt effortless and magical. Here are the ones I love most.
 Show: show me your proudest work
+Next: What inspires you?
 Next: What are you working on now?
-Guess
 
 ## now
 Q: what are you working on now
@@ -127,10 +128,10 @@ Q: what are you up to these days
 Q: what is your latest project
 Q: what have you been making lately
 Q: what are you building right now
-A: Lately I've been bending rooms. Reality to bend and Volta are the newest. Here's the recent stuff.
+A: Right now, a game! It's a TIC Corp collab with Tep York. Meanwhile, here's the most recent stuff.
 Show: what's most recent
+Next: What is TIC Corp?
 Next: How was this site made?
-Guess
 
 ## AR
 Q: do you do AR
@@ -183,9 +184,8 @@ Q: do you use unity
 Q: what languages do you code in
 Q: do you know react
 Q: do you code
-A: Lens Studio for Spectacles, Unity for Quest, and Three.js or React Three Fiber on the web. Usually a lot of sketching before any of it.
+A: Lens Studio for Spectacles, Unity for Quest, and Three.js or React Three Fiber on the web.
 Next: Are you a designer or a developer?
-Guess
 
 ## design
 Q: are you a designer or a developer
@@ -193,19 +193,21 @@ Q: do you do ui ux
 Q: what's your background
 Q: where have you worked
 Q: work experience
-A: Both, honestly. I was a UI/UX designer at EPF on i-Akaun, and a creative developer at SHXFT Studio. I like living in the gap between the two.
+A: Both! I see myself as design and dev. At EPF I maintain the i-Akaun mobile app design and design its new features. At SHXFT I've done a lot of agency work, from AR mirrors to AR filters to web games.
 Show: product
 Next: Can I hire you?
-Guess
 
 ## TIC Corp
 Q: what is tic corp
 Q: do you sell clothes
 Q: parody clothing
 Q: do you have a shop
-A: TIC Corp is my parody clothing label. It's a joke, but a real one: it's a working shop.
+Q: what is laughwithtic
+Q: who is behind tic corp
+Q: are you part of a collective
+A: TIC Corp is me, Ceeq, Ichu and Amir. It's more of a creative collective: we do all sorts of things, but with a fashion focus. The shop is at [laughwithtic.com](https://laughwithtic.com).
 Show: TIC Corp
-Guess
+Next: What are you working on now?
 
 ## hire
 Q: can I hire you
@@ -216,9 +218,10 @@ Q: do you take commissions
 Q: I have a project for you
 Q: can you build something for me
 Q: are you looking for a job
-A: I'd love to hear what you're making. Write to me at [ikramandhakim@gmail.com](mailto:ikramandhakim@gmail.com) and tell me about it.
+Q: are you open to full time
+Q: are you open to collabs
+A: Yes! I'm open to freelance, collabs and full-time. Write to me at [ikramandhakim@gmail.com](mailto:ikramandhakim@gmail.com) and tell me what you're making.
 Next: How do I reach you?
-Guess
 
 ## contact
 Q: how do I reach you
@@ -233,9 +236,9 @@ Q: what inspires you
 Q: who are your influences
 Q: favourite film
 Q: favourite director
-A: Spike Jonze, mostly. Her, and that film where a room stretches around a dancer. Things that feel soft, a little lonely, and full of light.
-Next: How was this site made?
-Guess
+A: Spike Jonze! And everything that's going on around my life.
+Next: What are you proudest of?
+Next: What do you do for fun?
 
 ## this site
 Q: how was this site made
@@ -261,15 +264,16 @@ Q: what do you do for fun
 Q: hobbies
 Q: what do you do outside work
 Q: what do you do on weekends
-A: Trying whatever headset is newest, walking around with a camera, and thinking about rooms far too much.
-Guess
+Q: do you make music
+Q: are you a musician
+Q: what else do you do
+A: I make music!
 
 ## age
 Q: how old are you
 Q: what's your age
 Q: when were you born
-A: Old enough to remember Flash websites, young enough to still get giddy about every new headset.
-Guess
+A: Old enough!
 
 ## thanks
 Q: thanks

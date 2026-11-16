@@ -318,3 +318,9 @@ guessing. If the model can't load, it carries on with words alone.
 
 The starter answers were drafted from what the site already says; the ones
 marked `Guess` are not yet Ikram's words. Stills in `captures/2026-11-16-chat/`.
+
+## 2026-11-17 · the answers become Ikram's
+Asked Ikram twenty questions to check the drafts. The first round of answers
+went straight into `chat.md`: based in KL, design and dev both, Reality to
+bend as the proudest piece (and why), the TIC Corp game in progress, music
+outside work. Only "how are you" is still a guess.
