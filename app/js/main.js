@@ -10,8 +10,16 @@ import { createDirector } from './brain/director.js'
 import { createBar } from './bar/bar.js'
 import { initTune } from './dev/tune.js'
 import { createSound } from './sound/sound.js'
+import { loadChat } from './chat/chat.js'
 
 bootSettings()
+
+// The chat is small text; fetched alongside the content. If it fails, the bar
+// still works as before, for the board only.
+const chatLoading = loadChat().catch((error) => {
+  console.warn('chat: not available', error)
+  return null
+})
 
 const stage = document.getElementById('stage')
 const world = document.getElementById('world')
@@ -106,7 +114,7 @@ try {
     if (node && document.activeElement !== node.el) node.el.focus({ preventScroll: true })
   })
 
-  createBar({ content, director, mount: document.getElementById('bar') })
+  createBar({ content, director, mount: document.getElementById('bar'), chat: await chatLoading })
 
   const sound = createSound({ camera, director, button: document.getElementById('sound') })
   ticker.add(() => sound.update())

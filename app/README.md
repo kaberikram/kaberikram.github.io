@@ -31,6 +31,8 @@ input ──▶ Command ──▶ director ──▶ a pose for every card ─�
 | `js/brain/command.js` | The Command: validate it, pick the works it selects, read and write it as a URL hash. |
 | `js/brain/parse.js` | The on-device brain: text to a Command, which words were understood (for underlining), and a one-line plan. Words live in `LEXICON` at the top. |
 | `js/bar/bar.js` | The bar: pill, plan line while typing, answer sentence with editable blanks, work detail, About and Contact. Only sends Commands. |
+| `content/chat.md` | Everything the chat says, in plain text: topics, ways people ask, answers. Edit and reload. |
+| `js/chat/` | The chat: `script.js` reads chat.md, `match.js` picks the closest topic (shared words, or meaning), `chat.js` loads it and runs the sentence model in `embed-worker.js`. |
 | `js/brain/director.js` | Turns a Command into card poses, a camera move and a URL. The one path for every change. |
 | `js/board/layouts.js` | The arrangements (scatter, grid, timeline, stack, fan). Pure functions. |
 | `js/board/board.js` | One element per card and label, moved by springs. |
@@ -81,6 +83,24 @@ commits. Nothing it cannot read is a dead end: it offers a blank to fill.
 
 To teach it a word, add it to `LEXICON` in `js/brain/parse.js` and a case to
 `tests/parse.test.js`. Tags come from `content.json` automatically.
+
+## The chat
+
+Questions about you are answered from `content/chat.md`, written ahead of
+time. No server, no LLM: a small sentence model in the visitor's browser
+(downloaded the first time they open the bar) picks the closest answer, and
+shared words answer instantly before it has loaded. The format is explained at
+the top of the file. Lines marked `Guess` are drafts to rewrite.
+
+After changing questions, optionally refresh the precomputed vectors so the
+first answer is quicker (the browser fills in any that are missing):
+
+```
+npm i --no-save @huggingface/transformers@4.3.2
+node tools/embed-chat.mjs
+```
+
+Add `?nomodel` to try it with shared words only.
 
 ## Keys
 
