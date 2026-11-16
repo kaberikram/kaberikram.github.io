@@ -208,11 +208,11 @@ export function createBar({ content, director, mount }) {
     const c = state.command
     let html
     if (blank) {
-      html = `<p class="sentence">Not sure I caught “${escapeHtml(blank)}”. Are you after <span class="keep">${slot('kind', 'a kind of work')}?</span></p>`
+      html = `<p class="sentence">Not sure I caught “${escapeHtml(blank)}”. Are you after ${slot('kind', 'a kind of work')}?</p>`
     } else {
       const where = c.kind ? `in ${kindLabel(c.kind)}` : 'of any kind'
       const extra = [...c.tags, c.years ? (c.years[0] === c.years[1] ? String(c.years[0]) : `${c.years[0]}–${c.years[1]}`) : null].filter(Boolean)
-      html = `<p class="sentence">Here's my ${slot('sort', sortText(c.sort))} work ${slot('kind', where)}, shown as <span class="keep">${slot('layout', LAYOUT_TEXT[c.layout])}.</span> <span class="count">${state.results.length} piece${state.results.length === 1 ? '' : 's'}${extra.length ? ` · ${escapeHtml(extra.join(', '))}` : ''}</span></p>`
+      html = `<p class="sentence">Here's my ${slot('sort', sortText(c.sort))} work ${slot('kind', where)}, shown as ${slot('layout', LAYOUT_TEXT[c.layout])}. <span class="count">${state.results.length} piece${state.results.length === 1 ? '' : 's'}${extra.length ? ` · ${escapeHtml(extra.join(', '))}` : ''}</span></p>`
       if (note) html += `<p class="note">${escapeHtml(note.text)}</p>`
     }
     if (openSlot) {
