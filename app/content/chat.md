@@ -206,7 +206,10 @@ Q: do you have a shop
 Q: what is laughwithtic
 Q: who is behind tic corp
 Q: are you part of a collective
-A: TIC Corp is a parody clothing label I co-founded with my friends. I designed and built the whole site, shop and order tracking included. Come say hi at [laughwithtic.com](https://laughwithtic.com)!
+Q: who runs tic corp
+Q: who is in tic
+Q: who are ceeq ichu and amir
+A: TIC Corp is a parody clothing label I co-founded with my friends Ichu, Ceeq and Amir. We treat humour as interaction: the Rat'teryx Jacket is our deadpan send-up of Arc'teryx. I designed and built the whole site, shop and order tracking included. Come say hi at [laughwithtic.com](https://laughwithtic.com)!
 Show: TIC Corp
 Next: What are you working on now?
 
