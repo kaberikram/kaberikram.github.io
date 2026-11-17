@@ -325,6 +325,14 @@ went straight into `chat.md`: based in KL, design and dev both, Reality to
 bend as the proudest piece (and why), the TIC Corp game in progress, music
 outside work. Only "how are you" is still a guess.
 
+## 2026-11-17 · more to ask about
+Grok went through the public record and the chat grew from 25 topics to 40:
+education, how the AR work started, the Ghost Catch story, hackathons, press,
+EPF, SHXFT, music and more. The research notes themselves stay out of the
+repo. TIC Corp is now described in the label's own words, and Tep York (TY) is
+simply named as the collaborator on the game until there is more to say. The
+new answers marked `Guess` are drafts still waiting for Ikram's words.
+
 ## 2026-11-17 · our own letters
 "Study allo.joshpuckett.me, make our own font and use it for my website."
 
