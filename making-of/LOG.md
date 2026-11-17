@@ -422,3 +422,12 @@ above and below, also in Kertas. Only a light wash marks the current one. A tap
 elsewhere or Esc puts it away without changing anything.
 
 Stills in `captures/2026-11-17-dropdown/`.
+
+Then: "i think we should still show highlight instead of just a line so its
+obvious, but the highlight make it like rough paper edges? similar to the
+window? then the menu that appear also make it raw rough paper?" The blanks get
+their highlight back, but as a scrap of warm paper with the same hand-cut
+outline as the windows (`roughEdge`, now in `util.js` and sized to each piece).
+The menu is a bigger scrap of the same paper with no shadow, and the current
+choice sits on a slightly darker scrap. `three-desktop.jpg` and
+`three-phone.jpg` show grey pills, then the plain line, then paper.

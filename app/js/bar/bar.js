@@ -14,7 +14,7 @@
 
 import { SUGGESTIONS, LAYOUT_TEXT, describe, parse, sortText } from '../brain/parse.js'
 import { hasFilter, toHash } from '../brain/command.js'
-import { escapeHtml } from '../util.js'
+import { escapeHtml, hashString, roughEdge } from '../util.js'
 import { cue } from '../cue.js'
 import { answerHtml } from '../chat/script.js'
 
@@ -353,7 +353,17 @@ export function createBar({ content, director, mount, chat = null }) {
       if (note) html += `<p class="note">${escapeHtml(note.text)}</p>`
     }
     answer.innerHTML = html
+    answer.querySelectorAll('.slot').forEach((el) => cut(el, `${el.dataset.slot}:${el.textContent}`, 2.2))
     renderMenu()
+  }
+
+  // Blanks, their menu and its current choice are cut from paper with the same
+  // hand-cut outline as the windows on the board, sized to each piece.
+  function cut(el, seed, amount) {
+    const w = el.offsetWidth
+    const h = el.offsetHeight
+    if (!w || !h) return
+    el.style.setProperty('--rough', roughEdge(hashString(seed), amount, { w, h }))
   }
 
   // The choices for a blank float over the card, anchored on the word: the
@@ -376,6 +386,8 @@ export function createBar({ content, director, mount, chat = null }) {
     const options = optionsFor(openSlot, director.getState().command)
     menu.dataset.for = openSlot
     menu.innerHTML = options.map(([value, text, on]) => `<button type="button" role="option" aria-selected="${on}" class="opt${on ? ' on' : ''}" data-value="${escapeHtml(value)}">${escapeHtml(text)}</button>`).join('')
+    cut(menu, `menu:${openSlot}`, 3)
+    menu.querySelectorAll('.opt').forEach((el) => cut(el, `opt:${el.dataset.value}`, 2))
     placeMenu(anchor)
     menu.classList.add('on')
     // The bar may still be growing or sliding; keep the menu on its word.
