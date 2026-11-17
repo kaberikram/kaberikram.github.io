@@ -43,7 +43,7 @@ Ikram asked for his own CVs to count as sources, since he wrote them. They are c
 
 **Also from the CVs (not asked, but useful):** GOWAAA dates are Jan 2022 – Feb 2025 in the CV, but Oct 2021 – Feb 2025 on LinkedIn. FabU work included the *ALANGKAH* ASM ArtScience Virtual Exhibition for Akademi Sains Malaysia.
 
-**Updated tally (Part 1, 11 claims):** confirmed 8 (1, 2 as a team entry, 3, 5, 6, 9, 10, 11) · partly 3 (4b Take a Leap, 7, 8) · not found 0 · wrong 0.
+**Updated tally (Part 1, 11 claims):** confirmed 9 (1, 2 as a team entry, 3, 5, 6, 8, 9, 10, 11) · partly 2 (4b Take a Leap, 7) · not found 0 · wrong 0. Team names Ichu, Ceeq and Amir are now confirmed (17 Nov 2026).
 
 ---
 
