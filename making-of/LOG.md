@@ -360,3 +360,9 @@ type-designer touches came in too: horizontals are a little thinner than
 verticals, and where an arch grows out of a stem (n, m, h, u, r) it thins, so
 the joins stay open when the letters are small. `specimen.png` compares
 before and after.
+
+Then: "inter swap with allo?" The working text (input, pills, dates,
+details, Tune) is now Allo itself, Josh Puckett's font, self-hosted under its
+open licence (`app/fonts/allo/`, with `OFL.txt`; cut down to Latin, about
+150 KB). So the pair is Kertas for Ikram's voice and Allo for everything
+around it. The page no longer loads anything from Google Fonts.

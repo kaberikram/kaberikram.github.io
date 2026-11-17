@@ -11,16 +11,24 @@
   --card-radius: 16px;
   --label-size: 40px;
   --bloom-opacity: 0.62;
-  --ui-font: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /* Allo by Josh Puckett (SIL OFL 1.1, app/fonts/allo/OFL.txt): the quiet working text. */
+  --ui-font: Allo, "Helvetica Neue", Helvetica, Arial, sans-serif;
   --hand: 35;
   /* Kertas: the board's own letters, drawn for this site (tools/kertas). */
-  --brand-font: Kertas, Inter, Helvetica, sans-serif;
+  --brand-font: Kertas, Allo, Helvetica, sans-serif;
 }
 
 @font-face {
   font-family: Kertas;
   src: url("../fonts/Kertas.woff2") format("woff2");
   font-weight: 300 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Allo;
+  src: url("../fonts/allo/Allo.woff2") format("woff2");
+  font-weight: 100 900;
   font-display: swap;
 }
 
