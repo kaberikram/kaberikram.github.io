@@ -352,22 +352,81 @@ export function createBar({ content, director, mount, chat = null }) {
       html = `<p class="sentence">Here's my ${slot('sort', sortText(c.sort))} work ${slot('kind', where)}, shown as ${slot('layout', LAYOUT_TEXT[c.layout])}. <span class="count">${state.results.length} piece${state.results.length === 1 ? '' : 's'}${extra.length ? ` · ${escapeHtml(extra.join(', '))}` : ''}</span></p>`
       if (note) html += `<p class="note">${escapeHtml(note.text)}</p>`
     }
-    if (openSlot) {
-      const options = optionsFor(openSlot, c)
-      html += `<div class="options" data-for="${openSlot}">${options.map(([value, text, on]) => `<button type="button" class="opt${on ? ' on' : ''}" data-value="${escapeHtml(value)}">${escapeHtml(text)}</button>`).join('')}</div>`
-    }
     answer.innerHTML = html
+    renderMenu()
+  }
+
+  // The choices for a blank float over the card, anchored on the word: the
+  // current choice sits right where the word is, the others stack above and
+  // below it. The menu lives outside the bar so the bar's rounded edge does
+  // not clip it.
+  const menu = document.createElement('div')
+  menu.className = 'slot-menu'
+  menu.setAttribute('role', 'listbox')
+  document.body.append(menu)
+  let menuFollow = 0
+
+  function renderMenu() {
+    const anchor = openSlot && answer.querySelector(`.slot[data-slot="${openSlot}"]`)
+    if (!anchor || !sections.answer.classList.contains('on')) {
+      menu.classList.remove('on')
+      cancelAnimationFrame(menuFollow)
+      return
+    }
+    const options = optionsFor(openSlot, director.getState().command)
+    menu.dataset.for = openSlot
+    menu.innerHTML = options.map(([value, text, on]) => `<button type="button" role="option" aria-selected="${on}" class="opt${on ? ' on' : ''}" data-value="${escapeHtml(value)}">${escapeHtml(text)}</button>`).join('')
+    placeMenu(anchor)
+    menu.classList.add('on')
+    // The bar may still be growing or sliding; keep the menu on its word.
+    cancelAnimationFrame(menuFollow)
+    const until = performance.now() + 700
+    const follow = () => {
+      const current = openSlot && answer.querySelector(`.slot[data-slot="${openSlot}"]`)
+      if (!current) return
+      placeMenu(current)
+      if (performance.now() < until) menuFollow = requestAnimationFrame(follow)
+    }
+    menuFollow = requestAnimationFrame(follow)
+  }
+
+  function placeMenu(anchor) {
+    const word = anchor.getBoundingClientRect()
+    const current = menu.querySelector('.opt.on') || menu.firstElementChild
+    const width = Math.max(menu.offsetWidth, word.width + 24)
+    const height = menu.offsetHeight
+    const pad = 8
+    let left = word.left + word.width / 2 - width / 2
+    let top = word.top + word.height / 2 - (current.offsetTop + current.offsetHeight / 2)
+    left = Math.min(Math.max(pad, left), innerWidth - width - pad)
+    top = Math.min(Math.max(pad, top), innerHeight - height - pad)
+    menu.style.minWidth = `${Math.round(word.width + 24)}px`
+    menu.style.left = `${Math.round(left)}px`
+    menu.style.top = `${Math.round(top)}px`
+    menu.style.transformOrigin = `${Math.round(word.left + word.width / 2 - left)}px ${Math.round(word.top + word.height / 2 - top)}px`
+  }
+
+  function closeMenu() {
+    if (!openSlot) return false
+    openSlot = null
+    answer.querySelectorAll('.slot.is-open').forEach((slotEl) => {
+      slotEl.classList.remove('is-open')
+      slotEl.setAttribute('aria-expanded', 'false')
+    })
+    renderMenu()
+    return true
   }
 
   answer.addEventListener('click', (e) => {
-    const target = e.target.closest('button')
+    const target = e.target.closest('.slot')
     if (!target) return
-    if (target.dataset.slot) {
-      openSlot = openSlot === target.dataset.slot ? null : target.dataset.slot
-      renderAnswer(director.getState())
-      return
-    }
-    if (!target.dataset.value) return
+    openSlot = openSlot === target.dataset.slot ? null : target.dataset.slot
+    renderAnswer(director.getState())
+  })
+
+  menu.addEventListener('click', (e) => {
+    const target = e.target.closest('.opt')
+    if (!target) return
     const state = director.getState()
     const next = { ...state.command, focus: null }
     const value = target.dataset.value
@@ -384,6 +443,19 @@ export function createBar({ content, director, mount, chat = null }) {
     render()
   })
 
+  // A tap anywhere else, or Esc, puts the menu away without changing anything.
+  addEventListener('pointerdown', (e) => {
+    if (!openSlot || menu.contains(e.target) || e.target.closest('.slot')) return
+    closeMenu()
+  }, true)
+  addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || !openSlot) return
+    e.stopPropagation()
+    e.preventDefault()
+    closeMenu()
+  }, true)
+  addEventListener('resize', () => closeMenu())
+
   // ---- detail ---------------------------------------------------------------
 
   function fact(label, value) {
@@ -395,7 +467,6 @@ export function createBar({ content, director, mount, chat = null }) {
     const at = state.results.indexOf(work.id)
     const many = state.results.length > 1
     const links = (work.links || []).map((link) => `<a class="pill" href="${escapeHtml(link.url)}" target="_blank" rel="noopener">${escapeHtml(link.label)}</a>`).join('')
-    const mail = `mailto:${content.owner.email}?subject=${encodeURIComponent(`About ${work.title}`)}`
     detail.innerHTML = `
       <div class="d-top">
         <span class="d-kind"><i class="dab" style="--dab:${content.kindById.get(work.kind).dab}"></i>${escapeHtml(kindLabel(work.kind))}</span>
@@ -408,7 +479,7 @@ export function createBar({ content, director, mount, chat = null }) {
       <p class="d-line">${escapeHtml(work.line)}</p>
       ${work.summary ? `<p class="d-summary">${escapeHtml(work.summary)}</p>` : ''}
       <dl class="d-facts">${fact('When', work.when)}${fact('Role', work.role)}${fact('Made with', (work.tools || []).join(', '))}</dl>
-      <div class="d-actions">${links}<a class="pill dark" href="${mail}">Ask me about this</a></div>`
+      ${links ? `<div class="d-actions">${links}</div>` : ''}`
   }
 
   function renderPanel(name) {
@@ -484,6 +555,8 @@ export function createBar({ content, director, mount, chat = null }) {
     }
     show('detail', hasDetail)
     show('answer', hasAnswer)
+    if (!hasAnswer) openSlot = null
+    renderMenu()
     show('plan', isTyping && (!isTalk || planUseful))
     show('chips', mode === 'idle' || Boolean(blank) || (isTalk && !isTyping && chipsShown !== ''))
     if (lastMode && mode !== lastMode && mode !== 'typing' && lastMode !== 'typing' && mode !== 'talk' && lastMode !== 'talk') cue('shape')

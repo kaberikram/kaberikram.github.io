@@ -406,3 +406,19 @@ Tried live the same evening, then rolled back: "feels a bit too much now! I
 think before was better, we have separation, just needed a bit of learning
 curve." Talking and looking at a work stay as two modes for now. The stills
 above are kept as a record of the experiment.
+
+## 2026-11-17 · the blanks float
+"remove ask me about this! and then when tapping on category we make it like a
+floating dropdown like this image, also on these tappable category we use
+kertas! also make sure the highlight etc not so heavy so it doesnt feel
+cluttered"
+
+The work card loses its black "Ask me about this" button; the bar under it is
+already the way to ask. The blanks in "Here's my [newest] work [of any kind],
+shown as [a board]" are now words in Kertas with a faint underline instead of
+grey pills. Tapping one floats a small soft sheet over the card, anchored on
+the word: the current choice sits exactly where the word was, the others stack
+above and below, also in Kertas. Only a light wash marks the current one. A tap
+elsewhere or Esc puts it away without changing anything.
+
+Stills in `captures/2026-11-17-dropdown/`.
