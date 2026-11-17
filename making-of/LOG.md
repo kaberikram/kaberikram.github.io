@@ -294,3 +294,33 @@ same white glass as the bar:
 - The corner button has a small slider icon and fills in ink when open.
 
 Before and after in `captures/2026-11-16-tune/`.
+
+## 2026-11-16 · the bar talks back
+"So we can make a conversational AI chat without even using LLM credit? Some
+stuff that we can pre-bake about myself?"
+
+Yes. The bar is now a conversation. Ask "who are you?" or "where do you
+live?" and Ikram answers, in a sentence that arrives a word at a time after a
+short pause, like someone gathering a thought. The visitor's words sit above
+it, small and quiet; the exchange before fades back. Some answers move the
+board too ("tell me about Dreampop" flies to it). Board requests ("just the
+AR work") still work as before.
+
+No server and no LLM. Every answer is written ahead of time in
+`app/content/chat.md`, a plain text file of topics: ways people might ask,
+what to say back. Choosing the answer happens on the visitor's device in two
+ways: shared words (instant, and exact for the suggested questions), and a
+small sentence model (all-MiniLM-L6-v2, about 23 MB, loaded the first time
+someone opens the bar, then cached) that matches by meaning, so "where do u
+live" finds "where are you based". Nothing typed leaves the device. When no
+topic is close enough it says so kindly and offers other questions, instead of
+guessing. If the model can't load, it carries on with words alone.
+
+The starter answers were drafted from what the site already says; the ones
+marked `Guess` are not yet Ikram's words. Stills in `captures/2026-11-16-chat/`.
+
+## 2026-11-17 · the answers become Ikram's
+Asked Ikram twenty questions to check the drafts. The first round of answers
+went straight into `chat.md`: based in KL, design and dev both, Reality to
+bend as the proudest piece (and why), the TIC Corp game in progress, music
+outside work. Only "how are you" is still a guess.

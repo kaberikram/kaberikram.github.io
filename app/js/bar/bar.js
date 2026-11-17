@@ -6,6 +6,8 @@
 //   answer   one sentence with editable blanks: "Here's my [proudest] work [of
 //            any kind], shown as [a board]." Change a blank, the board follows.
 //   detail   the focused work, with its facts and a way to get in touch.
+//   talk     a conversation: what the visitor said and what you say back,
+//            from app/content/chat.md. The board may move with an answer.
 //
 // It never moves a card itself. It reads the director's state and sends it
 // Commands, like every other input.
@@ -14,12 +16,14 @@ import { SUGGESTIONS, LAYOUT_TEXT, describe, parse, sortText } from '../brain/pa
 import { hasFilter, toHash } from '../brain/command.js'
 import { escapeHtml } from '../util.js'
 import { cue } from '../cue.js'
+import { answerHtml } from '../chat/script.js'
 
 const SORTS = [['proud', 'proudest'], ['recent', 'newest'], ['oldest', 'earliest']]
 const LAYOUTS = [['scatter', 'a board'], ['grid', 'a grid'], ['timeline', 'a timeline'], ['stack', 'a stack']]
 
-export function createBar({ content, director, mount }) {
+export function createBar({ content, director, mount, chat = null }) {
   mount.innerHTML = `
+    <div class="sec sec-talk"><div><div class="talk"><button type="button" class="talk-close" aria-label="Close the conversation">×</button><div id="b-talk" aria-live="polite"></div></div></div></div>
     <div class="sec sec-detail"><div id="b-detail"></div></div>
     <div class="sec sec-answer"><div id="b-answer"></div></div>
     <div class="sec sec-plan"><div><p id="b-plan" class="plan" aria-live="polite"></p></div></div>
@@ -39,7 +43,9 @@ export function createBar({ content, director, mount }) {
   const detail = $('#b-detail')
   const answer = $('#b-answer')
   const chips = $('.chips')
+  const talkLog = $('#b-talk')
   const sections = {
+    talk: $('.sec-talk'),
     detail: $('.sec-detail'),
     answer: $('.sec-answer'),
     plan: $('.sec-plan'),
@@ -56,6 +62,18 @@ export function createBar({ content, director, mount }) {
   let lastLength = 0
   let lastFound = 0
   let lastMode = null
+
+  // The conversation. Each exchange: { said, reply, next, pending, fresh }.
+  let talk = []
+  let talking = false
+  let talkView = '' // the board as the last answer left it
+  let ownMove = false
+  let planUseful = false
+  const touch = matchMedia('(pointer: coarse)').matches
+  const viewKey = () => {
+    const state = director.getState()
+    return `${toHash(state.command)}|${state.focus || ''}`
+  }
 
   const typing = () => input.value.trim().length > 0
 
@@ -112,7 +130,8 @@ export function createBar({ content, director, mount }) {
     if (result.found.length > lastFound) cue('understood')
     lastFound = result.found.length
     paintMirror(result.found)
-    plan.textContent = result.understood ? describe(result, content) : 'Keep going, or pick something below'
+    planUseful = result.understood && result.boardChange
+    plan.textContent = result.understood ? describe(result, content) : chat ? 'Press Enter to ask me' : 'Keep going, or pick something below'
     plan.classList.toggle('quiet', !result.understood)
     previewTimer = setTimeout(() => preview(result), 170)
     render()
@@ -131,6 +150,15 @@ export function createBar({ content, director, mount }) {
     clearTimeout(previewTimer)
     lastLength = 0
     lastFound = 0
+    if (chat) {
+      converse(text.trim(), result)
+      return
+    }
+    commitBoard(text, result)
+  }
+
+  function commitBoard(text, result) {
+    talking = false
     if (!result.understood) {
       cue('unsure')
       if (previewing && committed) director.apply(committed, { url: 'none', stagger: false })
@@ -162,13 +190,120 @@ export function createBar({ content, director, mount }) {
     commit(text)
   }
 
+  // ---- talk -----------------------------------------------------------------
+
+  // Hear the words, then either answer in conversation or hand them to the
+  // board. A clear board request ("just the AR work") goes to the board unless
+  // the chat is sure; anything else the chat gets first. While the sentence
+  // model is still loading, a question that is not a board request waits a
+  // few seconds for it rather than guess from words.
+  function converse(said, result) {
+    const exchange = { said, reply: null, next: [], pending: true, fresh: false }
+    const restore = previewing && committed ? committed : null
+    finishTyping()
+    blank = null
+    note = null
+    openSlot = null
+    talk.push(exchange)
+    talk = talk.slice(-2)
+    talking = true
+    talkView = viewKey()
+    if (touch) input.blur()
+    render()
+    const began = performance.now()
+    chat.hear(said, { wait: result.boardChange ? 0 : 5000 }).then((heard) => {
+      const answer = heard.level === 'sure' || (heard.level === 'close' && !result.boardChange)
+      if (!answer && result.understood) {
+        talk = talk.filter((e) => e !== exchange)
+        commitBoard(said, result)
+        return
+      }
+      const reply = answer ? chat.answer(heard.topic) : chat.nothing()
+      const next = answer ? heard.topic.next : chat.script.nothing.next
+      // A short pause, like someone gathering a thought, longer for a longer
+      // answer. Time already spent listening counts towards it.
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
+      const pause = reduce ? 0 : Math.max(0, Math.min(1100, 320 + reply.length * 4) - (performance.now() - began))
+      setTimeout(() => {
+        if (!talk.includes(exchange)) return
+        exchange.reply = reply
+        exchange.next = next.length ? next : chat.script.start.next
+        exchange.pending = false
+        exchange.fresh = !reduce
+        cue(answer ? 'confirm' : 'unsure')
+        ownMove = true
+        const shown = answer && heard.topic.show ? parse(heard.topic.show, content) : null
+        if (shown && shown.boardChange) director.apply(shown.command, { url: 'push' })
+        else if (restore) director.apply(restore, { url: 'none', stagger: false })
+        ownMove = false
+        talkView = viewKey()
+        talking = true
+        render()
+      }, pause)
+    })
+  }
+
+  let talkShown = ''
+  function renderTalk() {
+    // Only when the words change, so a fading-in answer is never cut short.
+    const key = JSON.stringify(talk.map((e) => [e.said, e.reply]))
+    if (key === talkShown) return
+    talkShown = key
+    talkLog.innerHTML = talk.map((e, i) => `
+      <div class="ex${i < talk.length - 1 ? ' past' : ''}">
+        <p class="said">${escapeHtml(e.said)}</p>
+        ${e.pending ? '<p class="reply dots" aria-label="Thinking"><i></i><i></i><i></i></p>' : `<p class="reply${e.fresh ? ' fresh' : ''}">${answerHtml(e.reply, escapeHtml)}</p>`}
+      </div>`).join('')
+    // The newest answer arrives a word at a time.
+    const fresh = talkLog.querySelector('.reply.fresh')
+    if (fresh) {
+      const walker = document.createTreeWalker(fresh, NodeFilter.SHOW_TEXT)
+      const nodes = []
+      while (walker.nextNode()) nodes.push(walker.currentNode)
+      let i = 0
+      for (const node of nodes) {
+        const parts = node.textContent.split(/(\s+)/)
+        const frag = document.createDocumentFragment()
+        for (const part of parts) {
+          if (!part) continue
+          if (/^\s+$/.test(part)) frag.append(part)
+          else {
+            const w = document.createElement('span')
+            w.className = 'w'
+            w.style.setProperty('--i', i++)
+            w.textContent = part
+            frag.append(w)
+          }
+        }
+        node.replaceWith(frag)
+      }
+      for (const e of talk) e.fresh = false
+    }
+    talkLog.scrollTop = talkLog.scrollHeight
+  }
+
+  function endTalk() {
+    talk = []
+    talking = false
+    render()
+  }
+
+  $('.talk-close').addEventListener('click', () => {
+    endTalk()
+    input.focus()
+  })
+
   $('.row').addEventListener('submit', (e) => {
     e.preventDefault()
     if (typing()) commit(input.value)
   })
   input.addEventListener('input', onInput)
   input.addEventListener('scroll', () => { mirror.style.transform = `translateX(${-input.scrollLeft}px)` })
-  input.addEventListener('focus', () => mount.classList.add('is-open'))
+  input.addEventListener('focus', () => {
+    mount.classList.add('is-open')
+    // Someone who opens the bar is likely to talk: start the model now.
+    if (chat) chat.warm()
+  })
   input.addEventListener('blur', () => {
     if (!typing()) mount.classList.remove('is-open')
   })
@@ -178,6 +313,8 @@ export function createBar({ content, director, mount }) {
     if (typing()) {
       input.value = ''
       onInput()
+    } else if (talking) {
+      endTalk()
     } else {
       input.blur()
     }
@@ -306,7 +443,15 @@ export function createBar({ content, director, mount }) {
 
   // ---- chips ----------------------------------------------------------------
 
-  chips.innerHTML = SUGGESTIONS.map((text) => `<button type="button" class="chip">${escapeHtml(text)}</button>`).join('')
+  let chipsShown = ''
+  function setChips(list) {
+    const html = list.map((text) => `<button type="button" class="chip">${escapeHtml(text)}</button>`).join('')
+    if (html === chipsShown) return
+    chipsShown = html
+    chips.innerHTML = html
+  }
+  const starters = chat && chat.script.start.next.length ? chat.script.start.next : SUGGESTIONS
+  setChips(starters)
   chips.addEventListener('click', (e) => {
     const chip = e.target.closest('.chip')
     if (chip) ask(chip.textContent)
@@ -319,10 +464,19 @@ export function createBar({ content, director, mount }) {
     if (note && note.at !== toHash(state.command)) note = null
     const away = toHash(state.command) !== ''
     const isTyping = typing()
-    const hasDetail = !isTyping && Boolean(state.panel || state.focus)
-    const hasAnswer = !isTyping && (Boolean(blank) || Boolean(note) || away)
-    const mode = isTyping ? 'typing' : hasDetail ? 'detail' : hasAnswer ? 'answer' : 'idle'
+    const isTalk = talking && talk.length > 0
+    const hasDetail = !isTalk && !isTyping && Boolean(state.panel || state.focus)
+    const hasAnswer = !isTalk && !isTyping && (Boolean(blank) || Boolean(note) || away)
+    const mode = isTalk ? 'talk' : isTyping ? 'typing' : hasDetail ? 'detail' : hasAnswer ? 'answer' : 'idle'
 
+    if (isTalk || talkLog.firstChild) renderTalk()
+    if (isTalk) {
+      const last = talk[talk.length - 1]
+      setChips(last.pending ? [] : last.next)
+    } else {
+      setChips(starters)
+    }
+    show('talk', isTalk)
     if (hasAnswer) renderAnswer(state)
     if (hasDetail) {
       if (state.panel) renderPanel(state.panel)
@@ -330,15 +484,18 @@ export function createBar({ content, director, mount }) {
     }
     show('detail', hasDetail)
     show('answer', hasAnswer)
-    show('plan', isTyping)
-    show('chips', mode === 'idle' || Boolean(blank))
-    if (lastMode && mode !== lastMode && mode !== 'typing' && lastMode !== 'typing') cue('shape')
+    show('plan', isTyping && (!isTalk || planUseful))
+    show('chips', mode === 'idle' || Boolean(blank) || (isTalk && !isTyping && chipsShown !== ''))
+    if (lastMode && mode !== lastMode && mode !== 'typing' && lastMode !== 'typing' && mode !== 'talk' && lastMode !== 'talk') cue('shape')
     lastMode = mode
     mount.dataset.mode = mode
-    input.placeholder = mode === 'idle' ? 'Ask me anything' : mode === 'detail' ? 'Ask for something else' : 'Ask me anything'
+    input.placeholder = mode === 'talk' ? 'Say something back' : mode === 'detail' ? 'Ask for something else' : 'Ask me anything'
   }
 
   director.subscribe(() => {
+    // The visitor moved the board themselves (a card, a key, Back): the
+    // conversation steps aside. Reframes and our own answers keep it.
+    if (talking && !previewing && !ownMove && viewKey() !== talkView) talking = false
     if (!previewing) {
       // Anything that moves the board other than our own preview supersedes
       // an unanswered "not sure what you meant".
