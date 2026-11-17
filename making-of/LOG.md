@@ -374,3 +374,30 @@ details, Tune) is now Allo itself, Josh Puckett's font, self-hosted under its
 open licence (`app/fonts/allo/`, with `OFL.txt`; cut down to Latin, about
 150 KB). So the pair is Kertas for Ikram's voice and Allo for everything
 around it. The page no longer loads anything from Google Fonts.
+
+## 2026-11-17 · one conversation
+"So far the feeling of my portfolio feels livelier and really magical! But
+these 2 different modes [are a] bit disjointed... I feel like we should go
+towards the chat-ish vibe, but it's alive and you can choose to arrange."
+
+Until now the bar had two faces that took turns. Talking showed the answer;
+looking at a work showed a separate detail card that swapped the
+conversation away, and to get from one to the other you had to click off and
+click the window again.
+
+Now there is only the conversation. When an answer flies to a work ("what are
+you proudest of?"), that work appears as a small card right under the reply:
+its kind, title, line and date, ‹ 1 of 5 › to walk the others, and "Tell me
+about it", which simply carries on talking (a written answer if one points at
+that work, otherwise its own summary in Ikram's voice). Picking a work on the
+board does the same: it joins the conversation, and earlier works fold to a
+single line you can tap to look again. Esc steps back from the work but keeps
+what was said; × ends the conversation and lets the board go.
+
+Arranging stays in reach the whole time: a quiet line under the conversation
+says what the board shows ("my [proudest] work [of any kind], as [a board]"),
+and each blank can be changed without leaving the chat. Board asks typed into
+it ("just the AR work") are answered in the conversation too. Cards can still
+be picked up and moved on the board.
+
+Stills in `captures/2026-11-17-one-conversation/`.
