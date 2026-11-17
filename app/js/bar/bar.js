@@ -5,14 +5,9 @@
 //            underlined; the board previews it live. Enter commits.
 //   answer   one sentence with editable blanks: "Here's my [proudest] work [of
 //            any kind], shown as [a board]." Change a blank, the board follows.
-//   detail   the focused work, with its facts (only without the chat).
-//   talk     one conversation for everything: what the visitor said, what
-//            you say back (from app/content/chat.md), and the works being
-//            looked at, as small cards inside the conversation. Picking a
-//            work on the board, or an answer that flies to one, adds it to
-//            the same thread; "Tell me about it" carries on talking. A line
-//            under the conversation says what the board shows, with blanks
-//            to rearrange it, so nothing ever swaps the chat away.
+//   detail   the focused work, with its facts and a way to get in touch.
+//   talk     a conversation: what the visitor said and what you say back,
+//            from app/content/chat.md. The board may move with an answer.
 //
 // It never moves a card itself. It reads the director's state and sends it
 // Commands, like every other input.
@@ -68,13 +63,8 @@ export function createBar({ content, director, mount, chat = null }) {
   let lastFound = 0
   let lastMode = null
 
-  // The conversation, oldest first. Two kinds of entry:
-  //   { type: 'ex', said, reply, next, pending, fresh, piece }   an exchange;
-  //       piece is the work the answer brought forward, if any
-  //   { type: 'piece', id, fresh }   a work the visitor picked on the board
+  // The conversation. Each exchange: { said, reply, next, pending, fresh }.
   let talk = []
-  let lastFocus = null
-  const KEEP = 6
   let talking = false
   let talkView = '' // the board as the last answer left it
   let ownMove = false
@@ -169,10 +159,6 @@ export function createBar({ content, director, mount, chat = null }) {
 
   function commitBoard(text, result) {
     talking = false
-    if (chat && result.understood && result.boardChange) {
-      boardInTalk(text, result)
-      return
-    }
     if (!result.understood) {
       cue('unsure')
       if (previewing && committed) director.apply(committed, { url: 'none', stagger: false })
@@ -206,126 +192,21 @@ export function createBar({ content, director, mount, chat = null }) {
 
   // ---- talk -----------------------------------------------------------------
 
-  function push(entry) {
-    talk.push(entry)
-    talk = talk.slice(-KEEP)
-    talking = true
-  }
-
-  // The newest entry that carries a work: its card is shown in full.
-  function liveEntry() {
-    for (let i = talk.length - 1; i >= 0; i--) {
-      const e = talk[i]
-      if (e.type === 'piece' || (e.type === 'ex' && e.piece)) return e
-    }
-    return null
-  }
-  const pieceOf = (e) => (e.type === 'piece' ? e.id : e.piece)
-
-  // Board-only asks ("just the AR work") are answered in the conversation too.
-  function boardInTalk(said, result) {
-    finishTyping()
-    cue('confirm')
-    blank = null
-    openSlot = null
-    const asked = hasFilter(result.command)
-    ownMove = true
-    director.apply(result.command, { url: 'push' })
-    ownMove = false
-    const state = director.getState()
-    const empty = asked && !hasFilter(state.command)
-    const reply = empty
-      ? 'Nothing matched all of that, so here is everything.'
-      : `${describe(result, content).replace(/^Showing/, "Here's").replace(/^Going to /, 'Here is ')}.`
-    push({ type: 'ex', said: said.trim(), reply, next: chat.script.start.next, pending: false, fresh: true, piece: state.focus || null })
-    lastFocus = state.focus
-    talkView = viewKey()
-    if (touch) input.blur()
-    render()
-  }
-
-  // A work picked on the board joins the conversation. Stepping through works
-  // replaces the card at the end instead of piling them up.
-  function notePiece(id) {
-    const last = talk[talk.length - 1]
-    if (last && last.type === 'piece') {
-      if (last.id !== id) {
-        last.id = id
-        last.fresh = true
-      }
-    } else if (!(last && last.type === 'ex' && last.piece === id)) {
-      push({ type: 'piece', id, fresh: true })
-    }
-    talking = true
-  }
-
-  // What you say about one work: a written topic if one points at it,
-  // otherwise its own summary, in your voice.
-  function tellAbout(id) {
-    const work = content.byId.get(id)
-    const said = `Tell me about ${work.title}`
-    const exchange = { type: 'ex', said, reply: null, next: [], pending: true, fresh: false, piece: null }
-    push(exchange)
-    render()
-    const began = performance.now()
-    chat.hear(said, { wait: 2500 }).then((heard) => {
-      let reply = null
-      let next = chat.script.start.next
-      if (heard.topic && heard.level !== 'none' && heard.topic.show) {
-        const shown = parse(heard.topic.show, content)
-        if (shown.command.focus === id || shown.workId === id) {
-          reply = chat.answer(heard.topic)
-          if (heard.topic.next.length) next = heard.topic.next
-        }
-      }
-      if (!reply) {
-        const mail = `mailto:${content.owner.email}?subject=${encodeURIComponent(`About ${work.title}`)}`
-        reply = work.summary
-          ? `${work.summary} If you want the longer story, [write to me](${mail}).`
-          : `${work.title}: ${work.line}. I haven't written the long version here yet, so [write to me](${mail}) and I'll tell you properly.`
-      }
-      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
-      const pause = reduce ? 0 : Math.max(0, Math.min(1100, 320 + reply.length * 4) - (performance.now() - began))
-      setTimeout(() => {
-        if (!talk.includes(exchange)) return
-        exchange.reply = reply
-        exchange.next = next
-        exchange.pending = false
-        exchange.fresh = !reduce
-        cue('confirm')
-        render()
-      }, pause)
-    })
-  }
-
-  function step(entry, delta) {
-    const list = director.getState().results
-    const at = list.indexOf(pieceOf(entry))
-    if (at < 0 || list.length < 2) return
-    const id = list[(at + delta + list.length) % list.length]
-    if (entry.type === 'piece') entry.id = id
-    else entry.piece = id
-    entry.fresh = true
-    lastFocus = id
-    ownMove = true
-    director.focus(id)
-    ownMove = false
-    render()
-  }
-
   // Hear the words, then either answer in conversation or hand them to the
   // board. A clear board request ("just the AR work") goes to the board unless
   // the chat is sure; anything else the chat gets first. While the sentence
   // model is still loading, a question that is not a board request waits a
   // few seconds for it rather than guess from words.
   function converse(said, result) {
-    const exchange = { type: 'ex', said, reply: null, next: [], pending: true, fresh: false, piece: null }
+    const exchange = { said, reply: null, next: [], pending: true, fresh: false }
     const restore = previewing && committed ? committed : null
     finishTyping()
     blank = null
     note = null
     openSlot = null
-    push(exchange)
+    talk.push(exchange)
+    talk = talk.slice(-2)
+    talking = true
     talkView = viewKey()
     if (touch) input.blur()
     render()
@@ -355,10 +236,6 @@ export function createBar({ content, director, mount, chat = null }) {
         if (shown && shown.boardChange) director.apply(shown.command, { url: 'push' })
         else if (restore) director.apply(restore, { url: 'none', stagger: false })
         ownMove = false
-        // The work the answer flew to sits right under it, in the conversation.
-        const focus = director.getState().focus
-        if (shown && shown.boardChange && focus) exchange.piece = focus
-        lastFocus = focus
         talkView = viewKey()
         talking = true
         render()
@@ -366,45 +243,17 @@ export function createBar({ content, director, mount, chat = null }) {
     })
   }
 
-  function pieceHtml(id, live) {
-    const work = content.byId.get(id)
-    const kind = content.kindById.get(work.kind)
-    if (!live) {
-      return `<button type="button" class="piece-mini" data-id="${work.id}"><span class="pm-title">${escapeHtml(work.title)}</span><span class="pm-line">${escapeHtml(work.line)}</span></button>`
-    }
-    const state = director.getState()
-    const at = state.results.indexOf(id)
-    const many = at >= 0 && state.results.length > 1
-    const facts = [work.when, work.role, (work.tools || []).join(', ')].filter(Boolean)
-    const links = (work.links || []).map((link) => `<a class="pill" href="${escapeHtml(link.url)}" target="_blank" rel="noopener">${escapeHtml(link.label)}</a>`).join('')
-    const mail = `mailto:${content.owner.email}?subject=${encodeURIComponent(`About ${work.title}`)}`
-    return `
-      <div class="piece${state.focus === id ? ' is-shown' : ''}" data-id="${work.id}">
-        <div class="p-top">
-          <span class="d-kind">${escapeHtml(kind.label)}</span>
-          ${many ? `<span class="d-nav"><button type="button" data-act="prev" aria-label="Previous work">‹</button><span class="d-count">${at + 1} of ${state.results.length}</span><button type="button" data-act="next" aria-label="Next work">›</button></span>` : ''}
-        </div>
-        <h3 class="p-title">${escapeHtml(work.title)}</h3>
-        <p class="p-line">${escapeHtml(work.line)}${facts.length ? `<span class="p-facts"> · ${escapeHtml(facts.join(' · '))}</span>` : ''}</p>
-        <div class="p-actions"><button type="button" class="pill dark" data-act="more">Tell me about it</button>${state.focus === id ? '' : '<button type="button" class="pill" data-act="look">Show me</button>'}${links}<a class="pill quiet" href="${mail}">Write to me about it</a></div>
-      </div>`
-  }
-
   let talkShown = ''
   function renderTalk() {
-    // Only when something changes, so a fading-in answer is never cut short.
-    const state = director.getState()
-    const live = liveEntry()
-    const key = JSON.stringify([talk.map((e) => [e.type, e.said, e.reply, pieceOf(e)]), live && pieceOf(live), state.focus, state.results.join()])
+    // Only when the words change, so a fading-in answer is never cut short.
+    const key = JSON.stringify(talk.map((e) => [e.said, e.reply]))
     if (key === talkShown) return
     talkShown = key
-    talkLog.innerHTML = talk.map((e, i) => {
-      const past = i < talk.length - 1 && e !== live
-      if (e.type === 'piece') return `<div class="ex is-piece${e === live ? '' : ' past'}${e.fresh ? ' fresh' : ''}">${pieceHtml(e.id, e === live)}</div>`
-      const reply = e.pending ? '<p class="reply dots" aria-label="Thinking"><i></i><i></i><i></i></p>' : `<p class="reply${e.fresh ? ' fresh' : ''}">${answerHtml(e.reply, escapeHtml)}</p>`
-      const card = e.piece ? `<div class="ex-piece${e === live && e.fresh ? ' fresh' : ''}">${pieceHtml(e.piece, e === live)}</div>` : ''
-      return `<div class="ex${past ? ' past' : ''}"><p class="said">${escapeHtml(e.said)}</p>${reply}${card}</div>`
-    }).join('')
+    talkLog.innerHTML = talk.map((e, i) => `
+      <div class="ex${i < talk.length - 1 ? ' past' : ''}">
+        <p class="said">${escapeHtml(e.said)}</p>
+        ${e.pending ? '<p class="reply dots" aria-label="Thinking"><i></i><i></i><i></i></p>' : `<p class="reply${e.fresh ? ' fresh' : ''}">${answerHtml(e.reply, escapeHtml)}</p>`}
+      </div>`).join('')
     // The newest answer arrives a word at a time.
     const fresh = talkLog.querySelector('.reply.fresh')
     if (fresh) {
@@ -428,42 +277,14 @@ export function createBar({ content, director, mount, chat = null }) {
         }
         node.replaceWith(frag)
       }
-      // The card under an answer comes in once the words have.
-      const card = fresh.parentElement.querySelector('.ex-piece.fresh')
-      if (card) card.style.setProperty('--after', `${Math.min(1400, i * 34 + 200)}ms`)
+      for (const e of talk) e.fresh = false
     }
-    for (const e of talk) e.fresh = false
     talkLog.scrollTop = talkLog.scrollHeight
   }
-
-  talkLog.addEventListener('click', (e) => {
-    const mini = e.target.closest('.piece-mini')
-    if (mini) {
-      director.focus(mini.dataset.id)
-      return
-    }
-    const target = e.target.closest('button[data-act]')
-    if (!target) return
-    const live = liveEntry()
-    if (!live) return
-    const act = target.dataset.act
-    if (act === 'next') step(live, 1)
-    else if (act === 'prev') step(live, -1)
-    else if (act === 'more') tellAbout(pieceOf(live))
-    else if (act === 'look') {
-      lastFocus = pieceOf(live)
-      ownMove = true
-      director.focus(pieceOf(live))
-      ownMove = false
-      render()
-    }
-  })
 
   function endTalk() {
     talk = []
     talking = false
-    // The conversation was what explained the work in view; leave with it.
-    if (chat && director.getState().focus) director.unfocus()
     render()
   }
 
@@ -492,8 +313,6 @@ export function createBar({ content, director, mount, chat = null }) {
     if (typing()) {
       input.value = ''
       onInput()
-    } else if (talking && director.getState().focus) {
-      director.unfocus()
     } else if (talking) {
       endTalk()
     } else {
@@ -525,10 +344,7 @@ export function createBar({ content, director, mount, chat = null }) {
   function renderAnswer(state) {
     const c = state.command
     let html
-    if (talking && talk.length && !blank) {
-      const where = c.kind ? `in ${kindLabel(c.kind)}` : 'of any kind'
-      html = `<p class="sentence board-line"><span class="bl-lead">On the board</span> my ${slot('sort', sortText(c.sort))} work ${slot('kind', where)}, as ${slot('layout', LAYOUT_TEXT[c.layout])} <span class="count">${state.results.length} piece${state.results.length === 1 ? '' : 's'}</span></p>`
-    } else if (blank) {
+    if (blank) {
       html = `<p class="sentence">Not sure I caught “${escapeHtml(blank)}”. Are you after ${slot('kind', 'a kind of work')}?</p>`
     } else {
       const where = c.kind ? `in ${kindLabel(c.kind)}` : 'of any kind'
@@ -649,16 +465,14 @@ export function createBar({ content, director, mount, chat = null }) {
     const away = toHash(state.command) !== ''
     const isTyping = typing()
     const isTalk = talking && talk.length > 0
-    // With the chat, a focused work lives inside the conversation, never as a
-    // separate card that replaces it.
-    const hasDetail = !isTalk && !isTyping && Boolean(state.panel || (state.focus && !chat))
-    const hasAnswer = !isTyping && (isTalk || Boolean(blank) || Boolean(note) || away)
+    const hasDetail = !isTalk && !isTyping && Boolean(state.panel || state.focus)
+    const hasAnswer = !isTalk && !isTyping && (Boolean(blank) || Boolean(note) || away)
     const mode = isTalk ? 'talk' : isTyping ? 'typing' : hasDetail ? 'detail' : hasAnswer ? 'answer' : 'idle'
 
     if (isTalk || talkLog.firstChild) renderTalk()
     if (isTalk) {
       const last = talk[talk.length - 1]
-      setChips(last.type === 'piece' ? starters : last.pending ? [] : last.next)
+      setChips(last.pending ? [] : last.next)
     } else {
       setChips(starters)
     }
@@ -681,15 +495,7 @@ export function createBar({ content, director, mount, chat = null }) {
   director.subscribe(() => {
     // The visitor moved the board themselves (a card, a key, Back): the
     // conversation steps aside. Reframes and our own answers keep it.
-    const now = director.getState()
-    if (!chat) {
-      if (talking && !previewing && !ownMove && viewKey() !== talkView) talking = false
-    } else if (!previewing && !ownMove && now.focus && now.focus !== lastFocus && !now.panel) {
-      // A work picked on the board (click, tap, arrow keys, a link): it
-      // joins the conversation instead of replacing it.
-      notePiece(now.focus)
-    }
-    if (!previewing) lastFocus = now.focus
+    if (talking && !previewing && !ownMove && viewKey() !== talkView) talking = false
     if (!previewing) {
       // Anything that moves the board other than our own preview supersedes
       // an unanswered "not sure what you meant".

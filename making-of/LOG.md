@@ -401,3 +401,8 @@ it ("just the AR work") are answered in the conversation too. Cards can still
 be picked up and moved on the board.
 
 Stills in `captures/2026-11-17-one-conversation/`.
+
+Tried live the same evening, then rolled back: "feels a bit too much now! I
+think before was better, we have separation, just needed a bit of learning
+curve." Talking and looking at a work stay as two modes for now. The stills
+above are kept as a record of the experiment.
