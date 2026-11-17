@@ -130,10 +130,11 @@
   transition: background 0.2s ease;
 }
 
+.slot-menu .opt::before { clip-path: none; border-radius: 12px; }
+
 .chip:hover, .pill:hover, .opt:hover { background: rgba(40, 30, 25, 0.12); }
 .pill.dark { background: var(--ink); color: #fff; }
 .pill.dark:hover { background: #3a3835; }
-.opt.on { background: var(--ink); color: #fff; }
 
 .pill .dab { display: inline-block; margin-right: 7px; vertical-align: 0; }
 
@@ -150,23 +151,90 @@ button:focus-visible, .pill:focus-visible, #b-input:focus-visible {
 .sentence .count { color: #8f8780; font-size: 12.5px; font-weight: 500; white-space: nowrap; }
 .note { padding: 2px 20px 0; font-size: 12.5px; color: #8f8780; }
 
+/* A blank in the sentence is a word in Kertas on a scrap of paper: a light
+   warm highlight with a hand-cut edge, like the windows on the board (the
+   outline, --rough, is cut per blank by bar.js). */
 .slot {
-  padding: 2px 9px 3px;
+  position: relative;
+  isolation: isolate;
+  padding: 0 7px 1px;
   margin: 0 1px;
   border: 0;
-  border-radius: 8px;
-  background: rgba(40, 30, 25, 0.07);
+  background: transparent;
   color: var(--ink);
-  font: inherit;
+  font-family: var(--brand-font);
+  font-size: 17px;
+  font-weight: 480;
+  font-variation-settings: "HAND" var(--hand);
+  line-height: inherit;
   text-decoration: underline;
-  text-decoration-color: rgba(28, 27, 26, 0.35);
-  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(28, 27, 26, 0.25);
+  text-underline-offset: 5px;
   cursor: pointer;
 }
 
-.slot:hover, .slot.is-open { background: rgba(40, 30, 25, 0.14); }
+.slot::before, .slot-menu .opt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--scrap, #efebe4);
+  clip-path: var(--rough, none);
+  transition: background 0.2s ease;
+}
 
-.options { display: flex; flex-wrap: wrap; gap: 7px; padding: 8px 20px 2px; }
+.slot:hover, .slot.is-open { --scrap: #e6e0d6; }
+
+/* The menu for a blank: a smooth, soft rounded sheet in the same warm paper
+   tone, floating over the card, its current choice sitting on the word
+   itself. Placed by bar.js. */
+.slot-menu {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 16px;
+  background: rgba(246, 243, 238, 0.96);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 0 0 1px rgba(40, 30, 25, 0.05), 0 10px 28px rgba(40, 30, 25, 0.07);
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.96);
+  transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.2, 0.9, 0.25, 1), visibility 0s linear 0.22s;
+}
+
+.slot-menu.on {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.2, 0.9, 0.25, 1), visibility 0s;
+}
+
+.slot-menu .opt {
+  position: relative;
+  isolation: isolate;
+  --scrap: transparent;
+  padding: 5px 14px 6px;
+  border-radius: 0;
+  background: transparent;
+  color: #5d5650;
+  font: 450 17px/1.3 var(--brand-font);
+  font-variation-settings: "HAND" var(--hand);
+  text-align: center;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(28, 27, 26, 0.18);
+  text-underline-offset: 5px;
+}
+
+.slot-menu .opt:hover { --scrap: #ebe6de; background: transparent; color: var(--ink); }
+.slot-menu .opt.on { --scrap: #e3dcd1; color: var(--ink); text-decoration-color: rgba(28, 27, 26, 0.4); }
 
 /* Talk: what the visitor said, small and quiet; what you say back, larger,
    arriving a word at a time. Older exchanges fade back. */
@@ -319,7 +387,8 @@ button:focus-visible, .pill:focus-visible, #b-input:focus-visible {
 .d-facts dd { font-size: 13.5px; font-weight: 500; }
 .d-facts:empty { display: none; }
 
-.d-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 20px 16px; }
+#b-detail { padding-bottom: 16px; }
+.d-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 20px 0; }
 
 #bar[data-mode="detail"] .row { border-top: 1px solid rgba(40, 30, 25, 0.07); }
 #bar[data-mode="answer"] .row { border-top: 1px solid rgba(40, 30, 25, 0.07); margin-top: 8px; }
@@ -337,6 +406,6 @@ button:focus-visible, .pill:focus-visible, #b-input:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #bar, .sec { transition: none; }
+  #bar, .sec, .slot-menu { transition: none; }
   .reply.fresh .w, .dots i { animation: none; }
 }
