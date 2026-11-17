@@ -128,9 +128,10 @@ Q: what are you up to these days
 Q: what is your latest project
 Q: what have you been making lately
 Q: what are you building right now
-A: Right now, a game! It's a TIC Corp collab with Tep York. Meanwhile, here's the most recent stuff.
+A: Right now, a game! It's a TIC Corp collab with Tep York, the KL artist. It's still under wraps, so no spoilers yet. Meanwhile, here's the most recent stuff.
 Show: what's most recent
 Next: What is TIC Corp?
+Next: Who is Tep York?
 Next: How was this site made?
 
 ## AR
@@ -193,7 +194,7 @@ Q: do you do ui ux
 Q: what's your background
 Q: where have you worked
 Q: work experience
-A: Both! I see myself as design and dev. At EPF I maintain the i-Akaun mobile app design and design its new features. At SHXFT I've done a lot of agency work, from AR mirrors to AR filters to web games.
+A: Both! Since March 2025 I've been a UI/UX designer at EPF, designing the i-Akaun app and looking after its design system. On the side I'm a contract creative developer for SHXFT, a Dubai studio: I built the MOMNTS face-AR editor, SCXPE and the studio's websites.
 Show: product
 Next: Can I hire you?
 
@@ -205,7 +206,7 @@ Q: do you have a shop
 Q: what is laughwithtic
 Q: who is behind tic corp
 Q: are you part of a collective
-A: TIC Corp is me, Ceeq, Ichu and Amir. It's more of a creative collective: we do all sorts of things, but with a fashion focus. The shop is at [laughwithtic.com](https://laughwithtic.com).
+A: TIC Corp is a parody clothing label I co-founded with my friends. I designed and built the whole site, shop and order tracking included. Come say hi at [laughwithtic.com](https://laughwithtic.com)!
 Show: TIC Corp
 Next: What are you working on now?
 
@@ -385,9 +386,55 @@ Q: what are you doing on quest 3
 Q: is that running in the browser
 Q: how did you bend the room
 Q: what is dimensional
-A: Lately it's all WebXR on Quest 3 passthrough, built with Meta's IWSDK and Three.js, right in the browser. Reality to bend lets you grab a wall and stretch it like taffy (thank you, Spike Jonze), and Dimensional stacks a video's frames on my real table so you can scrub it by hand.
+A: Lately it's all WebXR on Quest 3 passthrough, built with Meta's IWSDK and Three.js, right in the browser. [Reality to bend](https://www.instagram.com/reel/DeWqH_5NShD/) lets you grab a wall and stretch it like taffy (thank you, Spike Jonze), and [Dimensional](https://www.instagram.com/reel/DdnQuD9tr1a/) stacks a video's frames on my real table so you can scrub it by hand.
 Show: Reality to bend
 Next: What are you proudest of?
+Guess
+
+## EPF
+Q: what do you do at epf
+Q: tell me about epf
+Q: what is i-akaun
+Q: do you work in fintech
+Q: have you designed an app people actually use
+Q: tell me about your product design work
+Q: do you work on design systems
+A: I'm a UI/UX designer at EPF, Malaysia's retirement fund, since March 2025. I design flows and screens for the i-Akaun app, look after the Providence design system, and take prototypes out for real usability tests.
+Show: product
+Next: Can I hire you?
+Guess
+
+## SHXFT
+Q: what is shxft
+Q: tell me about shxft
+Q: what is momnts
+Q: what do you do for shxft
+Q: do you work with a dubai studio
+Q: what is scxpe
+A: SHXFT is a creative tech studio in Dubai, and I've been a contract creative dev with them since December 2025. I built MOMNTS, a live face-AR editor, plus SCXPE, a photoreal 3D way to explore buildings in the browser.
+Show: MOMNTS
+Next: What do you make on the web?
+Guess
+
+## depth-vfx
+Q: what is depth-vfx
+Q: what is vtime
+Q: tell me about depth vfx
+Q: light becomes rays
+Q: cinematic vfx on a phone
+A: depth-vfx is a little real-time VFX toy for your phone camera: light turns into rays, like a film shot, live. It's at [vtime.vercel.app](https://vtime.vercel.app) (it'll ask for your camera).
+Show: depth-vfx
+Next: What do you make on the web?
+Guess
+
+## co-founder
+Q: did you start a company
+Q: are you a founder
+Q: have you started anything of your own
+Q: do you run a brand
+A: Yep, I co-founded TIC Corp, a parody clothing label, with my friends. I'm the one who built the site!
+Show: TIC Corp
+Next: What is TIC Corp?
 Guess
 
 ## age
