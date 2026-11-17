@@ -431,3 +431,9 @@ outline as the windows (`roughEdge`, now in `util.js` and sized to each piece).
 The menu is a bigger scrap of the same paper with no shadow, and the current
 choice sits on a slightly darker scrap. `three-desktop.jpg` and
 `three-phone.jpg` show grey pills, then the plain line, then paper.
+
+Then: "for the floating menu make it smooth, for the highlight less rough then
+its good". The menu is a smooth rounded sheet again (warm paper tone, hairline,
+soft shadow), its current choice a rounded wash. The blanks keep their paper
+scraps, cut about half as rough as before. Final stills: `final-desktop.jpg`,
+`final-phone.jpg`.

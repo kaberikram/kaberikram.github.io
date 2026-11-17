@@ -130,6 +130,8 @@
   transition: background 0.2s ease;
 }
 
+.slot-menu .opt::before { clip-path: none; border-radius: 12px; }
+
 .chip:hover, .pill:hover, .opt:hover { background: rgba(40, 30, 25, 0.12); }
 .pill.dark { background: var(--ink); color: #fff; }
 .pill.dark:hover { background: #3a3835; }
@@ -184,9 +186,9 @@ button:focus-visible, .pill:focus-visible, #b-input:focus-visible {
 
 .slot:hover, .slot.is-open { --scrap: #e6e0d6; }
 
-/* The menu for a blank: a bigger scrap of the same paper floating over the
-   card, its current choice sitting on the word itself. Placed by bar.js. No
-   shadow: paper laid on paper. */
+/* The menu for a blank: a smooth, soft rounded sheet in the same warm paper
+   tone, floating over the card, its current choice sitting on the word
+   itself. Placed by bar.js. */
 .slot-menu {
   position: fixed;
   left: 0;
@@ -195,9 +197,12 @@ button:focus-visible, .pill:focus-visible, #b-input:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 7px 6px;
-  background: #f4f1ec;
-  clip-path: var(--rough, none);
+  padding: 4px;
+  border-radius: 16px;
+  background: rgba(246, 243, 238, 0.96);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 0 0 1px rgba(40, 30, 25, 0.05), 0 10px 28px rgba(40, 30, 25, 0.07);
   opacity: 0;
   visibility: hidden;
   transform: scale(0.96);

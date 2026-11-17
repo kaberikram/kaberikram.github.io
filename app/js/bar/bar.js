@@ -353,12 +353,12 @@ export function createBar({ content, director, mount, chat = null }) {
       if (note) html += `<p class="note">${escapeHtml(note.text)}</p>`
     }
     answer.innerHTML = html
-    answer.querySelectorAll('.slot').forEach((el) => cut(el, `${el.dataset.slot}:${el.textContent}`, 2.2))
+    answer.querySelectorAll('.slot').forEach((el) => cut(el, `${el.dataset.slot}:${el.textContent}`, 1.1))
     renderMenu()
   }
 
-  // Blanks, their menu and its current choice are cut from paper with the same
-  // hand-cut outline as the windows on the board, sized to each piece.
+  // Blanks are cut from paper with a gentle version of the hand-cut outline the
+  // windows on the board use, sized to each word. The menu itself stays smooth.
   function cut(el, seed, amount) {
     const w = el.offsetWidth
     const h = el.offsetHeight
@@ -386,8 +386,6 @@ export function createBar({ content, director, mount, chat = null }) {
     const options = optionsFor(openSlot, director.getState().command)
     menu.dataset.for = openSlot
     menu.innerHTML = options.map(([value, text, on]) => `<button type="button" role="option" aria-selected="${on}" class="opt${on ? ' on' : ''}" data-value="${escapeHtml(value)}">${escapeHtml(text)}</button>`).join('')
-    cut(menu, `menu:${openSlot}`, 3)
-    menu.querySelectorAll('.opt').forEach((el) => cut(el, `opt:${el.dataset.value}`, 2))
     placeMenu(anchor)
     menu.classList.add('on')
     // The bar may still be growing or sliding; keep the menu on its word.
