@@ -437,6 +437,19 @@ Show: TIC Corp
 Next: What is TIC Corp?
 Guess
 
+## spectacles
+Q: when did you make the spectacles stuff
+Q: tell me about your spectacles lenses
+Q: what is the teleprompter
+Q: did you make a currency converter
+Q: pomodoro timer on spectacles
+Q: when did you work on spectacles
+Q: what lenses have you made for snap spectacles
+A: All my Spectacles work happened between late 2024 and February 2025. I made small useful lenses: a teleprompter, a currency converter and a cozy pomodoro timer. And Ghost Catch, the hackathon game!
+Show: just the AR work
+Next: Tell me the Ghost Catch story
+Guess
+
 ## age
 Q: how old are you
 Q: what's your age
