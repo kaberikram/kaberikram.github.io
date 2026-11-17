@@ -128,9 +128,10 @@ Q: what are you up to these days
 Q: what is your latest project
 Q: what have you been making lately
 Q: what are you building right now
-A: Right now, a game! It's a TIC Corp collab with Tep York. Meanwhile, here's the most recent stuff.
+A: Right now, a game! It's a TIC Corp collab with the artist Tep York (TY). It's still under wraps, so no spoilers yet. Meanwhile, here's the most recent stuff.
 Show: what's most recent
 Next: What is TIC Corp?
+Next: Who is Tep York?
 Next: How was this site made?
 
 ## AR
@@ -142,7 +143,7 @@ Q: snap lenses
 Q: lens studio
 Q: have you worked with snapchat
 Q: do you make filters or lenses
-A: A lot of my AR lives on Snap Spectacles: small useful things like a teleprompter, a currency converter and a pomodoro timer, and Ghost Catch, which came second at Snap AR Day.
+A: A lot of my AR lives on Snap Spectacles: small useful things like a teleprompter, a currency converter and a pomodoro timer, and Ghost Catch, a team game that came second at Snap AR Day London.
 Show: just the AR work
 Next: Did you win anything?
 Next: What about mixed reality?
@@ -152,7 +153,7 @@ Q: did you win anything
 Q: have you won awards
 Q: what is ghost catch
 Q: snap ar day
-A: Ghost Catch, my game for Snap Spectacles, came second at Snap AR Day in 2024.
+A: Ghost Catch, a Spectacles game I built with Ruby Bell and Orlando Mathias, came second at the Snap AR Day London hackathon in 2024. And back at uni, our VR game Makhluk Halus won gold at SIGG!
 Show: Ghost Catch
 Next: Tell me about your AR work
 
@@ -162,7 +163,7 @@ Q: do you make vr
 Q: quest games
 Q: what is dreampop
 Q: tell me about dreampop
-A: Dreampop is a mixed reality game for Quest, inspired by popping bubble wrap, bubble shooters and push-pop fidget toys. Take a Leap is another one.
+A: Dreampop is my mixed reality game for Quest, inspired by popping bubble wrap, bubble shooters and push-pop fidget toys. It's on the Meta Quest store! I also helped build Take a Leap, another Quest game.
 Show: Dreampop
 Next: What do you make on the web?
 
@@ -184,7 +185,7 @@ Q: do you use unity
 Q: what languages do you code in
 Q: do you know react
 Q: do you code
-A: Lens Studio for Spectacles, Unity for Quest, and Three.js or React Three Fiber on the web.
+A: Lens Studio for Spectacles, Unity or WebXR (IWSDK) for Quest, and Three.js or React Three Fiber on the web.
 Next: Are you a designer or a developer?
 
 ## design
@@ -193,7 +194,7 @@ Q: do you do ui ux
 Q: what's your background
 Q: where have you worked
 Q: work experience
-A: Both! I see myself as design and dev. At EPF I maintain the i-Akaun mobile app design and design its new features. At SHXFT I've done a lot of agency work, from AR mirrors to AR filters to web games.
+A: Both! Since March 2025 I've been a UI/UX designer at EPF, designing the i-Akaun app and looking after its design system. On the side I'm a contract creative developer for SHXFT, a Dubai studio: I built the MOMNTS face-AR editor, SCXPE and the studio's websites.
 Show: product
 Next: Can I hire you?
 
@@ -205,7 +206,10 @@ Q: do you have a shop
 Q: what is laughwithtic
 Q: who is behind tic corp
 Q: are you part of a collective
-A: TIC Corp is me, Ceeq, Ichu and Amir. It's more of a creative collective: we do all sorts of things, but with a fashion focus. The shop is at [laughwithtic.com](https://laughwithtic.com).
+Q: who runs tic corp
+Q: who is in tic
+Q: who are ceeq ichu and amir
+A: TIC Corp, or laughwithtic, is a label by me, Ichu, Ceeq and Amir. We treat humour as interaction, interface and trust. We're best known for the Rat'teryx Jacket, a deadpan send-up of Arc'teryx, and we carry the joke into browser games, web tools, live visuals and drops. The shop is at [laughwithtic.com](https://www.laughwithtic.com/).
 Show: TIC Corp
 Next: What are you working on now?
 
@@ -264,10 +268,189 @@ Q: what do you do for fun
 Q: hobbies
 Q: what do you do outside work
 Q: what do you do on weekends
-Q: do you make music
-Q: are you a musician
 Q: what else do you do
 A: I make music!
+Next: Where can I hear your music?
+
+## education
+Q: where did you study
+Q: did you go to university
+Q: what did you study
+Q: do you have a degree
+Q: what's your education
+Q: which uni did you go to
+Q: did you study design
+A: I studied Virtual Reality Design at Multimedia University (MMU) in Cyberjaya, from 2018 to 2021. Before that, a diploma in digital animation at Limkokwing.
+Next: How did you get into AR?
+Next: What do you make?
+Guess
+
+## how I got into AR
+Q: how did you get into AR
+Q: how did you start
+Q: how did you become a creative technologist
+Q: what was your first AR project
+Q: when did you start making AR
+Q: what got you into this
+Q: how did your career start
+A: It started with my VR degree. Then in 2020 I made halohex, an AR music toy in Spark AR for a Facebook hackathon, and did an AR internship at PETRONAS Digital. After that it was agency life: FabU, then three-ish years making AR for brands at GOWAAA.
+Next: Where have you worked?
+Next: Did you win anything?
+Guess
+
+## GOWAAA
+Q: what is gowaaa
+Q: tell me about gowaaa
+Q: did you work at an agency
+Q: have you made filters for brands
+Q: have you worked with big brands
+Q: did you work in singapore
+A: I was an AR/VR developer at GOWAAA, a Singapore studio, from late 2021 to early 2025. Lots of AR for brands on Instagram, Snapchat, TikTok and the web, plus the Google Maps geospatial AR for Singapore.
+Next: Tell me about the Google Maps AR
+Next: Tell me about your AR work
+Guess
+
+## google maps AR
+Q: tell me about the google maps AR
+Q: geospatial AR
+Q: did you work with google
+Q: google I/O
+Q: what did you do for google maps
+Q: singapore tourism board
+Q: AR in google maps
+A: With the GOWAAA team I helped make 15 geospatial AR experiences around Singapore, for the Singapore Tourism Board. They live inside Google Maps, part of a pilot Google announced at I/O 2024. I worked with the design team on concepts and built the experiences.
+Show: Geospatial AR
+Next: What about mixed reality?
+Guess
+
+## ghost catch story
+Q: tell me the ghost catch story
+Q: how did you make ghost catch
+Q: what was snap ar day like
+Q: how does ghost catch work
+Q: did you go to london
+Q: who did you make ghost catch with
+A: At Snap AR Day London in December 2024, I teamed up with Ruby Bell and Orlando Mathias, who I'd only just met, for a 24-hour Spectacles hackathon. We made Ghost Catch: two players in the same room race to grab a cheeky ghost before the timer runs out. I did the dev, we came second, and it all felt surreal!
+Show: Ghost Catch
+Next: Did you win anything?
+Guess
+
+## hackathons
+Q: do you do hackathons
+Q: what hackathons have you joined
+Q: have you been to a game jam
+Q: have you competed in anything
+Q: gemini hackathon
+Q: vibe jam
+A: I love a hackathon! Facebook's AR hackathon in 2020, Meta's Quest hackathon in 2024 (that's where Dreampop came from), Snap AR Day London, #vibejam, and the Gemini AI Hackathon at Google Japan in 2026.
+Next: What is Dreampop?
+Next: Did you win anything?
+Guess
+
+## music
+Q: do you make music
+Q: are you a musician
+Q: where can I hear your music
+Q: what kind of music do you make
+Q: are you on soundcloud
+Q: what's your artist name
+Q: do you have songs out
+A: I do! Little songs on [SoundCloud](https://soundcloud.com/kaberikram), just under my name. I also made Dreampop's music and sound effects myself.
+Next: What do you do for fun?
+Guess
+
+## Tep York
+Q: who is tep york
+Q: what is tep york
+Q: who is ty
+Q: tell me about tep york
+Q: who are you making the game with
+A: Tep York, or TY, is an artist. TIC Corp and TY are making an online game together. More on that soon!
+Next: What is TIC Corp?
+Next: What are you working on now?
+
+## press
+Q: have you been featured anywhere
+Q: press
+Q: have you been on codrops
+Q: has anyone written about you
+Q: features
+A: Codrops featured my drag-a-shirt-onto-a-model idea in 2025: [Try It On](https://tympanus.net/codrops/2025/06/06/try-it-on-a-playful-drag-and-drop-styling-ui/). I first made it for my friends at TIC.
+Show: Styling Canvas
+Next: What is TIC Corp?
+Guess
+
+## webxr experiments
+Q: how did you make reality to bend
+Q: what is reality to bend
+Q: webxr
+Q: what are you doing on quest 3
+Q: is that running in the browser
+Q: how did you bend the room
+Q: what is dimensional
+A: Lately it's all WebXR on Quest 3 passthrough, built with Meta's IWSDK and Three.js, right in the browser. [Reality to bend](https://www.instagram.com/reel/DeWqH_5NShD/) lets you grab a wall and stretch it like taffy (thank you, Spike Jonze), and [Dimensional](https://www.instagram.com/reel/DdnQuD9tr1a/) stacks a video's frames on my real table so you can scrub it by hand.
+Show: Reality to bend
+Next: What are you proudest of?
+Guess
+
+## EPF
+Q: what do you do at epf
+Q: tell me about epf
+Q: what is i-akaun
+Q: do you work in fintech
+Q: have you designed an app people actually use
+Q: tell me about your product design work
+Q: do you work on design systems
+A: I'm a UI/UX designer at EPF, Malaysia's retirement fund, since March 2025. I design flows and screens for the i-Akaun app, look after the Providence design system, and take prototypes out for real usability tests.
+Show: product
+Next: Can I hire you?
+Guess
+
+## SHXFT
+Q: what is shxft
+Q: tell me about shxft
+Q: what is momnts
+Q: what do you do for shxft
+Q: do you work with a dubai studio
+Q: what is scxpe
+A: SHXFT is a creative tech studio in Dubai, and I've been a contract creative dev with them since December 2025. I built MOMNTS, a live face-AR editor, plus SCXPE, a photoreal 3D way to explore buildings in the browser.
+Show: MOMNTS
+Next: What do you make on the web?
+Guess
+
+## depth-vfx
+Q: what is depth-vfx
+Q: what is vtime
+Q: tell me about depth vfx
+Q: light becomes rays
+Q: cinematic vfx on a phone
+A: depth-vfx is a little real-time VFX toy for your phone camera: light turns into rays, like a film shot, live. It's at [vtime.vercel.app](https://vtime.vercel.app) (it'll ask for your camera).
+Show: depth-vfx
+Next: What do you make on the web?
+Guess
+
+## co-founder
+Q: did you start a company
+Q: are you a founder
+Q: have you started anything of your own
+Q: do you run a brand
+A: Yep! TIC Corp, or laughwithtic, is a label I run with my friends Ichu, Ceeq and Amir.
+Show: TIC Corp
+Next: What is TIC Corp?
+Guess
+
+## spectacles
+Q: when did you make the spectacles stuff
+Q: tell me about your spectacles lenses
+Q: what is the teleprompter
+Q: did you make a currency converter
+Q: pomodoro timer on spectacles
+Q: when did you work on spectacles
+Q: what lenses have you made for snap spectacles
+A: All my Spectacles work happened between late 2024 and February 2025. I made small useful lenses: a teleprompter, a currency converter and a cozy pomodoro timer. And Ghost Catch, the hackathon game!
+Show: just the AR work
+Next: Tell me the Ghost Catch story
+Guess
 
 ## age
 Q: how old are you
