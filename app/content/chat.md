@@ -142,7 +142,7 @@ Q: snap lenses
 Q: lens studio
 Q: have you worked with snapchat
 Q: do you make filters or lenses
-A: A lot of my AR lives on Snap Spectacles: small useful things like a teleprompter, a currency converter and a pomodoro timer, and Ghost Catch, which came second at Snap AR Day.
+A: A lot of my AR lives on Snap Spectacles: small useful things like a teleprompter, a currency converter and a pomodoro timer, and Ghost Catch, a team game that came second at Snap AR Day London.
 Show: just the AR work
 Next: Did you win anything?
 Next: What about mixed reality?
@@ -152,7 +152,7 @@ Q: did you win anything
 Q: have you won awards
 Q: what is ghost catch
 Q: snap ar day
-A: Ghost Catch, my game for Snap Spectacles, came second at Snap AR Day in 2024.
+A: Ghost Catch, a Spectacles game I built with Ruby Bell and Orlando Mathias, came second at the Snap AR Day London hackathon in 2024. And back at uni, our VR game Makhluk Halus won gold at SIGG!
 Show: Ghost Catch
 Next: Tell me about your AR work
 
@@ -162,7 +162,7 @@ Q: do you make vr
 Q: quest games
 Q: what is dreampop
 Q: tell me about dreampop
-A: Dreampop is a mixed reality game for Quest, inspired by popping bubble wrap, bubble shooters and push-pop fidget toys. Take a Leap is another one.
+A: Dreampop is my mixed reality game for Quest, inspired by popping bubble wrap, bubble shooters and push-pop fidget toys. It's on the Meta Quest store! I also helped build Take a Leap, a jelly jumping game.
 Show: Dreampop
 Next: What do you make on the web?
 
@@ -184,7 +184,7 @@ Q: do you use unity
 Q: what languages do you code in
 Q: do you know react
 Q: do you code
-A: Lens Studio for Spectacles, Unity for Quest, and Three.js or React Three Fiber on the web.
+A: Lens Studio for Spectacles, Unity or WebXR (IWSDK) for Quest, and Three.js or React Three Fiber on the web.
 Next: Are you a designer or a developer?
 
 ## design
@@ -264,10 +264,131 @@ Q: what do you do for fun
 Q: hobbies
 Q: what do you do outside work
 Q: what do you do on weekends
-Q: do you make music
-Q: are you a musician
 Q: what else do you do
 A: I make music!
+Next: Where can I hear your music?
+
+## education
+Q: where did you study
+Q: did you go to university
+Q: what did you study
+Q: do you have a degree
+Q: what's your education
+Q: which uni did you go to
+Q: did you study design
+A: I studied Virtual Reality Design at Multimedia University (MMU) in Cyberjaya, from 2018 to 2021. Before that, a diploma in digital animation at Limkokwing.
+Next: How did you get into AR?
+Next: What do you make?
+Guess
+
+## how I got into AR
+Q: how did you get into AR
+Q: how did you start
+Q: how did you become a creative technologist
+Q: what was your first AR project
+Q: when did you start making AR
+Q: what got you into this
+Q: how did your career start
+A: It started with my VR degree. Then in 2020 I made halohex, an AR music toy in Spark AR for a Facebook hackathon, and did an AR internship at PETRONAS Digital. After that it was agency life: FabU, then three-ish years making AR for brands at GOWAAA.
+Next: Where have you worked?
+Next: Did you win anything?
+Guess
+
+## GOWAAA
+Q: what is gowaaa
+Q: tell me about gowaaa
+Q: did you work at an agency
+Q: have you made filters for brands
+Q: have you worked with big brands
+Q: did you work in singapore
+A: I was an AR/VR developer at GOWAAA, a Singapore studio, from late 2021 to early 2025. Lots of AR for brands on Instagram, Snapchat, TikTok and the web, plus the Google Maps geospatial AR for Singapore.
+Next: Tell me about the Google Maps AR
+Next: Tell me about your AR work
+Guess
+
+## google maps AR
+Q: tell me about the google maps AR
+Q: geospatial AR
+Q: did you work with google
+Q: google I/O
+Q: what did you do for google maps
+Q: singapore tourism board
+Q: AR in google maps
+A: With the GOWAAA team I helped make 15 geospatial AR experiences around Singapore, for the Singapore Tourism Board. They live inside Google Maps, part of a pilot Google announced at I/O 2024. I worked with the design team on concepts and built the experiences.
+Show: Geospatial AR
+Next: What about mixed reality?
+Guess
+
+## ghost catch story
+Q: tell me the ghost catch story
+Q: how did you make ghost catch
+Q: what was snap ar day like
+Q: how does ghost catch work
+Q: did you go to london
+Q: who did you make ghost catch with
+A: At Snap AR Day London in December 2024, I teamed up with Ruby Bell and Orlando Mathias, who I'd only just met, for a 24-hour Spectacles hackathon. We made Ghost Catch: two players in the same room race to grab a cheeky ghost before the timer runs out. I did the dev, we came second, and it all felt surreal!
+Show: Ghost Catch
+Next: Did you win anything?
+Guess
+
+## hackathons
+Q: do you do hackathons
+Q: what hackathons have you joined
+Q: have you been to a game jam
+Q: have you competed in anything
+Q: gemini hackathon
+Q: vibe jam
+A: I love a hackathon! Facebook's AR hackathon in 2020, Meta's Quest hackathon in 2024 (that's where Dreampop came from), Snap AR Day London, #vibejam, and the Gemini AI Hackathon at Google Japan in 2026.
+Next: What is Dreampop?
+Next: Did you win anything?
+Guess
+
+## music
+Q: do you make music
+Q: are you a musician
+Q: where can I hear your music
+Q: what kind of music do you make
+Q: are you on soundcloud
+Q: what's your artist name
+Q: do you have songs out
+A: I do! Little songs on [SoundCloud](https://soundcloud.com/kaberikram), just under my name. I also made Dreampop's music and sound effects myself.
+Next: What do you do for fun?
+Guess
+
+## Tep York
+Q: who is tep york
+Q: what is tep york
+Q: who is ty
+Q: tell me about tep york
+Q: who are you making the game with
+A: Tep York (TY) is a Kuala Lumpur artist who used to run the skate company QUIT. [Here's a nice profile of him](https://www.artandmarket.net/fresh-face/2025/2/26/tep-york).
+Next: What is TIC Corp?
+Next: What are you working on now?
+Guess
+
+## press
+Q: have you been featured anywhere
+Q: press
+Q: have you been on codrops
+Q: has anyone written about you
+Q: features
+A: Codrops featured my drag-a-shirt-onto-a-model idea in 2025: [Try It On](https://tympanus.net/codrops/2025/06/06/try-it-on-a-playful-drag-and-drop-styling-ui/). I first made it for my friends at TIC.
+Show: Styling Canvas
+Next: What is TIC Corp?
+Guess
+
+## webxr experiments
+Q: how did you make reality to bend
+Q: what is reality to bend
+Q: webxr
+Q: what are you doing on quest 3
+Q: is that running in the browser
+Q: how did you bend the room
+Q: what is dimensional
+A: Lately it's all WebXR on Quest 3 passthrough, built with Meta's IWSDK and Three.js, right in the browser. Reality to bend lets you grab a wall and stretch it like taffy (thank you, Spike Jonze), and Dimensional stacks a video's frames on my real table so you can scrub it by hand.
+Show: Reality to bend
+Next: What are you proudest of?
+Guess
 
 ## age
 Q: how old are you
