@@ -6,9 +6,13 @@
 Writes app/fonts/Kertas.woff2: one variable font with two axes.
 
   wght  300-700  how wide the pen is
-  HAND  0-100    0 is the clean drawing; 100 is the same letter cut out of
-                 paper by hand: edges a little uneven, strokes wander, each
-                 letter sits a touch off the line at its own small angle
+  HAND  0-100    0 is the clean drawing; 100 is the same letter set by hand:
+                 strokes drift a little, each letter sits a touch off the
+                 line at its own small angle
+
+The pen is not quite even: horizontals are a little thinner than verticals,
+and where an arch grows out of a stem (n, m, h, u, r) it thins, so joins
+stay open at small sizes.
 
 Every master is made from the same skeletons and the same number of points,
 so they always interpolate. The wobble is seeded by the glyph's name, so it is
@@ -35,8 +39,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, '..', '..', 'app', 'fonts')
 
 UPM = 1000
-STEP = 26          # skeleton sampling, in units: small facets, like scissor cuts
-CAP_POINTS = 7     # points on each round end
+STEP = 13          # skeleton sampling, in units: fine enough to read as smooth curves
+CAP_POINTS = 10    # points on each round end
+CONTRAST = 0.16    # horizontals this much thinner than verticals, like a real pen
+JOIN_TAPER = 0.34  # an arch thins this much where it leaves a stem
+JOIN_LENGTH = 90   # over this many units
 SB = 52            # base side bearing
 WEIGHT = {300: 50, 700: 104}   # pen width at each end of wght
 SPACE = 240
@@ -96,7 +103,39 @@ def strokes_of(glyph_strokes):
             for part in split_corners(s['pts']):
                 pts, length = resample(part)
                 out.append({'pts': pts, 'closed': False, 'w': s.get('w', 1), 'len': length})
+    mark_joins(out)
     return out
+
+
+def _tangent(pts, i):
+    a, b = pts[max(0, i - 1)], pts[min(len(pts) - 1, i + 1)]
+    L = math.dist(a, b) or 1
+    return ((b[0] - a[0]) / L, (b[1] - a[1]) / L)
+
+
+def mark_joins(strokes):
+    """Find stroke ends that grow out of another stroke along its direction
+    (the arch of n leaving its stem, the bowl of u meeting its stem). Those
+    ends get thinner, the way a type designer opens up a join."""
+    for s in strokes:
+        s['taper'] = [False, False]
+        if s['closed'] or s.get('dot'):
+            continue
+        for end, idx in ((0, 0), (1, len(s['pts']) - 1)):
+            p = s['pts'][idx]
+            t = _tangent(s['pts'], idx)
+            for o in strokes:
+                if o is s or o.get('dot'):
+                    continue
+                m = len(o['pts'])
+                for j, q in enumerate(o['pts']):
+                    if not o['closed'] and (j < 2 or j > m - 3):
+                        continue
+                    if math.dist(p, q) < 14:
+                        u = _tangent(o['pts'], j)
+                        if abs(t[0] * u[0] + t[1] * u[1]) > 0.75:
+                            s['taper'][end] = True
+                        break
 
 
 # ---- the hand ----
@@ -140,8 +179,8 @@ def outline(stroke, width, hand, seed):
     left_cut = Noise(seed + ':left', 55)
     right_cut = Noise(seed + ':right', 55)
     press = Noise(seed + ':press', 240)
-    amp_walk = 11 * hand
-    amp_cut = 0.13 * w * hand
+    amp_walk = 5 * hand
+    amp_cut = 0.025 * w * hand
     step = stroke['len'] / max(1, (n if closed else n - 1))
 
     L, Rt = [], []
@@ -149,7 +188,13 @@ def outline(stroke, width, hand, seed):
         d = i * step
         m = amp_walk * walk(d)
         cx, cy = p[0] + nx * m, p[1] + ny * m
-        half = w / 2 * (1 + 0.16 * hand * press(d))
+        shape = 1 - CONTRAST * tx * tx
+        taper = stroke.get('taper', (False, False))
+        for flag, dist in ((taper[0], d), (taper[1], stroke['len'] - d)):
+            if flag and dist < JOIN_LENGTH:
+                f = dist / JOIN_LENGTH
+                shape *= 1 - JOIN_TAPER * (1 - f * f * (3 - 2 * f))
+        half = w / 2 * shape * (1 + 0.07 * hand * press(d))
         hl = half + amp_cut * left_cut(d)
         hr = half + amp_cut * right_cut(d)
         L.append((cx + nx * hl, cy + ny * hl, cx, cy, tx, ty, nx, ny, hl))
@@ -189,8 +234,8 @@ def skeleton_box(strokes):
 
 def build_glyph(name, strokes, sb, width, hand):
     rnd = random.Random(name + ':tilt')
-    tilt = math.radians(rnd.uniform(-1.6, 1.6)) * hand
-    lift = rnd.uniform(-9, 9) * hand
+    tilt = math.radians(rnd.uniform(-1.1, 1.1)) * hand
+    lift = rnd.uniform(-5, 5) * hand
     x0, x1 = skeleton_box(strokes)
     lsb = SB * sb[0] + width / 2
     rsb = SB * sb[1] + width / 2
@@ -309,13 +354,13 @@ def main():
     name.setName('Kertas', 4, 3, 1, 0x409)
     name.setName('Version 1.000', 5, 3, 1, 0x409)
     name.setName('Kertas-Regular', 6, 3, 1, 0x409)
-    name.setName('Kertas. Drawn by Ikram Hakim, 2026. Every letter is a pen line, cut from paper.', 10, 3, 1, 0x409)
+    name.setName('Kertas. Drawn by Ikram Hakim, 2026. Every letter is a pen line.', 10, 3, 1, 0x409)
     buildStatTable(vf, [
         {'tag': 'wght', 'name': 'Weight', 'values': [
             {'value': 300, 'name': 'Light'}, {'value': 400, 'name': 'Regular', 'flags': 2},
             {'value': 500, 'name': 'Medium'}, {'value': 700, 'name': 'Bold'}]},
         {'tag': 'HAND', 'name': 'Hand', 'values': [
-            {'value': 0, 'name': 'Drawn', 'flags': 2}, {'value': 100, 'name': 'Cut'}]},
+            {'value': 0, 'name': 'Drawn', 'flags': 2}, {'value': 100, 'name': 'Loose'}]},
     ])
     os.makedirs(OUT, exist_ok=True)
     vf.flavor = 'woff2'

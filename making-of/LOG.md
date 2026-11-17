@@ -343,12 +343,20 @@ Two axes:
 
 - **Weight** (300–700), how wide the pen is.
 - **Hand** (0–100), our own axis. At 0 the letters are the clean drawing. At
-  100 the same letters look cut out of paper with scissors: edges a little
-  uneven, strokes wandering, each letter sitting a touch off the line at its
-  own small angle. The site uses 55. It is a slider in Tune ("Letters,
+  100 the strokes drift a little and each letter sits a touch off the line at
+  its own small angle. The site uses 35. It is a slider in Tune ("Letters,
   hand-cut").
 
 Kertas replaces Archivo: the name in the corner, the group labels, card
 titles, the open card's title, and Ikram's side of the conversation, so the
 answers read as their voice. Inter stays for the small working text (the
 input, pills, dates, details). Stills in `captures/2026-11-17-kertas/`.
+
+Same day, after the first look: "so cute! can we improve this font, less paper
+drawing like but similar." The first cut had scissor edges: rough outlines and
+visible facets. Now the curves are smooth, the edges are clean, and the hand
+axis only nudges letters off the line instead of roughing them up. Two
+type-designer touches came in too: horizontals are a little thinner than
+verticals, and where an arch grows out of a stem (n, m, h, u, r) it thins, so
+the joins stay open when the letters are small. `specimen.png` compares
+before and after.

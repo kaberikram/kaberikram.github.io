@@ -21,7 +21,7 @@ export const DEFAULTS = {
   ink: '#1C1B1A',
   cardRadius: 0,
   labelSize: 20,
-  hand: 55,
+  hand: 35,
   spread: 0.6,
   depth: 1.8,
   tilt: 5,

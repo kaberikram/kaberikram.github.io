@@ -12,7 +12,7 @@
   --label-size: 40px;
   --bloom-opacity: 0.62;
   --ui-font: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --hand: 55;
+  --hand: 35;
   /* Kertas: the board's own letters, drawn for this site (tools/kertas). */
   --brand-font: Kertas, Inter, Helvetica, sans-serif;
 }
