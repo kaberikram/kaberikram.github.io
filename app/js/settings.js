@@ -21,6 +21,7 @@ export const DEFAULTS = {
   ink: '#1C1B1A',
   cardRadius: 0,
   labelSize: 20,
+  hand: 55,
   spread: 0.6,
   depth: 1.8,
   tilt: 5,
@@ -70,6 +71,7 @@ const BOUNDS = {
   portal: [0, 0.35],
   roomTilt: [0, 20],
   labelSize: [12, 64],
+  hand: [0, 100],
   spread: [0.3, 2],
   depth: [0, 2.5],
   tilt: [0, 10],
@@ -184,6 +186,7 @@ export function applyCss() {
   root.style.setProperty('--ink', s.ink)
   root.style.setProperty('--card-radius', `${s.cardRadius}px`)
   root.style.setProperty('--label-size', `${s.labelSize}px`)
+  root.style.setProperty('--hand', String(s.hand))
   root.style.setProperty('--portal', String(s.portal))
   root.style.setProperty('--bloom', bloomGradient(s))
   root.style.setProperty('--bloom-opacity', String(s.bloomOpacity))

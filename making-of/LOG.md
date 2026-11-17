@@ -324,3 +324,31 @@ Asked Ikram twenty questions to check the drafts. The first round of answers
 went straight into `chat.md`: based in KL, design and dev both, Reality to
 bend as the proudest piece (and why), the TIC Corp game in progress, music
 outside work. Only "how are you" is still a guess.
+
+## 2026-11-17 · our own letters
+"Study allo.joshpuckett.me, make our own font and use it for my website."
+
+Allo is a friendly sans by Josh Puckett: Inter redrawn, with a made-up axis,
+Roundness, that slides each letter from sharp to round. The lesson taken from
+it: a font can carry a feeling as an axis, not just a weight.
+
+So the board now has its own typeface, **Kertas** (Malay for paper). Nothing
+is borrowed from Allo or Inter: every letter is drawn from scratch as a
+skeleton, the line a pen would travel (`tools/kertas/glyphs.py`), and a small
+script strokes it with a round pen into a variable font
+(`tools/kertas/build.py` → `app/fonts/Kertas.woff2`, about 48 KB, 107
+characters). Sharp turns become separate strokes, so every joint is soft.
+
+Two axes:
+
+- **Weight** (300–700), how wide the pen is.
+- **Hand** (0–100), our own axis. At 0 the letters are the clean drawing. At
+  100 the same letters look cut out of paper with scissors: edges a little
+  uneven, strokes wandering, each letter sitting a touch off the line at its
+  own small angle. The site uses 55. It is a slider in Tune ("Letters,
+  hand-cut").
+
+Kertas replaces Archivo: the name in the corner, the group labels, card
+titles, the open card's title, and Ikram's side of the conversation, so the
+answers read as their voice. Inter stays for the small working text (the
+input, pills, dates, details). Stills in `captures/2026-11-17-kertas/`.

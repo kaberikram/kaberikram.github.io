@@ -45,6 +45,7 @@ const GROUPS = [
       { key: 'ink', type: 'color', label: 'Ink' },
       { key: 'cardRadius', type: 'range', label: 'Corner radius', min: 0, max: 36, step: 1, unit: 'px' },
       { key: 'labelSize', type: 'range', label: 'Label size', min: 12, max: 64, step: 1, unit: 'px' },
+      { key: 'hand', type: 'range', label: 'Letters, hand-cut', min: 0, max: 100, step: 1 },
       { key: 'breathe', type: 'range', label: 'Idle drift', min: 0, max: 1, step: 1 },
     ],
   },
