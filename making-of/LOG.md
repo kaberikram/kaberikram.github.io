@@ -332,3 +332,45 @@ EPF, SHXFT, music and more. The research notes themselves stay out of the
 repo. TIC Corp is now described in the label's own words, and Tep York (TY) is
 simply named as the collaborator on the game until there is more to say. The
 new answers marked `Guess` are drafts still waiting for Ikram's words.
+
+## 2026-11-17 · our own letters
+"Study allo.joshpuckett.me, make our own font and use it for my website."
+
+Allo is a friendly sans by Josh Puckett: Inter redrawn, with a made-up axis,
+Roundness, that slides each letter from sharp to round. The lesson taken from
+it: a font can carry a feeling as an axis, not just a weight.
+
+So the board now has its own typeface, **Kertas** (Malay for paper). Nothing
+is borrowed from Allo or Inter: every letter is drawn from scratch as a
+skeleton, the line a pen would travel (`tools/kertas/glyphs.py`), and a small
+script strokes it with a round pen into a variable font
+(`tools/kertas/build.py` → `app/fonts/Kertas.woff2`, about 48 KB, 107
+characters). Sharp turns become separate strokes, so every joint is soft.
+
+Two axes:
+
+- **Weight** (300–700), how wide the pen is.
+- **Hand** (0–100), our own axis. At 0 the letters are the clean drawing. At
+  100 the strokes drift a little and each letter sits a touch off the line at
+  its own small angle. The site uses 35. It is a slider in Tune ("Letters,
+  hand-cut").
+
+Kertas replaces Archivo: the name in the corner, the group labels, card
+titles, the open card's title, and Ikram's side of the conversation, so the
+answers read as their voice. Inter stays for the small working text (the
+input, pills, dates, details). Stills in `captures/2026-11-17-kertas/`.
+
+Same day, after the first look: "so cute! can we improve this font, less paper
+drawing like but similar." The first cut had scissor edges: rough outlines and
+visible facets. Now the curves are smooth, the edges are clean, and the hand
+axis only nudges letters off the line instead of roughing them up. Two
+type-designer touches came in too: horizontals are a little thinner than
+verticals, and where an arch grows out of a stem (n, m, h, u, r) it thins, so
+the joins stay open when the letters are small. `specimen.png` compares
+before and after.
+
+Then: "inter swap with allo?" The working text (input, pills, dates,
+details, Tune) is now Allo itself, Josh Puckett's font, self-hosted under its
+open licence (`app/fonts/allo/`, with `OFL.txt`; cut down to Latin, about
+150 KB). So the pair is Kertas for Ikram's voice and Allo for everything
+around it. The page no longer loads anything from Google Fonts.

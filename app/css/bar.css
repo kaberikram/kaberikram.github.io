@@ -203,10 +203,12 @@ button:focus-visible, .pill:focus-visible, #b-input:focus-visible {
 .said::before { content: "you  ·  "; white-space: pre; color: #b3aca6; }
 
 .reply {
-  font-size: 16px;
-  line-height: 1.55;
-  font-weight: 450;
-  letter-spacing: -0.005em;
+  font-family: var(--brand-font);
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 430;
+  letter-spacing: 0.005em;
+  font-variation-settings: "HAND" calc(var(--hand) * 0.6);
   color: var(--ink);
   text-wrap: pretty;
 }
@@ -301,11 +303,11 @@ button:focus-visible, .pill:focus-visible, #b-input:focus-visible {
 .d-title {
   padding: 8px 20px 0;
   font-family: var(--brand-font);
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 28px;
+  font-weight: 540;
+  letter-spacing: 0;
   line-height: 1.1;
-  font-variation-settings: "wdth" 108;
+  font-variation-settings: "HAND" var(--hand);
 }
 
 .d-line { padding: 4px 20px 0; color: #6b635d; font-size: 14px; line-height: 1.5; }

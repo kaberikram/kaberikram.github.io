@@ -11,8 +11,25 @@
   --card-radius: 16px;
   --label-size: 40px;
   --bloom-opacity: 0.62;
-  --ui-font: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --brand-font: Archivo, Inter, Helvetica, sans-serif;
+  /* Allo by Josh Puckett (SIL OFL 1.1, app/fonts/allo/OFL.txt): the quiet working text. */
+  --ui-font: Allo, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --hand: 35;
+  /* Kertas: the board's own letters, drawn for this site (tools/kertas). */
+  --brand-font: Kertas, Allo, Helvetica, sans-serif;
+}
+
+@font-face {
+  font-family: Kertas;
+  src: url("../fonts/Kertas.woff2") format("woff2");
+  font-weight: 300 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Allo;
+  src: url("../fonts/allo/Allo.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
 }
 
 html, body {
@@ -81,10 +98,10 @@ html.reduced-motion #field { animation: none; }
 
 .brand h1 {
   font-family: var(--brand-font);
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  font-variation-settings: "wdth" 125;
+  font-size: 19px;
+  font-weight: 560;
+  letter-spacing: 0;
+  font-variation-settings: "HAND" var(--hand);
 }
 
 #nav {
@@ -215,7 +232,7 @@ html.failed #bar { display: none; }
   padding: 14px 10px 0 20px;
 }
 
-.tune-head strong { font: 700 17px/1 var(--brand-font); letter-spacing: -0.01em; font-variation-settings: "wdth" 108; }
+.tune-head strong { font: 560 18px/1 var(--brand-font); font-variation-settings: "HAND" var(--hand); }
 .tune-head span { flex: 1; color: var(--muted); font-size: 12px; }
 .tune-head kbd {
   display: inline-block;
