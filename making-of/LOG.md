@@ -509,3 +509,5 @@ drawn in tools/kertas). A "Caps" switch in the lab, on for the corner. The h1
 underneath keeps "Ikram Hakim" for screen readers. Stills: `caps-*.png`.
 Tried, then: "okay no cap it is". Back to "Ikram Hakim"; the Caps switch stays in
 the lab.
+
+Then the look changed, not the size. Ikram sent three references of crisp, solid stripes in slate, navy, orange, cream, plum, red and mint, all running into one vanishing point, and said the length was fine but it should look like that. So the soft see-through sheet became a new mode, "stretch": a line is cut across the name square to the sweep, every stroke (and every gap between strokes) it crosses becomes a flat band of colour, and the bands run off along the same bent path, narrowing to a point. Hard edges, no transparency, no blur, with a few fine lines inside each band. The bands keep one direction across instead of turning with the curve, so a strong bend shears the ribbon rather than folding it over itself. The corner keeps Ikram's reach, bend, turn and tip; only the mode, palette ("film", taken from the references) and cut changed. Captures: stripes-corner, stripes-close-up, stripes-lab.

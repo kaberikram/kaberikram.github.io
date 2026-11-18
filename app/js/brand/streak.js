@@ -19,6 +19,9 @@ export const PALETTES = {
   // thin-film colours, for the sheets: pink, mint, lilac, butter, sky
   iridescent: ['#FF9CC6', '#8FEBC8', '#B39CFF', '#FFD98A', '#8CCFFF', '#FF9CC6'],
   opal: ['#F6D3E4', '#D6F1E8', '#DCD5FA', '#F9EBD3', '#F6D3E4'],
+  // solid stripes, from Ikram's references: slate, navy, orange, cream,
+  // plum, red, mint, butter
+  film: ['#8FA3BF', '#1F2A5C', '#E8803F', '#F1EBDD', '#3B2350', '#D2373C', '#7CCBA8', '#E9D57A', '#5C6F9A', '#F4B183'],
 }
 
 export const SHAPES = {
@@ -150,7 +153,7 @@ function tintedCopies(src, colors, n) {
 
 export const DEFAULTS = {
   text: 'Ikram Hakim',
-  mode: 'smear',      // smear | drip | bridge | tunnel
+  mode: 'smear',      // smear | drip | bridge | tunnel | sheet | stretch
   cut: 0.96,          // where the slice is taken, 0..1 across (smear) or down (drip)
   length: 6,          // em
   bend: 0.8,          // em, how far the path bows away from straight
@@ -169,6 +172,7 @@ export const DEFAULTS = {
   face: 'ink',        // sheets: the letters on top, ink or pearl
   end: 'none',        // sheets: a second name where the sweep lands (none | ink | pearl)
   caps: 'off',        // 'on' sets the name in capitals
+  gaps: 'filled',     // stretch: spaces between strokes become stripes too (filled = colour | pale | clear)
   reach: 1,           // scales the streak's length and bend together: below 1 pulls it in close
   turn: 0,            // 3D: degrees the whole mark turns away around its upright axis
   tip: 0,             // 3D: degrees it tips back around its level axis
@@ -224,6 +228,7 @@ export async function render(canvas, opts, px, phase = 0) {
 
   if (o.mode === 'bridge') return renderBridge(canvas, o, px, bend, shape, colors)
   if (o.mode === 'sheet') return renderSheet(canvas, o, px, bend, shape, colors, phase)
+  if (o.mode === 'stretch') return renderStretch(canvas, o, px, bend, shape, colors)
 
   const src = await textCanvas(o.text, px, o.weight, o.hand)
   const W = src.width, H = src.height
@@ -433,6 +438,126 @@ async function renderSheet(canvas, o, px, bend, shape, colors, phase) {
     const ex = ox + p.x + (W * (1 - p.s)) / 2, ey = oy + p.y + (H * (1 - p.s)) / 2
     if (o.end === 'pearl') ctx.drawImage(film[0], ex, ey, W * p.s, H * p.s)
     else ctx.drawImage(src, ex, ey, W * p.s, H * p.s)
+  }
+  return { ox, oy, W, H }
+}
+
+// Solid stripes. A line is cut across the name, square to the sweep; every
+// stroke it crosses becomes a band of flat colour, and the bands run off along
+// the bent path, narrowing toward a vanishing point. No transparency, no blur:
+// hard edges, like a picture's edge smeared down a wall.
+function stripes(src, P0, ux, uy, nx, ny, slant, gaps, colors) {
+  const W = src.width, H = src.height
+  const d = src.getContext('2d').getImageData(0, 0, W, H).data
+  const half = (Math.abs(nx) * W + Math.abs(ny) * H) / 2 + 1
+  const ink = []
+  for (let k = -half; k <= half; k++) {
+    const along = slant * half * (k / half)
+    const x = Math.round(P0.x + nx * k + ux * along), y = Math.round(P0.y + ny * k + uy * along)
+    const on = x >= 0 && y >= 0 && x < W && y < H && d[(y * W + x) * 4 + 3] > 110
+    ink.push(on)
+  }
+  // runs of ink and of gap, as offsets across the sweep
+  const runs = []
+  let start = 0
+  for (let i = 1; i <= ink.length; i++) {
+    if (i === ink.length || ink[i] !== ink[start]) {
+      runs.push({ a: start - half, b: i - half, ink: ink[start] })
+      start = i
+    }
+  }
+  const first = runs.findIndex((r) => r.ink)
+  const last = runs.length - 1 - [...runs].reverse().findIndex((r) => r.ink)
+  if (first < 0) return []
+  const bands = []
+  let c = 0, g = 0
+  const pale = ['#ECE5D6', '#BCC8D8', '#F6F2EA', '#D9D0E8']
+  for (let i = first; i <= last; i++) {
+    const r = runs[i]
+    // filled: strokes and the spaces between them all take a colour, so the
+    // stripes come out wide and narrow; pale: spaces are soft paper tones
+    if (r.ink || gaps === 'filled') bands.push({ a: r.a, b: r.b, color: colors[c++ % colors.length] })
+    else if (gaps === 'pale') bands.push({ a: r.a, b: r.b, color: pale[g++ % pale.length] })
+  }
+  return bands
+}
+
+// fine lines inside a band: the same colour, a touch lighter or darker
+function shade(hex, k) {
+  const v = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
+  return `rgb(${v.map((x) => Math.round(k > 0 ? x + (255 - x) * k : x * (1 + k))).join(',')})`
+}
+
+async function renderStretch(canvas, o, px, bend, shape, colors) {
+  const src = await textCanvas(o.text, px, o.weight, o.hand)
+  const W = src.width, H = src.height
+  const em = px
+  const L = o.length * em
+  const a = (o.angle * Math.PI) / 180
+  const ux = Math.cos(a), uy = Math.sin(a)
+  const nx = -uy, ny = ux
+  // the cut line sits `cut` of the way through the name along the sweep
+  const ext = Math.abs(ux) * W + Math.abs(uy) * H
+  const P0 = { x: W / 2 + ux * (o.cut - 0.5) * ext, y: H / 2 + uy * (o.cut - 0.5) * ext }
+  const bands = stripes(src, P0, ux, uy, nx, ny, o.slant, o.gaps, colors)
+
+  const steps = Math.max(12, Math.ceil(L / 2))
+  const pts = []
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps
+    const b = bend * em * shape(t)
+    pts.push({ x: P0.x + ux * L * t + nx * b, y: P0.y + uy * L * t + ny * b, s: Math.max(0.02, 1 + o.spread * t * 0.5 - 0.45 * t) })
+  }
+  // the bands keep one direction across (like the smear's upright slices), so
+  // a strong bend shears the ribbon instead of folding it over itself
+  pts.forEach((p) => { p.nx = nx; p.ny = ny })
+  const at = (p, off) => [p.x + p.nx * off * p.s, p.y + p.ny * off * p.s]
+
+  let x0 = 0, y0 = 0, x1 = W, y1 = H
+  if (bands.length) {
+    const lo = bands[0].a, hi = bands[bands.length - 1].b
+    for (const p of pts) for (const off of [lo, hi]) {
+      const [x, y] = at(p, off)
+      x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y)
+    }
+  }
+  const pad = Math.ceil(em * 0.3)
+  const ox = Math.ceil(-x0) + pad, oy = Math.ceil(-y0) + pad
+  canvas.width = Math.ceil(x1 - x0) + pad * 2
+  canvas.height = Math.ceil(y1 - y0) + pad * 2
+  const ctx = canvas.getContext('2d')
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.save()
+  ctx.translate(ox, oy)
+
+  const strip = (a, b, fill) => {
+    ctx.beginPath()
+    pts.forEach((p, i) => { const [x, y] = at(p, a); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y) })
+    for (let i = pts.length - 1; i >= 0; i--) { const [x, y] = at(pts[i], b); ctx.lineTo(x, y) }
+    ctx.closePath()
+    ctx.fillStyle = fill
+    ctx.fill()
+  }
+  // a hair of overlap so neighbouring bands never show a seam
+  const seam = 0.35
+  const fine = Math.max(1, em * 0.07)
+  let seed = 7
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
+  for (const band of bands) {
+    strip(band.a - seam, band.b + seam, band.color)
+    // fine lines inside each band
+    for (let x = band.a + fine; x < band.b - fine * 0.5; x += fine * (0.8 + rnd() * 1.4)) {
+      const w = Math.min(band.b - x, fine * (0.3 + rnd() * 0.5))
+      strip(x, x + w, shade(band.color, (rnd() - 0.5) * 0.22))
+    }
+  }
+  ctx.restore()
+  if (o.face === 'pearl') {
+    ctx.globalAlpha = 0.85
+    ctx.drawImage(src, ox, oy)
+    ctx.globalAlpha = 1
+  } else if (o.face !== 'none') {
+    ctx.drawImage(src, ox, oy)
   }
   return { ox, oy, W, H }
 }

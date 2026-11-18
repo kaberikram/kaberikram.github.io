@@ -44,14 +44,24 @@ const SHEETS = [
     o: { mode: 'sheet', length: 2.6, bend: -0.6, shape: 'arch', angle: -28, twist: 1, sheen: 1.5, density: 0.05, glow: 0.3, spread: 0.4, fade: 0.6, palette: 'iridescent', motion: 'breathe' } },
 ]
 
-// what the board's corner shows right now; the lab opens on it
-const CORNER = { name: 'On the site', about: 'The name in the board\'s corner right now: one name under a lagoon sheet, turned in space.', o: { ...MARK } }
+const STRIPES = [
+  { name: 'Stripes', about: 'Solid bands of colour, one per stroke and per gap, pulled up out of the name and narrowing to a point. No see-through, no blur.',
+    o: { ...MARK, mode: 'stretch', palette: 'film', gaps: 'filled', cut: 0.5 } },
+  { name: 'Stripes, strokes only', about: 'Only the strokes become bands; the spaces between them stay open, so it reads as fine lines.',
+    o: { ...MARK, mode: 'stretch', palette: 'film', gaps: 'clear', cut: 0.5 } },
+  { name: 'Stripes, long', about: 'The same bands with twice the reach, sweeping up and over.',
+    o: { ...MARK, mode: 'stretch', palette: 'film', gaps: 'pale', cut: 0.5, reach: 1.2 } },
+]
 
-const PRESETS = [CORNER, ...SHEETS, ...STREAKS]
+// what the board's corner shows right now; the lab opens on it
+const CORNER = { name: 'On the site', about: 'The name in the board\'s corner right now: solid stripes of colour pulled up out of the name, turned in space.', o: { ...MARK } }
+
+const PRESETS = [CORNER, ...STRIPES, ...SHEETS, ...STREAKS]
 
 const CONTROLS = [
   { k: 'caps', pills: ['off', 'on'] },
-  { k: 'mode', pills: ['sheet', 'smear', 'bridge', 'drip', 'tunnel'] },
+  { k: 'mode', pills: ['stretch', 'sheet', 'smear', 'bridge', 'drip', 'tunnel'] },
+  { k: 'gaps', pills: ['filled', 'pale', 'clear'] },
   { k: 'face', pills: ['ink', 'pearl', 'none'] },
   { k: 'end', pills: ['none', 'ink', 'pearl'] },
   { k: 'shape', pills: Object.keys(SHAPES) },
@@ -109,10 +119,10 @@ const tiles = []
 function buildGrid() {
   const grid = document.getElementById('grid')
   PRESETS.forEach((p) => {
-    if (p === CORNER || p === SHEETS[0] || p === STREAKS[0]) {
+    if (p === CORNER || p === STRIPES[0] || p === SHEETS[0] || p === STREAKS[0]) {
       const h = document.createElement('p')
       h.className = 'grid-head'
-      h.textContent = p === CORNER ? 'On the site now' : p === SHEETS[0] ? 'Sheets: the name swept into see-through, soap-film ribbons' : 'Streaks: one slice of the name pulled out long'
+      h.textContent = p === CORNER ? 'On the site now' : p === STRIPES[0] ? 'Stripes: solid bands of colour converging to a point' : p === SHEETS[0] ? 'Sheets: the name swept into see-through, soap-film ribbons' : 'Streaks: one slice of the name pulled out long'
       grid.appendChild(h)
     }
     const b = document.createElement('button')
