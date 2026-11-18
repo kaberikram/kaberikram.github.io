@@ -489,3 +489,10 @@ together) now turns in space with a CSS 3D transform hinged on the left of the
 name: 28 degrees round, tipped back 14, camera 12 em away. On the board it turns
 a few degrees more as the pointer moves, like the room. The lab has the same
 three sliders (3D: turn, tip back, camera distance). Stills: `turned-*.png`.
+
+Then: "set this setting as the default on the lab also add another setting so i
+can control how long the streak is now icant make it shorter?" The lab now opens
+on the corner mark ("On the site", read straight from `mark.js`, so the two
+can't drift apart). Shortening Length didn't help because most of the sweep
+comes from the bend, so a new "Streak reach" slider scales length and bend
+together (0.05 to 2). `reach-0.4.png` shows it pulled in close.

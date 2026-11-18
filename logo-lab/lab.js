@@ -1,4 +1,5 @@
 import { render, turnInSpace, DEFAULTS, PALETTES, SHAPES } from '../app/js/brand/streak.js'
+import { MARK } from '../app/js/brand/mark.js'
 
 // Starting points. Every one of them can be tuned in the panel.
 const STREAKS = [
@@ -43,7 +44,10 @@ const SHEETS = [
     o: { mode: 'sheet', length: 2.6, bend: -0.6, shape: 'arch', angle: -28, twist: 1, sheen: 1.5, density: 0.05, glow: 0.3, spread: 0.4, fade: 0.6, palette: 'iridescent', motion: 'breathe' } },
 ]
 
-const PRESETS = [...SHEETS, ...STREAKS]
+// what the board's corner shows right now; the lab opens on it
+const CORNER = { name: 'On the site', about: 'The name in the board\'s corner right now: one name under a lagoon sheet, turned in space.', o: { ...MARK } }
+
+const PRESETS = [CORNER, ...SHEETS, ...STREAKS]
 
 const CONTROLS = [
   { k: 'mode', pills: ['sheet', 'smear', 'bridge', 'drip', 'tunnel'] },
@@ -62,7 +66,8 @@ const CONTROLS = [
   { k: 'tip', label: '3D: tip back (deg)', min: -50, max: 50, step: 1 },
   { k: 'depth', label: '3D: camera distance (em)', min: 4, max: 40, step: 0.5 },
   { k: 'slant', label: 'Slice tilt (lines)', min: -1, max: 1, step: 0.01 },
-  { k: 'length', label: 'Length (em)', min: 0.5, max: 12, step: 0.1 },
+  { k: 'reach', label: 'Streak reach (shorter / longer)', min: 0.05, max: 2, step: 0.01 },
+  { k: 'length', label: 'Length (em)', min: 0.1, max: 12, step: 0.1 },
   { k: 'bend', label: 'Bend (em)', min: -3, max: 3, step: 0.05 },
   { k: 'spread', label: 'Opens up', min: -0.6, max: 3, step: 0.05 },
   { k: 'fade', label: 'Fade', min: 0, max: 1, step: 0.05 },
@@ -103,10 +108,10 @@ const tiles = []
 function buildGrid() {
   const grid = document.getElementById('grid')
   PRESETS.forEach((p) => {
-    if (p === SHEETS[0] || p === STREAKS[0]) {
+    if (p === CORNER || p === SHEETS[0] || p === STREAKS[0]) {
       const h = document.createElement('p')
       h.className = 'grid-head'
-      h.textContent = p === SHEETS[0] ? 'Sheets: the name swept into see-through, soap-film ribbons' : 'Streaks: one slice of the name pulled out long'
+      h.textContent = p === CORNER ? 'On the site now' : p === SHEETS[0] ? 'Sheets: the name swept into see-through, soap-film ribbons' : 'Streaks: one slice of the name pulled out long'
       grid.appendChild(h)
     }
     const b = document.createElement('button')
