@@ -174,6 +174,14 @@ function buildPanel() {
       inputs[c.k] = row
     }
   }
+  // every setting as JSON, ready to paste into a message
+  document.getElementById('copy-json').addEventListener('click', async (e) => {
+    const out = {}
+    for (const c of CONTROLS) out[c.k] = current[c.k]
+    try { await navigator.clipboard.writeText(JSON.stringify(out, null, 2)) } catch {}
+    e.target.textContent = 'Copied'
+    setTimeout(() => (e.target.textContent = 'Copy settings'), 1400)
+  })
   document.getElementById('copy').addEventListener('click', async (e) => {
     try { await navigator.clipboard.writeText(location.href) } catch {}
     e.target.textContent = 'Copied'

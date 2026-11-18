@@ -113,7 +113,7 @@ body {
 .panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .panel-head strong { font: 600 17px Kertas, var(--ui-font); font-variation-settings: "HAND" 35; }
 
-button#copy, .pills button {
+button#copy, button#copy-json, .pills button {
   appearance: none;
   border: 1px solid var(--line);
   background: #fff;
@@ -151,3 +151,5 @@ input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius
   .hero { min-height: 180px; }
   .grid { grid-template-columns: 1fr; }
 }
+
+.panel-actions { display: flex; gap: 5px; }
