@@ -507,3 +507,5 @@ does. Stills of three moments: `breathing-corner.png`.
 Then: "try all caps text". IKRAM HAKIM in Kertas capitals (they were already
 drawn in tools/kertas). A "Caps" switch in the lab, on for the corner. The h1
 underneath keeps "Ikram Hakim" for screen readers. Stills: `caps-*.png`.
+Tried, then: "okay no cap it is". Back to "Ikram Hakim"; the Caps switch stays in
+the lab.

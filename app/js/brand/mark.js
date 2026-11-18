@@ -11,7 +11,7 @@ export const MARK = {
   reach: 0.55, length: 1.9, bend: -3, spread: -0.6, fade: 1, weight: 630, hand: 100,
   // turned in space so it doesn't read as a flat face
   turn: 14, tip: -16, depth: 12,
-  caps: 'on', // all capitals (Ikram, 2026-11-18)
+  caps: 'off', // capitals tried and dropped (Ikram, 2026-11-18)
 }
 
 const FONT_PX = 19
