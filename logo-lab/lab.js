@@ -1,4 +1,4 @@
-import { render, DEFAULTS, PALETTES, SHAPES } from '../app/js/brand/streak.js'
+import { render, turnInSpace, DEFAULTS, PALETTES, SHAPES } from '../app/js/brand/streak.js'
 
 // Starting points. Every one of them can be tuned in the panel.
 const STREAKS = [
@@ -58,6 +58,9 @@ const CONTROLS = [
   { k: 'sheen', label: 'Sheets: colour cycles', min: 0, max: 4, step: 0.05 },
   { k: 'density', label: 'Sheets: thickness', min: 0.01, max: 0.25, step: 0.005 },
   { k: 'glow', label: 'Sheets: glow', min: 0, max: 1.5, step: 0.05 },
+  { k: 'turn', label: '3D: turn (deg)', min: -70, max: 70, step: 1 },
+  { k: 'tip', label: '3D: tip back (deg)', min: -50, max: 50, step: 1 },
+  { k: 'depth', label: '3D: camera distance (em)', min: 4, max: 40, step: 0.5 },
   { k: 'slant', label: 'Slice tilt (lines)', min: -1, max: 1, step: 0.01 },
   { k: 'length', label: 'Length (em)', min: 0.5, max: 12, step: 0.1 },
   { k: 'bend', label: 'Bend (em)', min: -3, max: 3, step: 0.05 },
@@ -78,6 +81,7 @@ let currentName = PRESETS[0].name
 async function draw(canvas, o, cssPx, phase = 0) {
   const box = await render(canvas, o, Math.round(cssPx * dpr), phase)
   canvas.style.width = canvas.width / dpr + 'px'
+  turnInSpace(canvas, box, o, dpr, cssPx)
   return box
 }
 

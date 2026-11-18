@@ -482,3 +482,10 @@ corner (`app/js/brand/mark.js`, drawn by the same `streak.js`, which moved to
 `app/js/brand/`); the sheet runs off the left edge of the window. The h1 keeps
 the text underneath for screen readers. The lab also now saves every switch (mode, shape, colour, end) in its link.
 Stills: `on-the-board-*.png`.
+
+Then: "right now logo is display the text flat front face, i wish we can make it
+like 3d rotate so it doesnt feel flat". The whole mark (letters and sheet
+together) now turns in space with a CSS 3D transform hinged on the left of the
+name: 28 degrees round, tipped back 14, camera 12 em away. On the board it turns
+a few degrees more as the pointer moves, like the room. The lab has the same
+three sliders (3D: turn, tip back, camera distance). Stills: `turned-*.png`.

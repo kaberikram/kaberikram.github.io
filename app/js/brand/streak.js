@@ -168,6 +168,9 @@ export const DEFAULTS = {
   glow: 0.5,          // sheets: soft smeared halo under the sheet
   face: 'ink',        // sheets: the letters on top, ink or pearl
   end: 'none',        // sheets: a second name where the sweep lands (none | ink | pearl)
+  turn: 0,            // 3D: degrees the whole mark turns away around its upright axis
+  tip: 0,             // 3D: degrees it tips back around its level axis
+  depth: 14,          // 3D: camera distance in em; smaller means stronger perspective
   slant: 0,           // tilt of the slice; a tilted slice crosses several strokes, so the streak breaks into lines
 }
 
@@ -427,4 +430,15 @@ async function renderSheet(canvas, o, px, bend, shape, colors, phase) {
     else ctx.drawImage(src, ex, ey, W * p.s, H * p.s)
   }
   return { ox, oy, W, H }
+}
+
+// Turn the drawn mark in space with a CSS 3D transform, hinged on the left
+// edge of the name, so the letters and the sheet swing round together.
+// `extra` adds a little more turn (the corner uses it to follow the pointer).
+export function turnInSpace(canvas, box, o, dpr, cssPx, extra = { turn: 0, tip: 0 }) {
+  const t = (o.turn || 0) + extra.turn, k = (o.tip || 0) + extra.tip
+  if (!t && !k) { canvas.style.transform = ''; return }
+  const ox = box.ox / dpr, oy = (box.oy + box.H / 2) / dpr
+  canvas.style.transformOrigin = `${ox}px ${oy}px`
+  canvas.style.transform = `perspective(${((o.depth || 14) * cssPx).toFixed(0)}px) rotateY(${t}deg) rotateX(${k}deg)`
 }
