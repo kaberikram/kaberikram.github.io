@@ -437,3 +437,21 @@ its good". The menu is a smooth rounded sheet again (warm paper tone, hairline,
 soft shadow), its current choice a rounded wash. The blanks keep their paper
 scraps, cut about half as rough as before. Final stills: `final-desktop.jpg`,
 `final-phone.jpg`.
+
+## 2026-11-18 · the name gets a tail
+"i wanna work on my logo on the top left, letd do some variation maybe create a
+lab just for this!! was thinking to make the text has some like bended streak
+similar to spike jonze etc lets explore"
+
+A separate page, `/logo-lab/`, not linked from the site. The name is set in
+Kertas, then one slice of it (a column or a row of pixels) is pulled out long
+along a bent path, the same trick as the window walls: no blur, no shader, just
+the edge of the letters stretched. A tilted slice crosses several strokes, so
+the streak breaks into separate lines. Nine starting points (Tail, Comb,
+Hammock, Slit, Drip, Room, Breath, Pencil, Step down), each shown at real size
+and close up, with a panel to tune cut, tilt, length, bend, how much it opens
+up, fade, colour, motion, weight and HAND. The settings live in the link, so a
+pick can be sent back as a URL.
+
+Stills in `captures/2026-11-18-logo-lab/` (`in-the-corner.png` shows all nine
+at real size in the corner).
