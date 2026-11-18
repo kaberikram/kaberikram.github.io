@@ -167,6 +167,7 @@ export const DEFAULTS = {
   density: 0.07,      // sheets: how see-through each layer is
   glow: 0.5,          // sheets: soft smeared halo under the sheet
   face: 'ink',        // sheets: the letters on top, ink or pearl
+  end: 'none',        // sheets: a second name where the sweep lands (none | ink | pearl)
   slant: 0,           // tilt of the slice; a tilted slice crosses several strokes, so the streak breaks into lines
 }
 
@@ -362,7 +363,10 @@ async function renderSheet(canvas, o, px, bend, shape, colors, phase) {
   for (let i = 0; i <= steps; i++) {
     const t = i / steps
     const b = bend * em * shape(t)
-    const s = Math.max(0.05, 1 + o.spread * t * 0.5 - 0.45 * t)
+    // with a second name at the end the sweep comes back to full size there
+    const s = o.end !== 'none'
+      ? Math.max(0.05, 1 + (o.spread * 0.5 - 0.3) * Math.sin(Math.PI * t))
+      : Math.max(0.05, 1 + o.spread * t * 0.5 - 0.45 * t)
     const fold = Math.cos(Math.PI * o.twist * t + phase * 0.6 * (o.motion === 'sway' ? 1 : 0))
     pts.push({ t, x: ux * L * t + nx * b, y: uy * L * t + ny * b, s, fx: Math.max(0.04, Math.abs(fold)) })
   }
@@ -390,7 +394,9 @@ async function renderSheet(canvas, o, px, bend, shape, colors, phase) {
   for (let i = pts.length - 1; i >= 1; i--) {
     const p = pts[i]
     const f = (p.t * o.sheen + roll) % 1
-    lc.globalAlpha = Math.max(0, o.density * (1 - o.fade * p.t))
+    // joining two names, the ribbon is fullest at both ends and thins between
+    const thin = o.end !== 'none' ? Math.sin(Math.PI * p.t) : p.t
+    lc.globalAlpha = Math.max(0, o.density * (1 - o.fade * thin))
     const cx = ox + p.x + W / 2, cy = oy + p.y + H / 2
     lc.setTransform(p.s * p.fx, 0, 0, p.s, cx, cy)
     lc.drawImage(film[Math.floor(f * film.length) % film.length], -W / 2, -H / 2)
@@ -413,6 +419,12 @@ async function renderSheet(canvas, o, px, bend, shape, colors, phase) {
     ctx.globalAlpha = 1
   } else if (o.face !== 'none') {
     ctx.drawImage(src, ox, oy)
+  }
+  if (o.end !== 'none') {
+    const p = pts[pts.length - 1]
+    const ex = ox + p.x + (W * (1 - p.s)) / 2, ey = oy + p.y + (H * (1 - p.s)) / 2
+    if (o.end === 'pearl') ctx.drawImage(film[0], ex, ey, W * p.s, H * p.s)
+    else ctx.drawImage(src, ex, ey, W * p.s, H * p.s)
   }
   return { ox, oy, W, H }
 }

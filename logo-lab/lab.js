@@ -23,6 +23,14 @@ const STREAKS = [
 ]
 
 const SHEETS = [
+  { name: 'Twin', about: 'Pearl, with the name in ink, sweeping into a second Ikram Hakim below and to the side.',
+    o: { mode: 'sheet', length: 2.2, bend: 0.4, shape: 'arch', angle: 32, twist: 1, sheen: 0.9, density: 0.07, glow: 0.3, spread: 0, fade: 0.55, palette: 'iridescent', face: 'ink', end: 'ink' } },
+  { name: 'Twin, stacked', about: 'The second name sits right under the first, joined by a short hanging sheet.',
+    o: { mode: 'sheet', length: 1.5, bend: 0.5, shape: 'arch', angle: 90, twist: 1, sheen: 0.8, density: 0.08, glow: 0.3, spread: 0, fade: 0.5, palette: 'iridescent', face: 'ink', end: 'ink' } },
+  { name: 'Twin, far', about: 'A long ribbon to the right that dips and comes back up into the second name.',
+    o: { mode: 'sheet', length: 7.5, bend: 0.6, shape: 'arch', angle: 4, twist: 2, sheen: 1.4, density: 0.06, glow: 0.3, spread: 0.2, fade: 0.6, palette: 'iridescent', face: 'ink', end: 'ink' } },
+  { name: 'Twin, pearl end', about: 'The first name in ink, the second one in film colour, like a reflection it turns into.',
+    o: { mode: 'sheet', length: 2.4, bend: 0.5, shape: 'arch', angle: 28, twist: 1, sheen: 1, density: 0.065, glow: 0.3, spread: 0, fade: 0.55, palette: 'iridescent', face: 'ink', end: 'pearl' } },
   { name: 'Prism', about: 'The name swept down and to the side as see-through sheets, folding once, in soap-film colours.',
     o: { mode: 'sheet', length: 2.4, bend: 0.5, shape: 'swoop', angle: 38, twist: 0.6, sheen: 1.3, density: 0.06, glow: 0.2, spread: 0.3, fade: 0.55, palette: 'iridescent' } },
   { name: 'Silk', about: 'A long low sweep to the right that folds twice, like a ribbon caught in air.',
@@ -40,6 +48,7 @@ const PRESETS = [...SHEETS, ...STREAKS]
 const CONTROLS = [
   { k: 'mode', pills: ['sheet', 'smear', 'bridge', 'drip', 'tunnel'] },
   { k: 'face', pills: ['ink', 'pearl', 'none'] },
+  { k: 'end', pills: ['none', 'ink', 'pearl'] },
   { k: 'shape', pills: Object.keys(SHAPES) },
   { k: 'palette', pills: Object.keys(PALETTES) },
   { k: 'motion', pills: ['still', 'breathe', 'sway'] },

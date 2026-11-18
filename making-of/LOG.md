@@ -464,3 +464,10 @@ folding (squashed flat and back) as it goes and coloured like a soap film
 see-through ribbons that hang off the name. Kept on white, with only a light
 halo, to stay clean. Five starting points: Prism, Silk, Curtain, Pearl, Veil.
 Stills: `sheets.png`, `sheets-in-the-corner.png`.
+
+Then: "something like pearl but the front text is black also at the end of
+streak should have another ikram hakim text so its like joining 2 text
+together". The sheet can now land on a second name (`end`: ink or pearl). With
+an end, the ribbon is fullest at both names and thins in between, and it comes
+back to full size where it lands. Four twins: Twin, Twin stacked, Twin far,
+Twin pearl end. Stills: `twins.png`, `twin-corner.png`.
