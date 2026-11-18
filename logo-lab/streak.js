@@ -16,6 +16,9 @@ export const PALETTES = {
   dusk: ['#5B4B8A', '#C27BA0', '#F2B5A0'],
   lagoon: ['#2F7F8F', '#7FC8C9', '#CFE8E0'],
   'ink to sunset': ['#1C1B1A', '#E8735A', '#F4B183', '#E58FA5'],
+  // thin-film colours, for the sheets: pink, mint, lilac, butter, sky
+  iridescent: ['#FF9CC6', '#8FEBC8', '#B39CFF', '#FFD98A', '#8CCFFF', '#FF9CC6'],
+  opal: ['#F6D3E4', '#D6F1E8', '#DCD5FA', '#F9EBD3', '#F6D3E4'],
 }
 
 export const SHAPES = {
@@ -158,6 +161,12 @@ export const DEFAULTS = {
   weight: 560,
   hand: 35,
   motion: 'still',    // still | breathe | sway
+  angle: 40,          // sheets: direction of the sweep in degrees (0 right, 90 down)
+  twist: 0.5,         // sheets: how many half-folds the sheet turns through
+  sheen: 1.2,         // sheets: how many times the colours cycle along the sweep
+  density: 0.07,      // sheets: how see-through each layer is
+  glow: 0.5,          // sheets: soft smeared halo under the sheet
+  face: 'ink',        // sheets: the letters on top, ink or pearl
   slant: 0,           // tilt of the slice; a tilted slice crosses several strokes, so the streak breaks into lines
 }
 
@@ -205,6 +214,7 @@ export async function render(canvas, opts, px, phase = 0) {
   const em = px
 
   if (o.mode === 'bridge') return renderBridge(canvas, o, px, bend, shape, colors)
+  if (o.mode === 'sheet') return renderSheet(canvas, o, px, bend, shape, colors, phase)
 
   const src = await textCanvas(o.text, px, o.weight, o.hand)
   const W = src.width, H = src.height
@@ -312,4 +322,97 @@ async function renderBridge(canvas, o, px, bend, shape, colors) {
   ctx.drawImage(layer, 0, 0)
   ctx.drawImage(b, cb, 0, b.width - cb, b.height, x0 + L, top + endDy, b.width - cb, b.height)
   return { ox, oy: top, W: a.width + L + b.width, H }
+}
+
+// Sheets: the whole name swept through space as hundreds of faint layers,
+// each one a little further along a bent path, folding (scaled flat and back)
+// as it goes, and coloured like a soap film. The stems of the letters pile up
+// into translucent ribbons; where they overlap the colour deepens.
+function filmCopies(src, colors, n) {
+  return Array.from({ length: n }, (_, i) => {
+    const c = new OffscreenCanvas(src.width, src.height)
+    const x = c.getContext('2d')
+    x.drawImage(src, 0, 0)
+    x.globalCompositeOperation = 'source-in'
+    // a diagonal gradient that rolls with i, so the film shifts colour both
+    // along the sweep and across each letter
+    const g = x.createLinearGradient(0, 0, c.width * 0.35, c.height)
+    const k = colors.length
+    for (let j = 0; j <= 8; j++) {
+      const f = (j / 8 + i / n) % 1
+      g.addColorStop(j / 8, lerpColor(colors, f))
+    }
+    x.fillStyle = g
+    x.fillRect(0, 0, c.width, c.height)
+    return c
+  })
+}
+
+const filmCache = new Map()
+async function renderSheet(canvas, o, px, bend, shape, colors, phase) {
+  const src = await textCanvas(o.text, px, o.weight, o.hand)
+  const W = src.width, H = src.height
+  const em = px
+  const L = o.length * em
+  const a = (o.angle * Math.PI) / 180
+  const ux = Math.cos(a), uy = Math.sin(a)   // along the sweep
+  const nx = -uy, ny = ux                    // across it, for the bend
+  const steps = Math.max(8, Math.ceil(L))
+  const pts = []
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps
+    const b = bend * em * shape(t)
+    const s = Math.max(0.05, 1 + o.spread * t * 0.5 - 0.45 * t)
+    const fold = Math.cos(Math.PI * o.twist * t + phase * 0.6 * (o.motion === 'sway' ? 1 : 0))
+    pts.push({ t, x: ux * L * t + nx * b, y: uy * L * t + ny * b, s, fx: Math.max(0.04, Math.abs(fold)) })
+  }
+  // bounds of every layer, so the canvas fits the whole sweep
+  let x0 = 0, y0 = 0, x1 = W, y1 = H
+  for (const p of pts) {
+    const w = W * p.s, h = H * p.s
+    x0 = Math.min(x0, p.x + W / 2 - w / 2); x1 = Math.max(x1, p.x + W / 2 + w / 2)
+    y0 = Math.min(y0, p.y + H / 2 - h / 2); y1 = Math.max(y1, p.y + H / 2 + h / 2)
+  }
+  const pad = Math.ceil(em * 0.4)
+  const ox = Math.ceil(-x0) + pad, oy = Math.ceil(-y0) + pad
+  canvas.width = Math.ceil(x1 - x0) + pad * 2
+  canvas.height = Math.ceil(y1 - y0) + pad * 2
+  const ctx = canvas.getContext('2d')
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+  const key = [o.text, px, o.weight, o.hand, o.palette].join('|')
+  if (!filmCache.has(key)) filmCache.set(key, filmCopies(src, colors, 24))
+  const film = filmCache.get(key)
+  const roll = o.motion === 'breathe' ? phase * 0.08 : 0
+
+  const layer = new OffscreenCanvas(canvas.width, canvas.height)
+  const lc = layer.getContext('2d')
+  for (let i = pts.length - 1; i >= 1; i--) {
+    const p = pts[i]
+    const f = (p.t * o.sheen + roll) % 1
+    lc.globalAlpha = Math.max(0, o.density * (1 - o.fade * p.t))
+    const cx = ox + p.x + W / 2, cy = oy + p.y + H / 2
+    lc.setTransform(p.s * p.fx, 0, 0, p.s, cx, cy)
+    lc.drawImage(film[Math.floor(f * film.length) % film.length], -W / 2, -H / 2)
+  }
+  lc.setTransform(1, 0, 0, 1, 0, 0)
+  lc.globalAlpha = 1
+
+  if (o.glow > 0) {
+    ctx.save()
+    ctx.filter = `blur(${(em * 0.12 * o.glow).toFixed(1)}px)`
+    ctx.globalAlpha = Math.min(1, o.glow)
+    ctx.drawImage(layer, 0, 0)
+    ctx.restore()
+  }
+  ctx.drawImage(layer, 0, 0)
+  if (o.face === 'pearl') {
+    ctx.drawImage(film[Math.floor(roll * film.length) % film.length], ox, oy)
+    ctx.globalAlpha = 0.22
+    ctx.drawImage(src, ox, oy)
+    ctx.globalAlpha = 1
+  } else if (o.face !== 'none') {
+    ctx.drawImage(src, ox, oy)
+  }
+  return { ox, oy, W, H }
 }

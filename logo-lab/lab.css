@@ -69,6 +69,8 @@ body {
   gap: 20px;
 }
 
+.grid-head { grid-column: 1 / -1; color: var(--muted); margin-top: 12px; }
+
 .tile {
   appearance: none;
   border: 1px solid transparent;

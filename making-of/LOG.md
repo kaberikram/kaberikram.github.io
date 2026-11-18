@@ -455,3 +455,12 @@ pick can be sent back as a URL.
 
 Stills in `captures/2026-11-18-logo-lab/` (`in-the-corner.png` shows all nine
 at real size in the corner).
+
+Then a reference (translucent rainbow sheets swept through black space):
+"Something like this would be sick but cleaner". A new family, Sheets: the
+whole name is swept along a bent path as a few hundred faint layers, each
+folding (squashed flat and back) as it goes and coloured like a soap film
+(pink, mint, lilac, butter, sky). The stems of the letters pile up into
+see-through ribbons that hang off the name. Kept on white, with only a light
+halo, to stay clean. Five starting points: Prism, Silk, Curtain, Pearl, Veil.
+Stills: `sheets.png`, `sheets-in-the-corner.png`.

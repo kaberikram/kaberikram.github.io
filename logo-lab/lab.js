@@ -1,7 +1,7 @@
 import { render, DEFAULTS, PALETTES, SHAPES } from './streak.js'
 
 // Starting points. Every one of them can be tuned in the panel.
-const PRESETS = [
+const STREAKS = [
   { name: 'Tail', about: 'The last stroke of the m runs off to the right and sinks, opening up as it goes.',
     o: { mode: 'smear', cut: 0.975, length: 6, bend: 0.9, shape: 'swoop', spread: 0.6, fade: 0.75, palette: 'sunset' } },
   { name: 'Comb', about: 'The slice is tilted across Hakim, so the tail breaks into separate lines, like the walls of the windows.',
@@ -22,12 +22,33 @@ const PRESETS = [
     o: { mode: 'bridge', cut: 1, length: 2.2, bend: 0.5, shape: 'swoop', spread: 0.6, fade: 0.1, palette: 'lagoon' } },
 ]
 
+const SHEETS = [
+  { name: 'Prism', about: 'The name swept down and to the side as see-through sheets, folding once, in soap-film colours.',
+    o: { mode: 'sheet', length: 2.4, bend: 0.5, shape: 'swoop', angle: 38, twist: 0.6, sheen: 1.3, density: 0.06, glow: 0.2, spread: 0.3, fade: 0.55, palette: 'iridescent' } },
+  { name: 'Silk', about: 'A long low sweep to the right that folds twice, like a ribbon caught in air.',
+    o: { mode: 'sheet', length: 5, bend: 0.7, shape: 'wave', angle: 8, twist: 2, sheen: 1.6, density: 0.055, glow: 0.2, spread: 0.2, fade: 0.7, palette: 'iridescent' } },
+  { name: 'Curtain', about: 'Straight down, so every stem of every letter hangs as its own sheet.',
+    o: { mode: 'sheet', length: 1.8, bend: 0.35, shape: 'hook', angle: 84, twist: 0.25, sheen: 1, density: 0.07, glow: 0.2, spread: 0.6, fade: 0.65, palette: 'iridescent' } },
+  { name: 'Pearl', about: 'Short and quiet: the letters themselves take the film colour, with a faint sheet behind.',
+    o: { mode: 'sheet', length: 1.1, bend: 0.25, shape: 'swoop', angle: 30, twist: 0.4, sheen: 0.8, density: 0.05, glow: 0.35, spread: 0, fade: 0.7, palette: 'iridescent', face: 'pearl' } },
+  { name: 'Veil', about: 'The sheet rises up and back behind the name and slowly changes colour.',
+    o: { mode: 'sheet', length: 2.6, bend: -0.6, shape: 'arch', angle: -28, twist: 1, sheen: 1.5, density: 0.05, glow: 0.3, spread: 0.4, fade: 0.6, palette: 'iridescent', motion: 'breathe' } },
+]
+
+const PRESETS = [...SHEETS, ...STREAKS]
+
 const CONTROLS = [
-  { k: 'mode', pills: ['smear', 'bridge', 'drip', 'tunnel'] },
+  { k: 'mode', pills: ['sheet', 'smear', 'bridge', 'drip', 'tunnel'] },
+  { k: 'face', pills: ['ink', 'pearl', 'none'] },
   { k: 'shape', pills: Object.keys(SHAPES) },
   { k: 'palette', pills: Object.keys(PALETTES) },
   { k: 'motion', pills: ['still', 'breathe', 'sway'] },
   { k: 'cut', label: 'Cut at', min: 0.05, max: 1, step: 0.005 },
+  { k: 'angle', label: 'Sheets: direction (deg)', min: -90, max: 120, step: 1 },
+  { k: 'twist', label: 'Sheets: fold', min: 0, max: 4, step: 0.05 },
+  { k: 'sheen', label: 'Sheets: colour cycles', min: 0, max: 4, step: 0.05 },
+  { k: 'density', label: 'Sheets: thickness', min: 0.01, max: 0.25, step: 0.005 },
+  { k: 'glow', label: 'Sheets: glow', min: 0, max: 1.5, step: 0.05 },
   { k: 'slant', label: 'Slice tilt (lines)', min: -1, max: 1, step: 0.01 },
   { k: 'length', label: 'Length (em)', min: 0.5, max: 12, step: 0.1 },
   { k: 'bend', label: 'Bend (em)', min: -3, max: 3, step: 0.05 },
@@ -69,6 +90,12 @@ const tiles = []
 function buildGrid() {
   const grid = document.getElementById('grid')
   PRESETS.forEach((p) => {
+    if (p === SHEETS[0] || p === STREAKS[0]) {
+      const h = document.createElement('p')
+      h.className = 'grid-head'
+      h.textContent = p === SHEETS[0] ? 'Sheets: the name swept into see-through, soap-film ribbons' : 'Streaks: one slice of the name pulled out long'
+      grid.appendChild(h)
+    }
     const b = document.createElement('button')
     b.type = 'button'
     b.className = 'tile'
