@@ -496,3 +496,10 @@ on the corner mark ("On the site", read straight from `mark.js`, so the two
 can't drift apart). Shortening Length didn't help because most of the sweep
 comes from the bend, so a new "Streak reach" slider scales length and bend
 together (0.05 to 2). `reach-0.4.png` shows it pulled in close.
+
+Then Ikram tuned it in the lab and sent the settings back as JSON (the lab got
+a "Copy settings" button for this): the sheet pulled in close (reach 0.55),
+steeper (-79), colour cycling slowly (0.8), almost no glow (0.15), turned 14 and
+tipped forward 16, and breathing. The corner now redraws the sheet about 30
+times a second so it breathes, and keeps the letters pinned in place while it
+does. Stills of three moments: `breathing-corner.png`.
