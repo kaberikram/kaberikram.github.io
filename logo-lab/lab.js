@@ -50,6 +50,7 @@ const CORNER = { name: 'On the site', about: 'The name in the board\'s corner ri
 const PRESETS = [CORNER, ...SHEETS, ...STREAKS]
 
 const CONTROLS = [
+  { k: 'caps', pills: ['off', 'on'] },
   { k: 'mode', pills: ['sheet', 'smear', 'bridge', 'drip', 'tunnel'] },
   { k: 'face', pills: ['ink', 'pearl', 'none'] },
   { k: 'end', pills: ['none', 'ink', 'pearl'] },

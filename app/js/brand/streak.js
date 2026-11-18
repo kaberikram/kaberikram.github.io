@@ -168,6 +168,7 @@ export const DEFAULTS = {
   glow: 0.5,          // sheets: soft smeared halo under the sheet
   face: 'ink',        // sheets: the letters on top, ink or pearl
   end: 'none',        // sheets: a second name where the sweep lands (none | ink | pearl)
+  caps: 'off',        // 'on' sets the name in capitals
   reach: 1,           // scales the streak's length and bend together: below 1 pulls it in close
   turn: 0,            // 3D: degrees the whole mark turns away around its upright axis
   tip: 0,             // 3D: degrees it tips back around its level axis
@@ -211,6 +212,7 @@ function room(o) {
 // `phase` (seconds) drives motion; pass 0 for a still frame.
 export async function render(canvas, opts, px, phase = 0) {
   const o = { ...DEFAULTS, ...opts }
+  if (o.caps === 'on') o.text = o.text.toUpperCase()
   o.length *= o.reach
   o.bend *= o.reach
   const shape = SHAPES[o.shape] || SHAPES.swoop

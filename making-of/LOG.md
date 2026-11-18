@@ -503,3 +503,7 @@ steeper (-79), colour cycling slowly (0.8), almost no glow (0.15), turned 14 and
 tipped forward 16, and breathing. The corner now redraws the sheet about 30
 times a second so it breathes, and keeps the letters pinned in place while it
 does. Stills of three moments: `breathing-corner.png`.
+
+Then: "try all caps text". IKRAM HAKIM in Kertas capitals (they were already
+drawn in tools/kertas). A "Caps" switch in the lab, on for the corner. The h1
+underneath keeps "Ikram Hakim" for screen readers. Stills: `caps-*.png`.
