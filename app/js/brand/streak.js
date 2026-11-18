@@ -7,7 +7,7 @@
 // Lengths are in em (multiples of the font size) so a mark looks the same at
 // 19px in the corner and at 90px in the lab.
 
-const FONT_URL = '../app/fonts/Kertas.woff2'
+const FONT_URL = new URL('../../fonts/Kertas.woff2', import.meta.url).href
 
 export const PALETTES = {
   ink: ['#1C1B1A', '#1C1B1A'],

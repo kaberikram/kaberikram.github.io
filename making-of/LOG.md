@@ -471,3 +471,12 @@ together". The sheet can now land on a second name (`end`: ink or pearl). With
 an end, the ribbon is fullest at both names and thins in between, and it comes
 back to full size where it lands. Four twins: Twin, Twin stacked, Twin far,
 Twin pearl end. Stills: `twins.png`, `twin-corner.png`.
+
+Then Ikram sent back a link from the lab, "lets try this": a twin sheet, the
+second name rising up and to the right of the first, the ribbon between them
+thick (density 0.19), glowing (1.05), cycling colour fast (sheen 4), letters
+fully hand-cut (HAND 100) and a touch heavier (630). It is now the name in the
+board's corner (`app/js/brand/mark.js`, drawn by the same `streak.js`, which
+moved to `app/js/brand/`). The h1 keeps the text underneath for screen readers.
+The lab also now saves every switch (mode, shape, colour, end) in its link.
+Stills: `on-the-board-*.png`.

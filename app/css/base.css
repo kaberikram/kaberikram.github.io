@@ -96,6 +96,9 @@ html.reduced-motion #field { animation: none; }
 
 .brand { left: 24px; top: 26px; pointer-events: none; }
 
+.brand .brand-mark { position: absolute; pointer-events: none; }
+.brand.has-mark h1 { color: transparent; }
+
 .brand h1 {
   font-family: var(--brand-font);
   font-size: 19px;

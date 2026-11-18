@@ -1,4 +1,4 @@
-import { render, DEFAULTS, PALETTES, SHAPES } from './streak.js'
+import { render, DEFAULTS, PALETTES, SHAPES } from '../app/js/brand/streak.js'
 
 // Starting points. Every one of them can be tuned in the panel.
 const STREAKS = [
@@ -189,7 +189,7 @@ function syncPanel() {
 // --- link: the settings live in the address, so a pick can be sent back -----
 
 function writeHash() {
-  const keys = [...CONTROLS.filter((c) => !c.pills).map((c) => c.k)]
+  const keys = CONTROLS.map((c) => c.k)
   const q = new URLSearchParams({ v: currentName })
   for (const k of keys) q.set(k, current[k])
   history.replaceState(null, '', '#' + q.toString())
@@ -204,6 +204,8 @@ function readHash() {
     if (!q.has(c.k)) continue
     current[c.k] = c.pills ? q.get(c.k) : +q.get(c.k)
   }
+  // links made before the mode was saved in them: the sheet sliders mean a sheet
+  if (!q.has('mode') && !named && q.has('angle')) current.mode = 'sheet'
   if (q.get('v')) currentName = q.get('v')
 }
 
