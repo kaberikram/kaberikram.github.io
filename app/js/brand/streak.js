@@ -58,8 +58,9 @@ function measure(text, px, weight, hand) {
 // Canvas can't reach the custom HAND axis, so the word is drawn as an SVG
 // image with the font inside it, then copied onto a canvas.
 const textCache = new Map()
-export async function textCanvas(text, px, weight, hand) {
-  const key = [text, px, weight, hand].join('|')
+export async function textCanvas(text, px, weight, hand, color = '#1C1B1A') {
+  if (!/^#[0-9a-fA-F]{6}$/.test(color)) color = '#1C1B1A'
+  const key = [text, px, weight, hand, color].join('|')
   if (textCache.has(key)) return textCache.get(key)
   const p = (async () => {
     await document.fonts.load(`${weight} ${px}px Kertas`)
@@ -68,7 +69,7 @@ export async function textCanvas(text, px, weight, hand) {
     const w = Math.ceil(measure(text, px, weight, hand)) + pad * 2
     const h = Math.ceil(px * 1.35) + pad * 2
     const esc = text.replace(/&/g, '&amp;').replace(/</g, '&lt;')
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><style>@font-face{font-family:K;src:url(${url}) format("woff2");font-weight:300 700}text{font-family:K;font-size:${px}px;font-weight:${weight};font-variation-settings:"wght" ${weight},"HAND" ${hand};fill:#1C1B1A;white-space:pre}</style><text x="${pad}" y="${pad + px * 1.02}">${esc}</text></svg>`
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><style>@font-face{font-family:K;src:url(${url}) format("woff2");font-weight:300 700}text{font-family:K;font-size:${px}px;font-weight:${weight};font-variation-settings:"wght" ${weight},"HAND" ${hand};fill:${color};white-space:pre}</style><text x="${pad}" y="${pad + px * 1.02}">${esc}</text></svg>`
     const img = new Image()
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)
     await img.decode()
@@ -172,6 +173,7 @@ export const DEFAULTS = {
   face: 'ink',        // sheets: the letters on top, ink or pearl
   end: 'none',        // sheets: a second name where the sweep lands (none | ink | pearl)
   caps: 'off',        // 'on' sets the name in capitals
+  color: '#1C1B1A',   // colour of the letters themselves
   bands: 'off',       // sheets: 'on' gives each stroke one flat colour instead of a blended film
   gaps: 'filled',     // stretch: spaces between strokes become stripes too (filled = colour | pale | clear)
   reach: 1,           // scales the streak's length and bend together: below 1 pulls it in close
@@ -231,7 +233,7 @@ export async function render(canvas, opts, px, phase = 0) {
   if (o.mode === 'sheet') return renderSheet(canvas, o, px, bend, shape, colors, phase)
   if (o.mode === 'stretch') return renderStretch(canvas, o, px, bend, shape, colors)
 
-  const src = await textCanvas(o.text, px, o.weight, o.hand)
+  const src = await textCanvas(o.text, px, o.weight, o.hand, o.color)
   const W = src.width, H = src.height
   const r = room(o)
   const ox = Math.ceil(r.l * em), oy = Math.ceil(r.t * em)
@@ -293,8 +295,8 @@ export async function render(canvas, opts, px, phase = 0) {
 // into Hakim's first.
 async function renderBridge(canvas, o, px, bend, shape, colors) {
   const [first, ...rest] = o.text.split(' ')
-  const a = await textCanvas(first, px, o.weight, o.hand)
-  const b = await textCanvas(rest.join(' ') || first, px, o.weight, o.hand)
+  const a = await textCanvas(first, px, o.weight, o.hand, o.color)
+  const b = await textCanvas(rest.join(' ') || first, px, o.weight, o.hand, o.color)
   const em = px
   const L = Math.max(0.6, o.length) * em
   const r = room(o)
@@ -398,7 +400,7 @@ function bandedCopy(src, colors) {
 
 const filmCache = new Map()
 async function renderSheet(canvas, o, px, bend, shape, colors, phase) {
-  const src = await textCanvas(o.text, px, o.weight, o.hand)
+  const src = await textCanvas(o.text, px, o.weight, o.hand, o.color)
   const W = src.width, H = src.height
   const em = px
   const L = o.length * em
@@ -523,7 +525,7 @@ function shade(hex, k) {
 }
 
 async function renderStretch(canvas, o, px, bend, shape, colors) {
-  const src = await textCanvas(o.text, px, o.weight, o.hand)
+  const src = await textCanvas(o.text, px, o.weight, o.hand, o.color)
   const W = src.width, H = src.height
   const em = px
   const L = o.length * em

@@ -59,6 +59,7 @@ const CORNER = { name: 'On the site', about: 'The name in the board\'s corner ri
 const PRESETS = [CORNER, ...STRIPES, ...SHEETS, ...STREAKS]
 
 const CONTROLS = [
+  { k: 'color', label: 'Letter colour', swatches: ['#1C1B1A', '#FFFFFF', '#1F2A5C', '#3B2350', '#D2373C', '#E8803F', '#2F7F8F', '#8FA3BF'] },
   { k: 'caps', pills: ['off', 'on'] },
   { k: 'mode', pills: ['stretch', 'sheet', 'smear', 'bridge', 'drip', 'tunnel'] },
   { k: 'bands', pills: ['off', 'on'] },
@@ -159,6 +160,31 @@ const inputs = {}
 function buildPanel() {
   const root = document.getElementById('controls')
   for (const c of CONTROLS) {
+    if (c.swatches) {
+      // a row of quick colours, then the system picker for anything else
+      const lbl = document.createElement('div')
+      lbl.className = 'group-lbl'
+      lbl.textContent = c.label
+      const row = document.createElement('div')
+      row.className = 'swatches'
+      for (const v of c.swatches) {
+        const b = document.createElement('button')
+        b.type = 'button'
+        b.style.background = v
+        b.dataset.v = v
+        b.setAttribute('aria-label', v)
+        b.addEventListener('click', () => { current[c.k] = v; currentName = 'Custom'; sync() })
+        row.appendChild(b)
+      }
+      const pick = document.createElement('input')
+      pick.type = 'color'
+      pick.setAttribute('aria-label', 'Any colour')
+      pick.addEventListener('input', () => { current[c.k] = pick.value.toUpperCase(); currentName = 'Custom'; sync() })
+      row.appendChild(pick)
+      root.append(lbl, row)
+      inputs[c.k] = row
+      continue
+    }
     if (c.pills) {
       const lbl = document.createElement('div')
       lbl.className = 'group-lbl'
@@ -205,7 +231,11 @@ function syncPanel() {
   document.getElementById('panel-name').textContent = currentName
   for (const c of CONTROLS) {
     const el = inputs[c.k]
-    if (c.pills) {
+    if (c.swatches) {
+      const v = String(current[c.k] || '#1C1B1A').toUpperCase()
+      for (const b of el.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v.toUpperCase() === v))
+      el.querySelector('input').value = v.toLowerCase()
+    } else if (c.pills) {
       for (const b of el.children) b.setAttribute('aria-pressed', String(b.textContent === current[c.k]))
     } else {
       el.querySelector('input').value = current[c.k]
@@ -231,7 +261,7 @@ function readHash() {
   if (named) { current = { ...DEFAULTS, ...named.o }; currentName = named.name }
   for (const c of CONTROLS) {
     if (!q.has(c.k)) continue
-    current[c.k] = c.pills ? q.get(c.k) : +q.get(c.k)
+    current[c.k] = c.pills || c.swatches ? q.get(c.k) : +q.get(c.k)
   }
   // links made before the mode was saved in them: the sheet sliders mean a sheet
   if (!q.has('mode') && !named && q.has('angle')) current.mode = 'sheet'

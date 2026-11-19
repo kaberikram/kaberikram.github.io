@@ -153,3 +153,7 @@ input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius
 }
 
 .panel-actions { display: flex; gap: 5px; }
+.swatches { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 4px 0 12px; }
+.swatches button { appearance: none; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); cursor: pointer; padding: 0; }
+.swatches button[aria-pressed="true"] { outline: 2px solid var(--ink); outline-offset: 2px; }
+.swatches input[type="color"] { width: 30px; height: 24px; border: 1px solid var(--line); border-radius: 999px; background: #fff; padding: 1px 3px; cursor: pointer; }
