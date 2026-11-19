@@ -437,3 +437,83 @@ its good". The menu is a smooth rounded sheet again (warm paper tone, hairline,
 soft shadow), its current choice a rounded wash. The blanks keep their paper
 scraps, cut about half as rough as before. Final stills: `final-desktop.jpg`,
 `final-phone.jpg`.
+
+## 2026-11-18 · the name gets a tail
+"i wanna work on my logo on the top left, letd do some variation maybe create a
+lab just for this!! was thinking to make the text has some like bended streak
+similar to spike jonze etc lets explore"
+
+A separate page, `/logo-lab/`, not linked from the site. The name is set in
+Kertas, then one slice of it (a column or a row of pixels) is pulled out long
+along a bent path, the same trick as the window walls: no blur, no shader, just
+the edge of the letters stretched. A tilted slice crosses several strokes, so
+the streak breaks into separate lines. Nine starting points (Tail, Comb,
+Hammock, Slit, Drip, Room, Breath, Pencil, Step down), each shown at real size
+and close up, with a panel to tune cut, tilt, length, bend, how much it opens
+up, fade, colour, motion, weight and HAND. The settings live in the link, so a
+pick can be sent back as a URL.
+
+Stills in `captures/2026-11-18-logo-lab/` (`in-the-corner.png` shows all nine
+at real size in the corner).
+
+Then a reference (translucent rainbow sheets swept through black space):
+"Something like this would be sick but cleaner". A new family, Sheets: the
+whole name is swept along a bent path as a few hundred faint layers, each
+folding (squashed flat and back) as it goes and coloured like a soap film
+(pink, mint, lilac, butter, sky). The stems of the letters pile up into
+see-through ribbons that hang off the name. Kept on white, with only a light
+halo, to stay clean. Five starting points: Prism, Silk, Curtain, Pearl, Veil.
+Stills: `sheets.png`, `sheets-in-the-corner.png`.
+
+Then: "something like pearl but the front text is black also at the end of
+streak should have another ikram hakim text so its like joining 2 text
+together". The sheet can now land on a second name (`end`: ink or pearl). With
+an end, the ribbon is fullest at both names and thins in between, and it comes
+back to full size where it lands. Four twins: Twin, Twin stacked, Twin far,
+Twin pearl end. Stills: `twins.png`, `twin-corner.png`.
+
+Then Ikram sent back a link from the lab, "lets try this". First pass guessed it
+as a twin in soap-film colours (the link didn't carry the switches): "bro seems
+like the wrong shit". The real pick: one name, a lagoon-teal sheet arcing up and
+back over it (sheet, arch, lagoon, direction -71, fold 0.15, colour cycles 4,
+thickness 0.19, glow 1.05, length 1.9, bend -3, opens up -0.6, fade 1), letters
+fully hand-cut (HAND 100) at weight 630. It is now the name in the board's
+corner (`app/js/brand/mark.js`, drawn by the same `streak.js`, which moved to
+`app/js/brand/`); the sheet runs off the left edge of the window. The h1 keeps
+the text underneath for screen readers. The lab also now saves every switch (mode, shape, colour, end) in its link.
+Stills: `on-the-board-*.png`.
+
+Then: "right now logo is display the text flat front face, i wish we can make it
+like 3d rotate so it doesnt feel flat". The whole mark (letters and sheet
+together) now turns in space with a CSS 3D transform hinged on the left of the
+name: 28 degrees round, tipped back 14, camera 12 em away. On the board it turns
+a few degrees more as the pointer moves, like the room. The lab has the same
+three sliders (3D: turn, tip back, camera distance). Stills: `turned-*.png`.
+
+Then: "set this setting as the default on the lab also add another setting so i
+can control how long the streak is now icant make it shorter?" The lab now opens
+on the corner mark ("On the site", read straight from `mark.js`, so the two
+can't drift apart). Shortening Length didn't help because most of the sweep
+comes from the bend, so a new "Streak reach" slider scales length and bend
+together (0.05 to 2). `reach-0.4.png` shows it pulled in close.
+
+Then Ikram tuned it in the lab and sent the settings back as JSON (the lab got
+a "Copy settings" button for this): the sheet pulled in close (reach 0.55),
+steeper (-79), colour cycling slowly (0.8), almost no glow (0.15), turned 14 and
+tipped forward 16, and breathing. The corner now redraws the sheet about 30
+times a second so it breathes, and keeps the letters pinned in place while it
+does. Stills of three moments: `breathing-corner.png`.
+
+Then: "try all caps text". IKRAM HAKIM in Kertas capitals (they were already
+drawn in tools/kertas). A "Caps" switch in the lab, on for the corner. The h1
+underneath keeps "Ikram Hakim" for screen readers. Stills: `caps-*.png`.
+Tried, then: "okay no cap it is". Back to "Ikram Hakim"; the Caps switch stays in
+the lab.
+
+Then the look changed, not the size. Ikram sent three references of crisp, solid stripes in slate, navy, orange, cream, plum, red and mint, all running into one vanishing point, and said the length was fine but it should look like that. So the soft see-through sheet became a new mode, "stretch": a line is cut across the name square to the sweep, every stroke (and every gap between strokes) it crosses becomes a flat band of colour, and the bands run off along the same bent path, narrowing to a point. Hard edges, no transparency, no blur, with a few fine lines inside each band. The bands keep one direction across instead of turning with the curve, so a strong bend shears the ribbon rather than folding it over itself. The corner keeps Ikram's reach, bend, turn and tip; only the mode, palette ("film", taken from the references) and cut changed. Captures: stripes-corner, stripes-close-up, stripes-lab.
+
+Next morning Ikram set it straight: keep the blue sheet from before, just take the colours from the references. So the corner is back on the breathing sheet, but the sheet is no longer one blended film. A row is read across the name, each stroke it crosses gets its own flat colour from the reference palette, and the sheet keeps that colour all the way along, so every stroke trails its own band (navy, orange, cream, plum, red, mint, butter...). Thickness went from 0.19 to 0.35 so the colours read more solid. The hard "stretch" stripes stay in the lab as presets. Captures: banded-sheet-corner, banded-sheet-close-up, banded-sheet-lab.
+
+Then Ikram tuned it themselves in the lab and sent the settings back: the sheet now rises straight up (direction -90, no fold, no glow), reaches about twice as far (reach 1.21), keeps the stripe colours but as a blended film again (bands off, colour cycles 0.35), and the letters went plain: weight 450 and hand-cut 0, so the name reads clean under the colour. Captures: film-sheet-corner, film-sheet-close-up.
+
+Before merging, Ikram asked for a way to change the colour of the letters. The lab panel now opens with "Letter colour": eight quick swatches (ink, white, and the stripe colours) plus the system colour picker for anything else. The colour is part of the link and of Copy settings, so a pick can be sent back like the rest. The board still uses the usual ink until Ikram picks one. Capture: letter-colour-lab.
