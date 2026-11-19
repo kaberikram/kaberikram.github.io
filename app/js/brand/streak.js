@@ -172,6 +172,7 @@ export const DEFAULTS = {
   face: 'ink',        // sheets: the letters on top, ink or pearl
   end: 'none',        // sheets: a second name where the sweep lands (none | ink | pearl)
   caps: 'off',        // 'on' sets the name in capitals
+  bands: 'off',       // sheets: 'on' gives each stroke one flat colour instead of a blended film
   gaps: 'filled',     // stretch: spaces between strokes become stripes too (filled = colour | pale | clear)
   reach: 1,           // scales the streak's length and bend together: below 1 pulls it in close
   turn: 0,            // 3D: degrees the whole mark turns away around its upright axis
@@ -362,6 +363,39 @@ function filmCopies(src, colors, n) {
   })
 }
 
+// One flat colour per stroke: a row is read across the name, each stroke it
+// crosses gets the next palette colour, with hard edges halfway between
+// strokes. The sheet keeps those colours all the way along, so it comes out
+// as solid bands instead of a blended film.
+function bandedCopy(src, colors) {
+  const W = src.width, H = src.height
+  const d = src.getContext('2d').getImageData(0, 0, W, H).data
+  const row = Math.round(H * 0.62)
+  const runs = []
+  let inside = false, a = 0
+  for (let x = 0; x <= W; x++) {
+    const on = x < W && d[(row * W + x) * 4 + 3] > 110
+    if (on && !inside) { a = x; inside = true }
+    if (!on && inside) { runs.push([a, x]); inside = false }
+  }
+  // paint the bands on their own, then keep them only where the letters are
+  // (one source-in pass: several would each wipe out the previous band)
+  const bandsC = new OffscreenCanvas(W, H)
+  const bx = bandsC.getContext('2d')
+  runs.forEach((r, i) => {
+    const from = i ? (runs[i - 1][1] + r[0]) / 2 : 0
+    const to = i < runs.length - 1 ? (r[1] + runs[i + 1][0]) / 2 : W
+    bx.fillStyle = colors[i % colors.length]
+    bx.fillRect(Math.floor(from), 0, Math.ceil(to - from) + 1, H)
+  })
+  const c = new OffscreenCanvas(W, H)
+  const x = c.getContext('2d')
+  x.drawImage(src, 0, 0)
+  x.globalCompositeOperation = 'source-in'
+  x.drawImage(bandsC, 0, 0)
+  return [c]
+}
+
 const filmCache = new Map()
 async function renderSheet(canvas, o, px, bend, shape, colors, phase) {
   const src = await textCanvas(o.text, px, o.weight, o.hand)
@@ -397,8 +431,8 @@ async function renderSheet(canvas, o, px, bend, shape, colors, phase) {
   const ctx = canvas.getContext('2d')
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-  const key = [o.text, px, o.weight, o.hand, o.palette].join('|')
-  if (!filmCache.has(key)) filmCache.set(key, filmCopies(src, colors, 24))
+  const key = [o.text, px, o.weight, o.hand, o.palette, o.bands].join('|')
+  if (!filmCache.has(key)) filmCache.set(key, o.bands === 'on' ? bandedCopy(src, colors) : filmCopies(src, colors, 24))
   const film = filmCache.get(key)
   const roll = o.motion === 'breathe' ? phase * 0.08 : 0
 

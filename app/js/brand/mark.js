@@ -6,9 +6,10 @@ import { render, turnInSpace, DEFAULTS } from './streak.js'
 
 export const MARK = {
   ...DEFAULTS,
-  mode: 'stretch', face: 'ink', end: 'none', shape: 'arch', palette: 'film', gaps: 'filled', motion: 'breathe',
-  // was a lagoon sheet (mode sheet, palette lagoon); solid stripes from Ikram's references, 2026-11-18
-  cut: 0.5, angle: -79, twist: 0.2, sheen: 0.8, density: 0.19, glow: 0.15, slant: -0.03,
+  mode: 'sheet', face: 'ink', end: 'none', shape: 'arch', palette: 'film', bands: 'on', motion: 'breathe',
+  // the breathing sheet Ikram tuned, in the stripe colours from their references
+  // (one flat colour per stroke), 2026-11-19. Solid 'stretch' stripes were tried and dropped.
+  cut: 0.735, angle: -79, twist: 0.2, sheen: 0.8, density: 0.35, glow: 0.15, slant: -0.03,
   reach: 0.55, length: 1.9, bend: -3, spread: -0.6, fade: 1, weight: 630, hand: 100,
   // turned in space so it doesn't read as a flat face
   turn: 14, tip: -16, depth: 12,
