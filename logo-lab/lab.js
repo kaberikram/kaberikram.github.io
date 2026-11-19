@@ -54,7 +54,7 @@ const STRIPES = [
 ]
 
 // what the board's corner shows right now; the lab opens on it
-const CORNER = { name: 'On the site', about: 'The name in the board\'s corner right now: the breathing sheet, each stroke in its own flat stripe colour, turned in space.', o: { ...MARK } }
+const CORNER = { name: 'On the site', about: 'The name in the board\'s corner right now: the breathing sheet rising straight up in the stripe colours, turned in space.', o: { ...MARK } }
 
 const PRESETS = [CORNER, ...STRIPES, ...SHEETS, ...STREAKS]
 

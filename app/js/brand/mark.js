@@ -1,16 +1,16 @@
 // The name in the top-left corner, drawn as a sheet: the name swept through
-// space as a lagoon-coloured sheet that arcs up and back over it, breathing
-// slowly. Chosen in /logo-lab/ (Ikram's settings, 2026-11-18). The h1 keeps
+// space as a film-coloured sheet that arcs up and back over it, breathing
+// slowly. Chosen in /logo-lab/ (Ikram's settings, 2026-11-19). The h1 keeps
 // the real text for screen readers and as the fallback if anything here fails.
 import { render, turnInSpace, DEFAULTS } from './streak.js'
 
 export const MARK = {
   ...DEFAULTS,
-  mode: 'sheet', face: 'ink', end: 'none', shape: 'arch', palette: 'film', bands: 'on', motion: 'breathe',
-  // the breathing sheet Ikram tuned, in the stripe colours from their references
-  // (one flat colour per stroke), 2026-11-19. Solid 'stretch' stripes were tried and dropped.
-  cut: 0.735, angle: -79, twist: 0.2, sheen: 0.8, density: 0.35, glow: 0.15, slant: -0.03,
-  reach: 0.55, length: 1.9, bend: -3, spread: -0.6, fade: 1, weight: 630, hand: 100,
+  // Ikram's settings from the lab, 2026-11-19: the breathing sheet straight up,
+  // in the reference stripe colours as a blended film, plain letters (HAND 0)
+  mode: 'sheet', bands: 'off', gaps: 'filled', face: 'ink', end: 'none', shape: 'arch', palette: 'film', motion: 'breathe',
+  cut: 0.735, angle: -90, twist: 0, sheen: 0.35, density: 0.35, glow: 0, slant: -0.03,
+  reach: 1.21, length: 1.9, bend: -3, spread: -0.6, fade: 1, weight: 450, hand: 0,
   // turned in space so it doesn't read as a flat face
   turn: 14, tip: -16, depth: 12,
   caps: 'off', // capitals tried and dropped (Ikram, 2026-11-18)
