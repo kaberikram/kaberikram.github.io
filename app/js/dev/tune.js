@@ -64,6 +64,7 @@ const GROUPS = [
     controls: [
       { key: 'camStiffness', type: 'range', label: 'Camera pull', min: 20, max: 300, step: 1 },
       { key: 'camDamping', type: 'range', label: 'Camera settle', min: 4, max: 50, step: 0.5 },
+      { key: 'glide', type: 'range', label: 'Throw glide', min: 0, max: 1200, step: 10, unit: 'ms' },
       { key: 'cardStiffness', type: 'range', label: 'Card pull', min: 20, max: 400, step: 1 },
       { key: 'cardDamping', type: 'range', label: 'Card settle', min: 4, max: 50, step: 0.5 },
       { key: 'stagger', type: 'range', label: 'Deal gap', min: 0, max: 100, step: 1, unit: 'ms' },

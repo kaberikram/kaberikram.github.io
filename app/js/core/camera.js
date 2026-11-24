@@ -10,6 +10,7 @@
 // later (a WebGL layer, for instance) has one place to read it from.
 
 import { Springs } from './spring.js'
+import { glideStep } from './fling.js'
 import { clamp } from '../util.js'
 
 const X = 0
@@ -25,6 +26,9 @@ export const MAX_SCALE = 2.8
 
 // Never rotate about a point at or behind the eye.
 const EYE_MARGIN = 160
+
+// A glide ends once it drifts slower than this on screen (px/s).
+const GLIDE_REST = 12
 
 const RAD = Math.PI / 180
 
@@ -65,6 +69,16 @@ export function createCamera({ perspective = 800, stiffness = 90, damping = 20 }
   // A long flight in progress: where depth should end up once most of the
   // sideways travel is done.
   let arc = null
+  // Held by a hand: the world point at depth z that must stay under the screen
+  // point (px, py). Re-solved every step, after the lean has moved, so the
+  // grabbed spot never slips even while the board banks.
+  let hold = null
+  // How fast the hand is moving the camera (world units/s). Only feeds the lean.
+  const steer = { x: 0, y: 0 }
+  // Let go mid-move: the camera keeps the hand's speed and loses it smoothly,
+  // like a phone's scroll view. tau is the time constant in seconds.
+  let glide = null
+  let glideTau = 0.5
 
   function scaleAt(zw = 0, cz = sp.value[Z]) {
     return P / Math.max(1, P - zw - cz)
@@ -187,14 +201,76 @@ export function createCamera({ perspective = 800, stiffness = 90, damping = 20 }
     // Go somewhere at once, with no motion.
     jump({ x = sp.value[X], y = sp.value[Y], z = sp.value[Z] } = {}) {
       arc = null
+      glide = null
       sp.set(X, x)
       sp.set(Y, y)
       sp.set(Z, clampZ(z))
     },
 
+    // How long a throw keeps going: the time constant in ms. 500 matches a
+    // phone's own scrolling. 0 turns throwing off.
+    setGlide(ms) {
+      glideTau = Math.max(0, ms) / 1000
+    },
+
+    get gliding() {
+      return Boolean(glide)
+    },
+
+    get held() {
+      return Boolean(hold)
+    },
+
+    // Stop dead where it is: a finger landing on a moving board catches it.
+    // Returns true if the board was gliding.
+    stop() {
+      const was = Boolean(glide)
+      glide = null
+      arc = null
+      sp.set(X, sp.value[X])
+      sp.set(Y, sp.value[Y])
+      sp.set(Z, sp.value[Z])
+      return was
+    },
+
+    // Take hold of the board at a screen point. The world point under it, at
+    // depth z, stays under the hand until release().
+    grab(px, py, z = sp.target[PIVOT]) {
+      camera.stop()
+      const at = camera.screenToWorld(px, py, z)
+      hold = { px, py, z, wx: at.x, wy: at.y }
+      steer.x = 0
+      steer.y = 0
+    },
+
+    // The hand moved. vx, vy is its speed on screen (px/s), for the lean.
+    drag(px, py, vx = 0, vy = 0) {
+      if (!hold) return
+      hold.px = px
+      hold.py = py
+      const scale = scaleAt(hold.z)
+      steer.x = -vx / scale
+      steer.y = -vy / scale
+    },
+
+    // Let go with the hand moving at vx, vy on screen (px/s). The camera goes on
+    // at that speed, so nothing jolts at the moment of release, and slows to a
+    // stop about vx * tau further on.
+    release(vx = 0, vy = 0) {
+      const z = hold ? hold.z : sp.target[PIVOT]
+      hold = null
+      steer.x = 0
+      steer.y = 0
+      if (!glideTau || (!vx && !vy)) return
+      const scale = scaleAt(z)
+      glide = { vx: -vx / scale, vy: -vy / scale, scale }
+    },
+
     // Fly somewhere on the spring. A long sideways trip pulls back first and
     // pushes in on arrival, so the space is crossed, not slid over.
     to({ x = sp.target[X], y = sp.target[Y], z = sp.target[Z] } = {}, { arc: wantArc = false } = {}) {
+      glide = null
+      hold = null
       const final = clampZ(z)
       sp.to(X, x)
       sp.to(Y, y)
@@ -267,12 +343,34 @@ export function createCamera({ perspective = 800, stiffness = 90, damping = 20 }
           arc = null
         }
       }
+      let flowX = sp.velocity[X] + steer.x
+      let flowY = sp.velocity[Y] + steer.y
+      if (glide) {
+        const gx = glideStep(glide.vx, dt, glideTau)
+        const gy = glideStep(glide.vy, dt, glideTau)
+        sp.set(X, sp.value[X] + gx.travel)
+        sp.set(Y, sp.value[Y] + gy.travel)
+        glide.vx = gx.v
+        glide.vy = gy.v
+        flowX += glide.vx
+        flowY += glide.vy
+        if (Math.hypot(glide.vx, glide.vy) * glide.scale < GLIDE_REST) glide = null
+      }
       // Lean into fast moves, then level out.
-      const bankY = clamp(sp.velocity[X] * 0.002, -7, 7) * bankAmount
-      const bankX = clamp(-sp.velocity[Y] * 0.002, -7, 7) * bankAmount
+      const bankY = clamp(flowX * 0.002, -7, 7) * bankAmount
+      const bankX = clamp(-flowY * 0.002, -7, 7) * bankAmount
       sp.to(RX, room.x + pointerTilt.x + bankX)
       sp.to(RY, room.y + pointerTilt.y + bankY)
-      return sp.step(dt) || Boolean(arc)
+      const moving = sp.step(dt)
+      if (hold) {
+        // Put the held point back under the hand with this frame's lean and
+        // depth. Moving the camera sideways shifts every screen point by the
+        // same world amount, so one correction is exact.
+        const at = camera.screenToWorld(hold.px, hold.py, hold.z)
+        sp.set(X, sp.value[X] + hold.wx - at.x)
+        sp.set(Y, sp.value[Y] + hold.wy - at.y)
+      }
+      return moving || Boolean(arc) || Boolean(glide)
     },
 
     transform() {

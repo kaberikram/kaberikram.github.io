@@ -23,6 +23,19 @@ function check(condition, message) {
 
 const state = (page) => page.evaluate(() => window.__progress.director.getState())
 const hash = (page) => page.evaluate(() => location.hash)
+// A point on open board: at least `clear` px from every card and outside the
+// UI, so a press there grabs the board (phones snap touches to nearby buttons).
+const openSpot = (page, { clear = 48, minY = 80, maxY = Infinity } = {}) => page.evaluate(({ clear, minY, maxY }) => {
+  const rects = [...document.querySelectorAll('.card, .ui, #bar')].map((el) => el.getBoundingClientRect()).filter((r) => r.width && r.height)
+  let best = null
+  for (let y = minY; y < Math.min(innerHeight - 40, maxY); y += 10) {
+    for (let x = 40; x < innerWidth - 40; x += 10) {
+      const gap = Math.min(...rects.map((r) => Math.hypot(Math.max(r.left - x, 0, x - r.right), Math.max(r.top - y, 0, y - r.bottom))))
+      if (gap >= clear && document.elementFromPoint(x, y)?.id === 'stage' && (!best || gap > best.gap)) best = { x, y, gap }
+    }
+  }
+  return best
+}, { clear, minY, maxY })
 const settled = (page) => page.waitForFunction(() => !window.__progress.ticker.running, null, { timeout: 8000 })
 
 async function open(browser, options = {}, suffix = '') {
@@ -155,17 +168,56 @@ const browser = await chromium.launch()
   await page.keyboard.press('Home')
   await settled(page)
 
-  // Drag the board.
-  const before = await page.evaluate(() => ({ x: window.__progress.camera.x, s: window.__progress.camera.scaleAt(window.__progress.camera.pivot) }))
+  // Drag the board. Once the drag starts, the spot grabbed stays under the
+  // pointer exactly, lean and all.
   await page.mouse.move(700, 120)
   await page.mouse.down()
-  await page.mouse.move(600, 120, { steps: 6 })
+  await page.mouse.move(680, 120, { steps: 2 })
+  const grip = await page.evaluate(() => {
+    const c = window.__progress.camera
+    return c.screenToWorld(680, 120, c.pivot)
+  })
+  await page.mouse.move(600, 160, { steps: 6 })
   await page.mouse.move(500, 120, { steps: 6 })
   await page.waitForTimeout(150)
+  const under = await page.evaluate((g) => {
+    const c = window.__progress.camera
+    return c.worldToScreen(g.x, g.y, c.pivot)
+  }, grip)
+  check(Math.hypot(under.x - 500, under.y - 120) < 1.5, `dragging empty space keeps the grabbed spot under the pointer (${under.x.toFixed(1)}, ${under.y.toFixed(1)})`)
+  const stoppedAt = await page.evaluate(() => window.__progress.camera.x)
   await page.mouse.up()
   await settled(page)
-  const after = await page.evaluate(() => window.__progress.camera.x)
-  check(Math.abs((after - before.x) - 200 / before.s) < 6, 'dragging empty space pans the board one-to-one')
+  check(Math.abs((await page.evaluate(() => window.__progress.camera.x)) - stoppedAt) < 0.01, 'a drag that stopped before letting go does not glide')
+
+  // Throw it: let go mid-move and it carries on, then stops. Sent from inside
+  // the page, one move per frame, the way a real pointer arrives.
+  const thrownAt = await page.evaluate(() => window.__progress.camera.x)
+  await page.evaluate(async () => {
+    const stage = document.getElementById('stage')
+    const frame = () => new Promise(requestAnimationFrame)
+    const send = (type, x) => stage.dispatchEvent(new PointerEvent(type, { pointerId: 9, pointerType: 'mouse', isPrimary: true, button: 0, buttons: type === 'pointerup' ? 0 : 1, clientX: x, clientY: 120, bubbles: true }))
+    send('pointerdown', 700)
+    for (let x = 680; x >= 440; x -= 20) {
+      await frame()
+      send('pointermove', x)
+    }
+    send('pointerup', 440)
+  })
+  check(await page.evaluate(() => window.__progress.camera.gliding), 'letting go mid-move throws the board')
+  await page.waitForTimeout(120)
+  // Catch it: a press on the moving board stops it, and is not a click.
+  await page.mouse.down()
+  const caughtAt = await page.evaluate(() => window.__progress.camera.x)
+  // The hand went left, so the camera keeps moving right.
+  check(caughtAt > thrownAt, 'the throw carries on the way the hand was going')
+  await page.waitForTimeout(100)
+  check(await page.evaluate(() => !window.__progress.camera.gliding), 'pressing on a gliding board stops it')
+  await page.mouse.up()
+  await page.waitForTimeout(100)
+  check(!(await state(page)).focus, 'catching the board does not open a card')
+  await page.keyboard.press('Home')
+  await settled(page)
 
   // Pick up a card and put it down somewhere else.
   await page.keyboard.press('Home')
@@ -474,6 +526,56 @@ const browser = await chromium.launch()
   check(s.focus === 'IH0204', 'tapping a card focuses it')
   check(c.w > 300 && c.w <= 390, `the focused card fills the width (${Math.round(c.w)}px)`)
   check(await page.evaluate(() => document.documentElement.classList.contains('is-lean')), 'the lighter phone path is on')
+
+  // A real touch swipe, sent the way a phone sends it.
+  await page.evaluate(() => window.__progress.director.home())
+  await settled(page)
+  const cdp = await context.newCDPSession(page)
+  const touch = (type, x, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id: 1 }] })
+  const spot = await openSpot(page, { clear: 40 })
+  check(Boolean(spot), 'there is open board to swipe on')
+  const start = { x: Math.max(spot.x, 200), y: spot.y }
+  const swipeGrip = await page.evaluate((p) => {
+    const c = window.__progress.camera
+    return { x: c.x, w: c.screenToWorld(p.x, p.y, c.pivot) }
+  }, start)
+  await touch('touchStart', start.x, start.y)
+  for (let i = 1; i <= 10; i++) {
+    await touch('touchMove', start.x - i * 18, start.y)
+    await page.evaluate(() => new Promise(requestAnimationFrame))
+  }
+  const swiped = await page.evaluate((w) => {
+    const c = window.__progress.camera
+    return c.worldToScreen(w.x, w.y, c.pivot)
+  }, swipeGrip.w)
+  // The first step, before the drag starts, is absorbed, never jumped.
+  check(Math.abs(swiped.x - (start.x - 162)) < 2 && Math.abs(swiped.y - start.y) < 2, `a touch drag follows the finger (${swiped.x.toFixed(0)}, ${swiped.y.toFixed(0)})`)
+  await touch('touchEnd')
+  await settled(page)
+  // A flick at a real phone's pace (one move a frame), sent from inside the
+  // page: driven from outside, each touch takes longer than a frame to arrive
+  // and reads as a hand that had stopped.
+  const flick = await openSpot(page, { clear: 40 })
+  const flung = await page.evaluate(async (p) => {
+    const stage = document.getElementById('stage')
+    const c = window.__progress.camera
+    const frame = () => new Promise(requestAnimationFrame)
+    const send = (type, x) => stage.dispatchEvent(new PointerEvent(type, { pointerId: 21, pointerType: 'touch', isPrimary: true, button: 0, buttons: type === 'pointerup' ? 0 : 1, clientX: x, clientY: p.y, bubbles: true }))
+    send('pointerdown', p.x)
+    for (let i = 1; i <= 8; i++) {
+      await frame()
+      send('pointermove', p.x + i * 14)
+    }
+    const before = c.x
+    send('pointerup', p.x + 112)
+    const gliding = c.gliding
+    await frame()
+    await frame()
+    return { gliding, onward: before - c.x }
+  }, { x: Math.min(flick.x, 200), y: flick.y })
+  check(flung.gliding && flung.onward > 0, `a touch flick glides on (${flung.onward.toFixed(1)} units in two frames)`)
+  await settled(page)
+  check(!(await state(page)).focus, 'a swipe does not open a card')
   check(errors.length === 0, `no page errors (${errors.slice(0, 2).join(' | ') || 'none'})`)
   await context.close()
 }
