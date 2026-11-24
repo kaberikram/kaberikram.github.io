@@ -39,6 +39,7 @@ try {
   })
   camera.resize(innerWidth, innerHeight)
   camera.setBank(settings.bank)
+  camera.setGlide(settings.glide)
   stage.style.perspective = `${camera.perspective}px`
 
   const board = createBoard({ world, content })
@@ -98,6 +99,7 @@ try {
   subscribe((next, changed) => {
     camera.setSpring(next.camStiffness, next.camDamping)
     camera.setBank(next.bank)
+    camera.setGlide(next.glide)
     board.syncSprings()
     board.syncEdges()
     if (changed.some((key) => LAYOUT_KEYS.includes(key))) director.reframe()

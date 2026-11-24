@@ -6,6 +6,7 @@
 import { clamp } from '../util.js'
 import { getSettings, isLean, reducedMotion } from '../settings.js'
 import { cue } from '../cue.js'
+import { releaseVelocity, trimSamples } from '../core/fling.js'
 
 // Movement under this many pixels is a click, not a drag.
 const CLICK_SLOP = 6
@@ -20,10 +21,51 @@ export function initInput({ stage, camera, board, director, ticker }) {
     return Boolean(target.closest('input, textarea, select, [contenteditable], #tune-panel, #bar, #sound'))
   }
 
+  function newDrag(e, extra = {}) {
+    return {
+      id: null,
+      mode: 'pending',
+      travelled: 0,
+      pointerId: e.pointerId,
+      downX: e.clientX,
+      downY: e.clientY,
+      px: e.clientX,
+      py: e.clientY,
+      // Every position the hand reported, with its own timestamp, for the
+      // speed at release. Coalesced events included: a phone samples touches
+      // faster than it draws.
+      samples: [{ t: e.timeStamp, x: e.clientX, y: e.clientY }],
+      vx: 0,
+      vy: 0,
+      caught: false,
+      ...extra,
+    }
+  }
+
+  function record(e) {
+    const list = e.getCoalescedEvents ? e.getCoalescedEvents() : []
+    for (const c of list.length ? list : [e]) drag.samples.push({ t: c.timeStamp, x: c.clientX, y: c.clientY })
+    trimSamples(drag.samples)
+    // The hand's speed right now, for the lean. Same fit as the throw.
+    const v = releaseVelocity(drag.samples, e.timeStamp)
+    drag.vx = v.x
+    drag.vy = v.y
+  }
+
+  function startPan() {
+    drag.mode = 'pan'
+    if (director.getState().focus) director.unfocus({ keepCamera: true })
+    // Grab the board where the finger is now, so the few pixels it moved
+    // before this counted as a drag do not make the board jump.
+    camera.grab(drag.px, drag.py, camera.pivot)
+    ticker.wake()
+  }
+
   function beginPinch() {
     const [a, b] = [...pointers.values()]
     pinch = { dist: Math.hypot(a.x - b.x, a.y - b.y) || 1, mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 }
     if (drag && drag.mode === 'card') putDown(drag)
+    if (camera.held) camera.release()
     drag = null
   }
 
@@ -68,26 +110,21 @@ export function initInput({ stage, camera, board, director, ticker }) {
   stage.addEventListener('pointerdown', (e) => {
     if (e.button !== undefined && e.button > 0) return
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
-    stage.setPointerCapture(e.pointerId)
+    // Can throw if the pointer is already gone; the press still counts.
+    try { stage.setPointerCapture(e.pointerId) } catch {}
     if (pointers.size === 2) {
       beginPinch()
       return
     }
     if (pointers.size > 2) return
     const card = e.target.closest ? e.target.closest('.card') : null
-    drag = {
-      id: card ? card.dataset.id : null,
-      mode: 'pending',
-      travelled: 0,
-      downX: e.clientX,
-      downY: e.clientY,
-      px: e.clientX,
-      py: e.clientY,
-      t: performance.now(),
-      vx: 0,
-      vy: 0,
-    }
+    // A finger landing on a gliding board stops it, the way a phone's lists do.
+    // That touch is a catch, so lifting it again does not open a card.
+    // A flight the director started carries on until the finger actually drags.
+    const caught = camera.gliding && camera.stop()
+    drag = newDrag(e, { id: card ? card.dataset.id : null, caught })
     stage.classList.add('is-dragging')
+    ticker.wake()
   })
 
   stage.addEventListener('pointermove', (e) => {
@@ -103,8 +140,6 @@ export function initInput({ stage, camera, board, director, ticker }) {
     }
     const point = pointers.get(e.pointerId)
     if (!point) return
-    const dx = e.clientX - point.x
-    const dy = e.clientY - point.y
     point.x = e.clientX
     point.y = e.clientY
 
@@ -122,29 +157,22 @@ export function initInput({ stage, camera, board, director, ticker }) {
       ticker.wake()
       return
     }
-    if (!drag) return
+    if (!drag || e.pointerId !== drag.pointerId) return
 
-    const now = performance.now()
-    const dt = Math.max(1, now - drag.t) / 1000
-    drag.t = now
     drag.px = e.clientX
     drag.py = e.clientY
-    // Smoothed pointer speed in screen px/s, for the glide and the lean.
-    drag.vx += (dx / dt - drag.vx) * 0.35
-    drag.vy += (dy / dt - drag.vy) * 0.35
-    drag.travelled += Math.abs(dx) + Math.abs(dy)
+    record(e)
+    drag.travelled = Math.max(drag.travelled, Math.hypot(e.clientX - drag.downX, e.clientY - drag.downY))
 
     if (drag.mode === 'pending' && drag.travelled > CLICK_SLOP) {
-      if (!drag.id || !pickUp()) {
-        drag.mode = 'pan'
-        if (director.getState().focus) director.unfocus({ keepCamera: true })
-      }
+      // Catching a moving board and carrying on is always a pan, even on a card.
+      if (drag.caught || !drag.id || !pickUp()) startPan()
     }
 
     if (drag.mode === 'pan') {
-      // Measured at the depth being looked at, so that depth follows the hand.
-      const scale = camera.scaleAt(camera.pivot)
-      camera.jump({ x: camera.x - dx / scale, y: camera.y - dy / scale })
+      // The camera keeps the grabbed point under the finger; it re-solves
+      // once per frame, after the lean has moved.
+      camera.drag(drag.px, drag.py, drag.vx, drag.vy)
       ticker.wake()
     } else if (drag.mode === 'card') {
       follow()
@@ -155,6 +183,16 @@ export function initInput({ stage, camera, board, director, ticker }) {
 
   function release(e) {
     if (!pointers.delete(e.pointerId)) return
+    if (pinch && pointers.size === 1) {
+      // One finger of a pinch lifted: the other carries on panning from where
+      // it is, instead of the board freezing until both are off the glass.
+      pinch = null
+      const [[id, point]] = [...pointers]
+      drag = newDrag({ pointerId: id, clientX: point.x, clientY: point.y, timeStamp: e.timeStamp }, { caught: true })
+      drag.travelled = CLICK_SLOP + 1
+      startPan()
+      return
+    }
     if (pointers.size < 2) pinch = null
     if (pointers.size > 0) return
     stage.classList.remove('is-dragging')
@@ -163,19 +201,16 @@ export function initInput({ stage, camera, board, director, ticker }) {
     if (!ended) return
 
     if (ended.mode === 'pending') {
-      if (e.type === 'pointercancel') return
+      if (e.type === 'pointercancel' || ended.caught) return
       if (ended.id) director.focus(ended.id)
       else director.unfocus()
     } else if (ended.mode === 'pan') {
-      // Let go mid-move and the board glides on a little.
-      if (performance.now() - ended.t < 80) {
-        const scale = camera.scaleAt(camera.pivot)
-        camera.to({
-          x: camera.x - (ended.vx * 0.22) / scale,
-          y: camera.y - (ended.vy * 0.22) / scale,
-        })
-        ticker.wake()
-      }
+      // Let go mid-move and the board carries on at the hand's speed, slowing
+      // the way a phone's own scrolling does. A hand that stopped first, or a
+      // cancelled touch, throws nothing.
+      const v = e.type === 'pointercancel' || reducedMotion() ? { x: 0, y: 0 } : releaseVelocity(ended.samples, e.timeStamp)
+      camera.release(v.x, v.y)
+      ticker.wake()
     } else if (ended.mode === 'card') {
       putDown(ended)
     }
